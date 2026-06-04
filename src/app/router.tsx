@@ -10,20 +10,17 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import GuestRoute from "@/components/GuestRoute";
 import NotFound from "@/pages/NotFound";
 import { useAppSelector } from "@/store/hooks";
-import { Spinner } from "@/components/ui/spinner";
+import { HomePageSkeleton } from "@/pages/HomePage/HomePageSkeleton";
+import Search from "@/pages/search/Search";
+import VideoDetails from "@/pages/videodetails/VideoDetails";
+import TvDetails from "@/pages/tvstreaming/TvDetails";
+import MoviesTab from "@/pages/movies/MoviesTab";
 
 function RootRedirect() {
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full min-h-screen">
-        <div className="flex flex-col items-center gap-2">
-          <Spinner />
-          <span className="text-sm text-muted-foreground">Loading...</span>
-        </div>
-      </div>
-    );
+    return <HomePageSkeleton />;
   }
 
   if (!isAuthenticated || !user) {
@@ -77,6 +74,22 @@ export const appRoutes: RouteObject[] = [
       {
         path: "projects",
         element: <div>My Projects</div>,
+      },
+      {
+        path: "search",
+        element: <Search />,
+      },
+      {
+        path: "video/:id",
+        element: <VideoDetails />,
+      },
+      {
+        path: "tv",
+        element: <TvDetails />,
+      },
+      {
+        path: "movies",
+        element: <MoviesTab />,
       },
       {
         path: "settings",

@@ -2,7 +2,7 @@ import React from "react";
 import { useAppSelector } from "@/store/hooks";
 import { Navigate } from "react-router-dom";
 import NotFound from "@/pages/NotFound";
-import { Spinner } from "@/components/ui/spinner";
+import { HomePageSkeleton } from "@/pages/HomePage/HomePageSkeleton";
 
 interface Props {
   allowedRoles: string[];
@@ -13,14 +13,7 @@ export default function ProtectedRoute({ allowedRoles, children }: Props) {
   const { user, token, loading, isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full min-h-screen">
-        <div className="flex flex-col items-center gap-2">
-          <Spinner />
-          <span className="text-sm text-muted-foreground">Loading...</span>
-        </div>
-      </div>
-    )
+    return <HomePageSkeleton />;
   }
 
   if (!isAuthenticated || !token || !user) {
