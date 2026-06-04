@@ -1,35 +1,19 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ReactNode } from "react";
+import { Navbar } from "@/components/navbar/Navbar";
 
 type Props = {
-  children: React.ReactNode
-}
+  children: ReactNode;
+};
 
 export default function Layout({ children }: Props) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
+    <div className="min-h-screen bg-[#141414] text-white flex flex-col relative pb-16 md:pb-0">
+      <Navbar />
 
-      <SidebarInset>
-        {/* Top bar */}
-        <header className="flex h-12 items-center justify-between border-b px-4">
-          <div className="flex items-center">
-            <SidebarTrigger />
-            <h1 className="ml-4 font-semibold">Dashboard</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <div className="flex-1 p-4">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
-  )
+      {/* Main Content */}
+      <main className="flex-1 w-full max-w-[100vw] overflow-x-hidden">
+        {children}
+      </main>
+    </div>
+  );
 }
