@@ -54,8 +54,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   /* --primary: #0AC4E0; */
-  --primary: #E50813;
-  --primary-foreground: #fff;
+  --primary-foreground: #E50813;
+  --primary: #fff;
   --secondary: #000000;
   --secondary-foreground: #ECBA12;
   --muted: oklch(0.97 0 0);
