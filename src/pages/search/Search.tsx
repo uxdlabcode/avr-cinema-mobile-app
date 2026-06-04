@@ -37,16 +37,16 @@ const Search = () => {
     const user = useSelector((state: RootState) => state.auth.user);
 
     useEffect(() => {
-        if (user?.uid) {
-            dispatch(fetchInitialHistory(user.uid));
+        if (user?.id) {
+            dispatch(fetchInitialHistory(user.id));
         }
     }, [dispatch, user]);
 
     const performSearch = (searchQuery: string) => {
-        if (!searchQuery.trim() || !user?.uid) return;
+        if (!searchQuery.trim() || !user?.id) return;
 
         setIsSearching(true);
-        dispatch(saveSearch({ uid: user.uid, query: searchQuery.trim() }));
+        dispatch(saveSearch({ uid: user.id, query: searchQuery.trim() }));
 
         setTimeout(() => {
             // Mocking the Top Result
