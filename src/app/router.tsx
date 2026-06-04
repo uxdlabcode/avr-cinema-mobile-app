@@ -67,7 +67,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "dashboard",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
             <UserDashboard />
           </ProtectedRoute>
         ),

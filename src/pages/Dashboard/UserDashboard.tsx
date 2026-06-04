@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 import { Plus, Clipboard, FileText, MessageSquare, CheckCircle, ChevronRight, Star, Calendar, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -323,6 +325,7 @@ const LoadingSkeleton = () => {
 };
 
 export const UserDashboard = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -343,7 +346,7 @@ export const UserDashboard = () => {
           <div className="space-y-1">
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-                Superadmin Portal
+                Welcome back{user?.name ? `, ${user.name}` : ''}
               </h1>
             </div>
             <p className="text-muted-foreground text-base">

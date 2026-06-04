@@ -38,9 +38,12 @@ export const loginAsync = createAsyncThunk(
 
       const role = (userDoc?.role || "user").toLowerCase();
       
+      // Get the actual JWT token
+      const token = await authRes.user.getIdToken();
+
       return {
         user: { id: userDoc?.id || authRes.user?.uid || "", email: credentials.email, role, name: userDoc?.name },
-        accessToken: "firebase-managed-token",
+        accessToken: token,
       };
     } catch (error: any) {
       return rejectWithValue(error.message || "Login failed");
@@ -66,10 +69,19 @@ export const signupAsync = createAsyncThunk(
       };
       
       await createDocument("users", authRes.uid, newUser);
+      
+      // Import auth dynamically or just get it if it's available, 
+      // but emailPasswordSignUp doesn't return the full user credential.
+      // So let's get the token directly from the auth instance.
+      const { auth } = await import("@/Firebase/firebase");
+      let token = "firebase-managed-token";
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+      }
 
       return {
         user: { id: authRes.uid, email: credentials.email, role: "user", name: credentials.name },
-        accessToken: "firebase-managed-token",
+        accessToken: token,
       };
     } catch (error: any) {
       return rejectWithValue(error.message || "Signup failed");

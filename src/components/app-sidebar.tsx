@@ -81,7 +81,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar()
-  const user = useSelector((state: RootState) => state.user)
+  const user = useSelector((state: RootState) => state.auth.user)
 
   const navItems = data.superadminNav
   
@@ -115,8 +115,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={{
-          name: 'Super Admin',
-          email: user?.email || 'admin@avr.com',
+          name: user?.name || 'User',
+          email: user?.email || '',
           avatar: data.user.avatar
         }} />
       </SidebarFooter>
