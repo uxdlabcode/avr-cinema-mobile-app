@@ -64,7 +64,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
         </div>
         <Field className="gap-2">
           <FieldLabel htmlFor="email" className="text-primary/90">Email Address</FieldLabel>
-          <Input id="email" name="email" type="email" placeholder="sarah@gmail.com" required className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" />
+          <Input id="email" name="email" type="email" placeholder="sarah@gmail.com" required className=" bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" />
         </Field>
         <Field className="gap-2">
           <FieldLabel htmlFor="password" className="text-primary/90">Password</FieldLabel>

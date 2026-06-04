@@ -10,7 +10,7 @@ import { ThemeProvider } from "next-themes";
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <BrowserRouter>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
         <App />
         <Toaster position="top-right" />
       </ThemeProvider>
