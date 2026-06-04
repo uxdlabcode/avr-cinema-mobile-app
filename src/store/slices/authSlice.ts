@@ -31,7 +31,7 @@ export const loginAsync = createAsyncThunk(
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const authRes = await emailPasswordLogin(credentials.email, credentials.password);
-      if (!authRes || typeof authRes === 'boolean' || authRes.error) {
+      if (!authRes || typeof authRes === 'boolean') {
         return rejectWithValue("Invalid credentials");
       }
 
@@ -65,7 +65,7 @@ export const signupAsync = createAsyncThunk(
   async (credentials: { email: string; password: string; name: string }, { rejectWithValue }) => {
     try {
       const authRes = await emailPasswordSignUp(credentials.name, credentials.email, credentials.password);
-      if (authRes.error) {
+      if ('error' in authRes) {
         return rejectWithValue(authRes.message);
       }
 

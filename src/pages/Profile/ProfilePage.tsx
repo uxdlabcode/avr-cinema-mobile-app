@@ -142,15 +142,15 @@ export const ProfilePage = () => {
 
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="flex items-center justify-between p-4 rounded-2xl bg-card border border-red-500/30 hover:bg-red-500/10 transition-colors group mt-1 shadow-sm"
+                className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border hover:bg-white/5 transition-colors group mt-1 shadow-sm"
               >
                 <div className="flex items-center gap-4">
                   <div className="p-2.5 rounded-full bg-red-500/10 text-red-500 group-hover:scale-110 transition-transform">
                     <Trash2 className="w-5 h-5" />
                   </div>
-                  <span className="font-semibold text-sm text-red-500">Delete Account</span>
+                  <span className="font-semibold text-sm text-white">Delete Account</span>
                 </div>
-                <ChevronRight className="w-5 h-5 text-red-500/50 group-hover:text-red-500 transition-colors" />
+                <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
               </button>
             </div>
           </div>
