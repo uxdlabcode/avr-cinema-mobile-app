@@ -6,6 +6,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react"
+import { Link } from "react-router-dom"
 
 import {
   Avatar,
@@ -88,9 +89,11 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem asChild>
+                <Link to="/profile">
+                  <BadgeCheck />
+                  Account
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />

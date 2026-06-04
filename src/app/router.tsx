@@ -4,6 +4,8 @@ import Layout from "./layout/Layout";
 import Signin from "@/pages/Auth/Signin";
 import Signup from "@/pages/Auth/Signup";
 import { UserDashboard } from "@/pages/Dashboard/UserDashboard";
+import { ProfilePage } from "@/pages/Profile/ProfilePage";
+import { UpdateProfilePage } from "@/pages/Profile/UpdateProfilePage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import GuestRoute from "@/components/GuestRoute";
 import NotFound from "@/pages/NotFound";
@@ -80,8 +82,24 @@ export const appRoutes: RouteObject[] = [
         path: "settings",
         element: <HomePage />,
       },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "update-profile",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <UpdateProfilePage />
+          </ProtectedRoute>
+        ),
+      },
     ],
-  }, 
+  },
   {
     path: "*",
     element: <NotFound />,

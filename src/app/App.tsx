@@ -28,6 +28,8 @@ function App() {
                 email: user.email || "",
                 role,
                 name: userDoc?.name,
+                phone: userDoc?.phone || "",
+                avatar: userDoc?.avatar || "",
               },
               token,
             })

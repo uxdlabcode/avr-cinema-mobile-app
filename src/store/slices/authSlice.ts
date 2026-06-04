@@ -6,6 +6,8 @@ interface User {
   email: string;
   role: string;
   name?: string;
+  phone?: string;
+  avatar?: string;
 }
 
 interface AuthState {
@@ -42,7 +44,14 @@ export const loginAsync = createAsyncThunk(
       const token = await authRes.user.getIdToken();
 
       return {
-        user: { id: userDoc?.id || authRes.user?.uid || "", email: credentials.email, role, name: userDoc?.name },
+        user: { 
+          id: userDoc?.id || authRes.user?.uid || "", 
+          email: credentials.email, 
+          role, 
+          name: userDoc?.name,
+          phone: userDoc?.phone,
+          avatar: userDoc?.avatar
+        },
         accessToken: token,
       };
     } catch (error: any) {
@@ -80,7 +89,14 @@ export const signupAsync = createAsyncThunk(
       }
 
       return {
-        user: { id: authRes.uid, email: credentials.email, role: "user", name: credentials.name },
+        user: { 
+          id: authRes.uid, 
+          email: credentials.email, 
+          role: "user", 
+          name: credentials.name,
+          phone: "",
+          avatar: ""
+        },
         accessToken: token,
       };
     } catch (error: any) {
@@ -107,6 +123,14 @@ const authSlice = createSlice({
     },
     setAuthLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
+    },
+    updateAuthUser(state, action: PayloadAction<{ name?: string; phone?: string; avatar?: string }>) {
+      if (state.user) {
+        state.user = {
+          ...state.user,
+          ...action.payload,
+        };
+      }
     }
   },
   extraReducers: (builder) => {
@@ -144,5 +168,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setAuthUser, setAuthLoading } = authSlice.actions;
+export const { logout, setAuthUser, setAuthLoading, updateAuthUser } = authSlice.actions;
 export default authSlice.reducer;
