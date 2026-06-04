@@ -42,7 +42,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       
       if (signupAsync.fulfilled.match(resultAction)) {
         toast.success("Account created successfully!");
-        navigate("/dashboard");
+        navigate("/membership");
       } else {
         if (resultAction.payload) {
           toast.error(resultAction.payload as string);

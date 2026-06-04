@@ -15,6 +15,7 @@ import Search from "@/pages/search/Search";
 import VideoDetails from "@/pages/videodetails/VideoDetails";
 import TvDetails from "@/pages/tvstreaming/TvDetails";
 import MoviesTab from "@/pages/movies/MoviesTab";
+import Membership from "@/pages/membership/Membership";
 
 function RootRedirect() {
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -108,6 +109,14 @@ export const appRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
             <UpdateProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "membership",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <Membership />
           </ProtectedRoute>
         ),
       },
