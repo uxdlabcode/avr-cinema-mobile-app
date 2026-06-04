@@ -2,18 +2,18 @@ import { HomePage } from "@/pages/HomePage/HomePage";
 import { Outlet, type RouteObject, Navigate } from "react-router-dom";
 import Layout from "./layout/Layout";
 import Signin from "@/pages/Auth/Signin";
+import Signup from "@/pages/Auth/Signup";
 import { UserDashboard } from "@/pages/Dashboard/UserDashboard";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import GuestRoute from "@/components/GuestRoute";
 import NotFound from "@/pages/NotFound";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
+import { useAppSelector } from "@/store/hooks";
 import { Spinner } from "@/components/ui/spinner";
 
 function RootRedirect() {
-  const user = useSelector((state: RootState) => state.user);
+  const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
 
-  if (user.loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-full min-h-screen">
         <div className="flex flex-col items-center gap-2">
@@ -24,7 +24,7 @@ function RootRedirect() {
     );
   }
 
-  if (!user.uid) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/signin" replace />;
   }
 
@@ -49,6 +49,14 @@ export const appRoutes: RouteObject[] = [
     element: (
       <GuestRoute>
         <Signin />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: "signup",
+    element: (
+      <GuestRoute>
+        <Signup />
       </GuestRoute>
     ),
   },

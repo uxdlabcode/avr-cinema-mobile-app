@@ -2,21 +2,18 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
-// import { emailPasswordLogin, getMatchingData } from "@/Firebase"; // Removed Firebase for JWT
 import { useAppDispatch } from "@/store/hooks";
-import { loginAsync } from "@/store/slices/authSlice";
+import { signupAsync } from "@/store/slices/authSlice";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-// import { auth } from "@/Firebase/firebase";
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
+export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -27,21 +24,28 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     e.preventDefault();
     setLoading(true);
     const fd = new FormData(e.currentTarget);
+    const name = (fd.get("name") as string) || "";
     const email = (fd.get("email") as string) || "";
     const password = (fd.get("password") as string) || "";
+    const confirmPassword = (fd.get("confirmPassword") as string) || "";
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Dispatch JWT login action
-      const resultAction = await dispatch(loginAsync({ email, password }));
+      const resultAction = await dispatch(signupAsync({ name, email, password }));
       
-      if (loginAsync.fulfilled.match(resultAction)) {
-        toast.success("Login successful");
+      if (signupAsync.fulfilled.match(resultAction)) {
+        toast.success("Account created successfully!");
         navigate("/dashboard");
       } else {
         if (resultAction.payload) {
           toast.error(resultAction.payload as string);
         } else {
-          toast.error("Login failed");
+          toast.error("Signup failed");
         }
       }
     } catch (err) {
@@ -55,30 +59,30 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Login to your account</h1>
+          <h1 className="text-2xl font-bold">Create an account</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Enter your email below to login to your account
+            Enter your details below to sign up
           </p>
         </div>
+        <Field>
+          <FieldLabel htmlFor="name">Full Name</FieldLabel>
+          <Input id="name" name="name" type="text" placeholder="John Doe" required />
+        </Field>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input id="email" name="email" type="email" placeholder="m@example.com" required />
         </Field>
         <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
-              Forgot your password?
-            </a>
-          </div>
+          <FieldLabel htmlFor="password">Password</FieldLabel>
           <div className="relative">
             <Input
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
               required
-              placeholder="Enter your password"
+              placeholder="Create a password"
               disabled={loading}
+              minLength={6}
             />
             <button
               type="button"
@@ -91,40 +95,38 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           </div>
         </Field>
         <Field>
+          <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showPassword ? "text" : "password"}
+              required
+              placeholder="Confirm your password"
+              disabled={loading}
+              minLength={6}
+            />
+          </div>
+        </Field>
+        <Field>
           <Button type="submit" className="cursor-pointer" disabled={loading}>
             {loading ? (
               <span className="inline-flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 animate-spin"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                  ></path>
+                <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                 </svg>
-                Logging in...
+                Creating account...
               </span>
             ) : (
-              "Login"
+              "Sign up"
             )}
           </Button>
         </Field>
         <div className="text-center text-sm text-muted-foreground mt-4">
-          Don't have an account?{" "}
-          <Link to="/signup" className="underline underline-offset-4 hover:text-primary">
-            Sign up
+          Already have an account?{" "}
+          <Link to="/signin" className="underline underline-offset-4 hover:text-primary">
+            Sign in
           </Link>
         </div>
       </FieldGroup>

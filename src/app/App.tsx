@@ -1,40 +1,43 @@
 import { useEffect } from "react";
 import { useRoutes } from "react-router-dom";
 import { appRoutes } from "./router";
+import { useAppDispatch } from "@/store/hooks";
+import { setAuthUser, setAuthLoading, logout } from "@/store/slices/authSlice";
 import { onAuthStateChanged } from "firebase/auth";
-import {  getMatchingData } from "@/Firebase";
-import { useDispatch } from "react-redux";
-import { setUser, clearUser } from "@/store/userSlice";
+import { getMatchingData } from "@/Firebase";
 import { auth } from "@/Firebase/firebase";
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Fetch role from Firestore if user is authenticated
-        const users = await getMatchingData("users", "email", "==", user.email);
-        const userDoc = users && users.length > 0 ? users[0] : null;
-        const role = (userDoc?.role || "").toLowerCase();
+        try {
+          const users = await getMatchingData("users", "email", "==", user.email);
+          const userDoc = users && users.length > 0 ? users[0] : null;
+          const role = (userDoc?.role || "user").toLowerCase();
 
-        if (role === "superadmin") {
           dispatch(
-            setUser({
-              uid: user.uid,
-              email: user.email,
-              role: role,
+            setAuthUser({
+              user: {
+                id: userDoc?.id || user.uid,
+                email: user.email || "",
+                role,
+                name: userDoc?.name,
+              },
+              token: "firebase-managed-token",
             })
           );
-        } else {
-          await auth.signOut();
-          dispatch(clearUser());
+        } catch (error) {
+          console.error("Error hydrating user", error);
+          dispatch(logout());
         }
       } else {
-        dispatch(clearUser());
+        dispatch(logout());
       }
     });
-
+    
     return () => unsubscribe();
   }, [dispatch]);
 

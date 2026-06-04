@@ -1,6 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
+import { useAppSelector } from "@/store/hooks";
 import { Navigate } from "react-router-dom";
 import NotFound from "@/pages/NotFound";
 import { Spinner } from "@/components/ui/spinner";
@@ -11,9 +10,9 @@ interface Props {
 }
 
 export default function ProtectedRoute({ allowedRoles, children }: Props) {
-  const user = useSelector((state: RootState) => state.user);
+  const { user, token, loading, isAuthenticated } = useAppSelector((state) => state.auth);
 
-  if (user.loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-full min-h-screen">
         <div className="flex flex-col items-center gap-2">
@@ -24,7 +23,7 @@ export default function ProtectedRoute({ allowedRoles, children }: Props) {
     )
   }
 
-  if (!user || !user.uid) {
+  if (!isAuthenticated || !token || !user) {
     return <Navigate to="/signin" replace />;
   }
 
