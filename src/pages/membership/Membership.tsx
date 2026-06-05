@@ -37,7 +37,7 @@ export default function Membership() {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const dispatch = useAppDispatch();
-    const { plans, loading } = useAppSelector((state) => state.membership);
+    const { plans, loading, paymentProcessing } = useAppSelector((state) => state.membership);
     const { user } = useAppSelector((state) => state.auth);
     const [localLoadingPlan, setLocalLoadingPlan] = useState<string | null>(null);
     const [paymentError, setPaymentError] = useState<string | null>(null);
@@ -54,9 +54,10 @@ export default function Membership() {
             dispatch(setPlans(sortedData));
             dispatch(setLoading(false));
         }, (error) => {
-            console.error("Error fetching plans realtime:", error);
+            console.error("Error fetching plans:", error);
             dispatch(setError(error.message));
             dispatch(setLoading(false));
+            toast.error("Failed to load plans");
         });
 
         return () => unsubscribe();
@@ -67,18 +68,26 @@ export default function Membership() {
     };
 
     const handleSelectPlan = async (plan: Plan) => {
+        // Clear previous errors
+        setPaymentError(null);
+
         if (!user) {
-            toast.error("Please sign in to subscribe to a plan");
+            toast.error("Please sign in to subscribe");
+            navigate("/login");
             return;
         }
 
-        // Prevent double-clicks while processing
-        if (localLoadingPlan) return;
+        if (localLoadingPlan) {
+            toast.info("Please wait, processing...");
+            return;
+        }
 
+        // Set loading state for this specific plan
         setLocalLoadingPlan(plan.id);
-        setPaymentError(null);
-        
+
         try {
+            console.log("Creating order for plan:", plan.id, "Price:", plan.monthlyPrice);
+
             const resultAction = await dispatch(createRazorpayOrderAsync({
                 planId: plan.id,
                 price: plan.monthlyPrice,
@@ -86,53 +95,28 @@ export default function Membership() {
                 description: plan.description,
                 userId: user.id,
             }));
-            
+
+            console.log("Order creation result:", resultAction);
+
             if (createRazorpayOrderAsync.fulfilled.match(resultAction)) {
                 const { orderId, amount, currency } = resultAction.payload;
-                
-                const options: any = {
+
+                console.log("Order created:", orderId, amount, currency);
+
+                // Check if Razorpay is loaded
+                if (!window.Razorpay) {
+                    throw new Error("Razorpay SDK not loaded. Please refresh the page.");
+                }
+
+                const options = {
                     key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-                    amount: amount.toString(),
+                    amount: amount,
                     currency: currency,
                     name: "AVR Cinema",
                     description: `${plan.name} - Monthly Subscription`,
-                    image: LogoImage,
                     order_id: orderId,
-                    handler: async (res: any) => {
-                        // Payment was successful — now verify on server
-                        try {
-                            toast.loading("Verifying payment...", { id: "payment-verify" });
-
-                            const verifyAction = await dispatch(verifyRazorpayPaymentAsync({
-                                razorpay_order_id: res.razorpay_order_id,
-                                razorpay_payment_id: res.razorpay_payment_id,
-                                razorpay_signature: res.razorpay_signature,
-                                userId: user.id,
-                                planId: plan.id,
-                                amount: amount,
-                                currency: currency
-                            }));
-
-                            toast.dismiss("payment-verify");
-
-                            if (verifyRazorpayPaymentAsync.fulfilled.match(verifyAction)) {
-                                toast.success("Payment successful! 🎉");
-                                setSearchParams({ success: "true" });
-                            } else {
-                                const errorMsg = "Payment verification failed. Please contact support.";
-                                setPaymentError(errorMsg);
-                                toast.error(errorMsg);
-                            }
-                        } catch (err: any) {
-                            toast.dismiss("payment-verify");
-                            const errorMsg = "Payment verification error. Your payment may have been processed. Please contact support.";
-                            setPaymentError(errorMsg);
-                            toast.error(errorMsg);
-                            console.error("Verification error", err);
-                        }
-                    },
                     prefill: {
-                        name: user.displayName || "",
+                        name: user.displayName || user.email?.split('@')[0] || "",
                         email: user.email || "",
                         contact: user.phone || "",
                     },
@@ -146,64 +130,72 @@ export default function Membership() {
                     },
                     modal: {
                         ondismiss: () => {
-                            // User closed the Razorpay modal without completing
+                            console.log("Payment modal closed");
                             setLocalLoadingPlan(null);
                             toast.info("Payment cancelled");
                         },
-                        confirm_close: true,
-                        escape: true,
                     },
-                    retry: {
-                        enabled: true,
-                        max_count: 3,
+                    handler: async (response: any) => {
+                        console.log("Payment success response:", response);
+
+                        const loadingToast = toast.loading("Verifying payment...");
+
+                        try {
+                            const verifyAction = await dispatch(verifyRazorpayPaymentAsync({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                userId: user.id,
+                                planId: plan.id,
+                                amount: amount,
+                                currency: currency
+                            }));
+
+                            toast.dismiss(loadingToast);
+
+                            if (verifyRazorpayPaymentAsync.fulfilled.match(verifyAction)) {
+                                toast.success("Payment successful! 🎉");
+                                setLocalLoadingPlan(null);
+                                setSearchParams({ success: "true" });
+                            } else {
+                                const errorMsg = (verifyAction.payload as string) || "Verification failed";
+                                console.error("Verification failed:", errorMsg);
+                                toast.error(errorMsg);
+                                setPaymentError(errorMsg);
+                                setLocalLoadingPlan(null);
+                            }
+                        } catch (verifyError: any) {
+                            toast.dismiss(loadingToast);
+                            console.error("Verification error:", verifyError);
+                            toast.error("Payment verification failed");
+                            setPaymentError("Payment verification failed. Please contact support.");
+                            setLocalLoadingPlan(null);
+                        }
                     },
                 };
 
-                const rzp = new Razorpay(options);
+                const razorpay = new window.Razorpay(options);
 
-                rzp.on("payment.failed", function (response: any) {
-                    const errorDesc = response?.error?.description || "Payment failed";
-                    const errorCode = response?.error?.code || "";
-                    const errorReason = response?.error?.reason || "";
-                    
-                    console.error("Payment Failed:", { errorDesc, errorCode, errorReason });
-
-                    let userMessage = "Payment failed. ";
-
-                    // Map Razorpay error codes to user-friendly messages
-                    if (errorCode === "BAD_REQUEST_ERROR") {
-                        if (errorReason === "payment_failed") {
-                            userMessage += "Your bank declined the transaction. Please try a different payment method.";
-                        } else if (errorDesc.includes("OTP")) {
-                            userMessage += "OTP verification failed. Please try again after some time.";
-                        } else {
-                            userMessage += "There was an issue with the payment details. Please try again.";
-                        }
-                    } else if (errorCode === "GATEWAY_ERROR") {
-                        userMessage += "Your bank is currently facing issues. Please try again later or use a different payment method.";
-                    } else if (errorCode === "SERVER_ERROR") {
-                        userMessage += "A temporary server error occurred. Please try again after a few minutes.";
-                    } else {
-                        userMessage += errorDesc;
-                    }
-
-                    setPaymentError(userMessage);
-                    toast.error(userMessage, { duration: 6000 });
+                razorpay.on('payment.failed', (response: any) => {
+                    console.error("Payment failed:", response.error);
+                    const errorMsg = response.error?.description || "Payment failed. Please try again.";
+                    toast.error(errorMsg);
+                    setPaymentError(errorMsg);
                     setLocalLoadingPlan(null);
                 });
 
-                rzp.open();
+                razorpay.open();
             } else {
-                const errorMsg = (resultAction.payload as string) || "Failed to create payment order. Please try again.";
-                setPaymentError(errorMsg);
+                const errorMsg = (resultAction.payload as string) || "Failed to create order";
+                console.error("Order creation failed:", errorMsg);
                 toast.error(errorMsg);
+                setPaymentError(errorMsg);
                 setLocalLoadingPlan(null);
             }
         } catch (err: any) {
-            const errorMsg = "Something went wrong. Please try again.";
-            setPaymentError(errorMsg);
-            toast.error(errorMsg);
             console.error("Payment error:", err);
+            toast.error(err.message || "Something went wrong");
+            setPaymentError(err.message || "Payment failed");
             setLocalLoadingPlan(null);
         }
     };
@@ -219,12 +211,19 @@ export default function Membership() {
                 onClick={handleSkip}
                 className="absolute top-6 right-6 text-zinc-400 hover:text-white font-medium text-sm transition-colors z-10 flex items-center gap-1 bg-zinc-900/50 py-1.5 px-3 rounded-full border border-zinc-800"
             >
-                Skip
+                Skip for now
             </button>
 
-            {/* Fixed Logo at the top */}
+            {/* Logo */}
             <div className="fixed top-0 left-0 right-0 pt-4 flex justify-center z-50 pointer-events-none bg-gradient-to-b from-black/80 to-transparent pb-4">
-                <img src={LogoImage} alt="AVR Cinema" className="h-10 md:h-14 w-auto object-contain" />
+                <img
+                    src={LogoImage}
+                    alt="AVR Cinema"
+                    className="h-10 md:h-14 w-auto object-contain"
+                    onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                    }}
+                />
             </div>
 
             <div className="max-w-2xl mx-auto pt-20">
@@ -330,11 +329,16 @@ export default function Membership() {
                                                 disabled={!!localLoadingPlan}
                                             >
                                                 {localLoadingPlan === plan.id ? (
-                                                    <Spinner className="w-4 h-4 mr-2 border-black" />
+                                                    <>
+                                                        <Spinner className="w-4 h-4 mr-2 border-black" />
+                                                        Processing...
+                                                    </>
                                                 ) : (
-                                                    <Crown className="w-4 h-4 mr-2" />
+                                                    <>
+                                                        <Crown className="w-4 h-4 mr-2" />
+                                                        Select {plan.name}
+                                                    </>
                                                 )}
-                                                {localLoadingPlan === plan.id ? "Processing..." : `Select ${plan.name}`}
                                             </Button>
                                             {plan.yearlyPrice > 0 && (
                                                 <p className="text-center text-xs text-zinc-500 mt-3">

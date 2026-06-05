@@ -1,13 +1,19 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import { emailPasswordLogin, emailPasswordSignUp, getMatchingData, createDocument } from "@/Firebase";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   role: string;
   name?: string;
+  displayName?: string;
   phone?: string;
   avatar?: string;
+  membershipPlanId?: string;
+  membershipStatus?: string;
+  membershipStartDate?: number;
+  membershipExpiryDate?: number;
+  lastPaymentId?: string;
 }
 
 interface AuthState {
