@@ -61,6 +61,14 @@ export const appRoutes: RouteObject[] = [
     ),
   },
   {
+    path: "membership",
+    element: (
+      <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+        <Membership />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/",
     element: <LayoutWrapper />,
     children: [
@@ -109,14 +117,6 @@ export const appRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
             <UpdateProfilePage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "membership",
-        element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
-            <Membership />
           </ProtectedRoute>
         ),
       },
