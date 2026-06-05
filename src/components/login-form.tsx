@@ -37,7 +37,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
       if (loginAsync.fulfilled.match(resultAction)) {
         toast.success("Login successful");
-        navigate("/membership");
+        navigate("/dashboard");
       } else {
         if (resultAction.payload) {
           toast.error(resultAction.payload as string);
