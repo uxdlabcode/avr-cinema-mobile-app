@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useRoutes } from "react-router-dom";
+import { useRoutes, useLocation } from "react-router-dom";
 import { appRoutes } from "./router";
 import { useAppDispatch } from "@/store/hooks";
 import { setAuthUser, setAuthLoading, logout } from "@/store/slices/authSlice";
@@ -9,6 +9,12 @@ import { auth } from "@/Firebase/firebase";
 
 function App() {
   const dispatch = useAppDispatch();
+  const { pathname } = useLocation();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {

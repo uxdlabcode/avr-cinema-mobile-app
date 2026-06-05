@@ -17,3 +17,7 @@ export { UserForgotPassword } from "./FirebaseAuth/UserForgotPassword";
 
 // Cloud Storage Functions
 export { UploadImage, deleteImage } from "./CloudStorage/UploadImages";
+
+// Cloudinary Signer Function
+export { getSignedUrl } from "./CloudinarySigner";
+
