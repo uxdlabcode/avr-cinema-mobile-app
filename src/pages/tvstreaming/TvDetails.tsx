@@ -8,6 +8,21 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
+import { getMatchingData, getSignedUrl } from '@/Firebase';
+
+interface TvShowItem {
+  id: string;
+  title: string;
+  description: string;
+  thumbnailUrl: string;
+  signedThumbnailUrl?: string;
+  genres?: string[];
+  duration?: string;
+  releaseYear?: number;
+  category?: string;
+  rating?: string;
+  [key: string]: any;
+}
 
 // Static Data
 const TABS = ['FOR YOU', 'TV GUIDE', 'NEWS', 'SPORTS', 'SHOWS'];
@@ -20,18 +35,6 @@ const LIVE_CHANNELS = [
   { id: 3, name: 'Star Sports', logo: '/assets/cast3.jpg', color: 'from-red-700 to-orange-500' },
   { id: 4, name: 'Sports Net', logo: '/assets/cast1.webp', color: 'from-green-600 to-teal-500' },
   { id: 5, name: 'News Live', logo: '/assets/cast2.webp', color: 'from-purple-700 to-purple-500' },
-];
-
-const HERO_SLIDES = [
-  { id: 1, title: 'The Office', image: '/assets/episode1.webp', rating: '4.5' },
-  { id: 2, title: 'Lord of the Rings', image: '/assets/episode2.webp', rating: '4.8' },
-  { id: 3, title: 'Anweshippin Kandethum', image: '/assets/poster.png', rating: '4.2' },
-];
-
-const LIVE_MOVIES = [
-  { id: 1, title: 'The Office', image: '/assets/episode1.webp' },
-  { id: 2, title: 'Lord of The Rings - The Fellowship', image: '/assets/episode2.webp' },
-  { id: 3, title: 'Anweshippin Kandethum', image: '/assets/poster.png' },
 ];
 
 // Skeleton Loading Component
@@ -88,15 +91,46 @@ const TvDetails = () => {
   const [activeTab, setActiveTab] = useState('FOR YOU');
   const [activeDay, setActiveDay] = useState('TODAY');
   const [isLoading, setIsLoading] = useState(true);
+  const [tvShows, setTvShows] = useState<TvShowItem[]>([]);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Simulate loading
+  // Fetch TV shows from Firestore
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
+    const fetchTvShows = async () => {
+      try {
+        setIsLoading(true);
+        const fetchedShows = await getMatchingData("media", "category", "==", "TV Show");
+
+        const signedShows = await Promise.all(
+          fetchedShows.map(async (show) => {
+            let signedThumb = show.thumbnailUrl || "";
+            if (signedThumb) {
+              try {
+                signedThumb = await getSignedUrl(show.thumbnailUrl);
+              } catch (err) {
+                console.error("Error signing URL:", err);
+              }
+            }
+            return {
+              ...show,
+              signedThumbnailUrl: signedThumb
+            } as TvShowItem;
+          })
+        );
+
+        setTvShows(signedShows);
+      } catch (error) {
+        console.error("Error fetching TV Shows from Firestore:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTvShows();
   }, []);
 
+  // Synchronize carousel slide snaps
   useEffect(() => {
     if (!carouselApi) return;
     setCurrentSlide(carouselApi.selectedScrollSnap());
@@ -105,7 +139,18 @@ const TvDetails = () => {
     });
   }, [carouselApi]);
 
+  // Auto scroll featured hero TV shows every 6 seconds
+  useEffect(() => {
+    if (!carouselApi || tvShows.length === 0) return;
+    const timer = setInterval(() => {
+      carouselApi.scrollNext();
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [carouselApi, tvShows]);
+
   if (isLoading) return <TvDetailsSkeleton />;
+
+  const featuredShows = tvShows.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0">
@@ -121,11 +166,10 @@ const TvDetails = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-1.5 text-xs font-bold rounded-full whitespace-nowrap transition-all border ${
-              activeTab === tab
+            className={`px-4 py-1.5 text-xs font-bold rounded-full whitespace-nowrap transition-all border ${activeTab === tab
                 ? 'bg-white text-black border-white'
                 : 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-zinc-200'
-            }`}
+              }`}
           >
             {tab}
           </button>
@@ -157,11 +201,10 @@ const TvDetails = () => {
               <button
                 key={day}
                 onClick={() => setActiveDay(day)}
-                className={`text-xs font-bold pb-2 border-b-2 transition-colors ${
-                  activeDay === day
+                className={`text-xs font-bold pb-2 border-b-2 transition-colors ${activeDay === day
                     ? 'text-white border-white'
                     : 'text-zinc-500 border-transparent hover:text-zinc-300'
-                }`}
+                  }`}
               >
                 {day}
               </button>
@@ -176,7 +219,7 @@ const TvDetails = () => {
       )}
 
       {/* Hero Carousel (FOR YOU tab) */}
-      {activeTab === 'FOR YOU' && (
+      {activeTab === 'FOR YOU' && featuredShows.length > 0 && (
         <div className="px-4 pt-2">
           <Carousel
             setApi={setCarouselApi}
@@ -184,19 +227,19 @@ const TvDetails = () => {
             className="w-full"
           >
             <CarouselContent className="ml-0">
-              {HERO_SLIDES.map((slide) => (
+              {featuredShows.map((slide) => (
                 <CarouselItem
                   key={slide.id}
                   className="pl-0 cursor-pointer"
-                  onClick={() => navigate(`/video/${slide.id}`)}
+                  onClick={() => navigate(`/tv/episode/${slide.id}`)}
                 >
                   <div className="relative w-full aspect-video rounded-xl overflow-hidden">
-                    <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+                    <img src={slide.signedThumbnailUrl || "/assets/poster.png"} alt={slide.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
                       <h3 className="text-lg font-bold text-white drop-shadow-lg">{slide.title}</h3>
                       <div className="flex items-center gap-1 bg-black/50 px-2 py-0.5 rounded text-[10px] text-zinc-300">
-                        ⭐ {slide.rating}
+                        ⭐ {slide.rating || "4.5"}
                       </div>
                     </div>
                   </div>
@@ -207,62 +250,44 @@ const TvDetails = () => {
 
           {/* Carousel Dots */}
           <div className="flex items-center justify-center gap-1.5 pt-4">
-            {HERO_SLIDES.map((_, index) => (
+            {featuredShows.map((_, index) => (
               <button
                 key={index}
                 onClick={() => carouselApi?.scrollTo(index)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  currentSlide === index
+                className={`h-2 rounded-full transition-all duration-300 ${currentSlide === index
                     ? 'w-4 bg-primary'
                     : 'w-2 bg-zinc-600 hover:bg-zinc-400'
-                }`}
+                  }`}
               />
             ))}
           </div>
         </div>
       )}
 
-      {/* Live Channels */}
-      <section className="px-4 pt-6 space-y-3">
-        <h2 className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors">
-          Live Channels <ChevronRight className="w-4 h-4 ml-1" />
-        </h2>
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-          {LIVE_CHANNELS.map((channel) => (
-            <div key={channel.id} className="shrink-0 flex flex-col items-center gap-2 cursor-pointer group">
-              <div className={`w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br ${channel.color} p-0.5 group-hover:scale-110 transition-transform`}>
-                <div className="w-full h-full rounded-full overflow-hidden bg-black">
-                  <img src={channel.logo} alt={channel.name} className="w-full h-full object-cover" />
+      {/* Popular TV Shows */}
+      {tvShows.length > 0 && (
+        <section className="px-4 pt-6 space-y-3">
+          <h2 className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors">
+            Popular TV Shows <ChevronRight className="w-4 h-4 ml-1" />
+          </h2>
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x">
+            {tvShows.map((show) => (
+              <div
+                key={show.id}
+                className="relative shrink-0 w-48 md:w-56 aspect-video rounded-lg overflow-hidden snap-start cursor-pointer group"
+                onClick={() => navigate(`/tv/episode/${show.id}`)}
+              >
+                <img src={show.signedThumbnailUrl || "/assets/poster.png"} alt={show.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 z-10">
+                  <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-[10px] font-semibold text-white truncate">{show.title}</span>
                 </div>
               </div>
-              <span className="text-[10px] text-zinc-400 font-medium text-center w-16 truncate">{channel.name}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Live Movies */}
-      <section className="px-4 pt-6 space-y-3">
-        <h2 className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors">
-          Live Movies <ChevronRight className="w-4 h-4 ml-1" />
-        </h2>
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x">
-          {LIVE_MOVIES.map((movie) => (
-            <div
-              key={movie.id}
-              className="relative shrink-0 w-48 md:w-56 aspect-video rounded-lg overflow-hidden snap-start cursor-pointer group"
-              onClick={() => navigate(`/video/${movie.id}`)}
-            >
-              <img src={movie.image} alt={movie.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 z-10">
-                <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-[10px] font-semibold text-white truncate">{movie.title}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
     </div>
   );

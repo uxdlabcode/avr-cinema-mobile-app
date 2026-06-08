@@ -104,14 +104,14 @@ export default function Membership() {
                 console.log("Order created:", orderId, amount, currency);
 
                 // Check if Razorpay is loaded
-                if (!window.Razorpay) {
-                    throw new Error("Razorpay SDK not loaded. Please refresh the page.");
+                if (!Razorpay) {
+                    throw new Error("Razorpay SDK not loaded. Please wait a moment and try again.");
                 }
 
                 const options = {
                     key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                     amount: amount,
-                    currency: currency,
+                    currency: currency as any,
                     name: "AVR Cinema",
                     description: `${plan.name} - Monthly Subscription`,
                     order_id: orderId,
@@ -174,7 +174,7 @@ export default function Membership() {
                     },
                 };
 
-                const razorpay = new window.Razorpay(options);
+                const razorpay = new Razorpay(options as any);
 
                 razorpay.on('payment.failed', (response: any) => {
                     console.error("Payment failed:", response.error);

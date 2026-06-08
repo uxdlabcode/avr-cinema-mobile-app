@@ -16,6 +16,7 @@ import VideoDetails from "@/pages/videodetails/VideoDetails";
 import TvDetails from "@/pages/tvstreaming/TvDetails";
 import MoviesTab from "@/pages/movies/MoviesTab";
 import Membership from "@/pages/membership/Membership";
+import Episode from "@/pages/tvstreaming/Episode";
 import { GetSupportPage } from "@/pages/Profile/GetSupportPage";
 import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
 
@@ -97,6 +98,10 @@ export const appRoutes: RouteObject[] = [
       {
         path: "tv",
         element: <TvDetails />,
+      },
+      {
+        path: "tv/episode/:id",
+        element: <Episode />,
       },
       {
         path: "movies",
