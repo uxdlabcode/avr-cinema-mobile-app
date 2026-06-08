@@ -4,6 +4,7 @@ import {
   Field,
   FieldGroup,
   FieldLabel,
+  FieldError,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,33 +14,134 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import LogoImage from "@/assets/Media (3) 1.png";
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [terms, setTerms] = useState(false);
+
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [termsError, setTermsError] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+    if (nameError) setNameError("");
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value.toLowerCase());
+    if (emailError) setEmailError("");
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (passwordError) setPasswordError("");
+  };
+
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value);
+    if (confirmPasswordError) setConfirmPasswordError("");
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    const fd = new FormData(e.currentTarget);
-    const name = (fd.get("name") as string) || "";
-    const email = (fd.get("email") as string) || "";
-    const password = (fd.get("password") as string) || "";
-    const confirmPassword = (fd.get("confirmPassword") as string) || "";
+    
+    setNameError("");
+    setEmailError("");
+    setPasswordError("");
+    setConfirmPasswordError("");
+    setTermsError("");
 
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      setLoading(false);
+    const emailVal = email.trim().toLowerCase();
+
+    let isValid = true;
+    let hasToastBeenShown = false;
+
+    if (!name.trim()) {
+      setNameError("Full name is required");
+      if (!hasToastBeenShown) {
+        toast.error("Please fill in all required fields");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!emailVal) {
+      setEmailError("Email address is required");
+      if (!hasToastBeenShown) {
+        toast.error("Please fill in all required fields");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      setEmailError("Please enter a valid email address");
+      if (!hasToastBeenShown) {
+        toast.error("Please enter a valid email address");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!password) {
+      setPasswordError("Password is required");
+      if (!hasToastBeenShown) {
+        toast.error("Please fill in all required fields");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      if (!hasToastBeenShown) {
+        toast.error("Password must be at least 6 characters");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!confirmPassword) {
+      setConfirmPasswordError("Please confirm your password");
+      if (!hasToastBeenShown) {
+        toast.error("Please fill in all required fields");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    } else if (password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      if (!hasToastBeenShown) {
+        toast.error("Passwords do not match");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!terms) {
+      setTermsError("You must agree to the Terms of Service");
+      if (!hasToastBeenShown) {
+        toast.error("You must agree to the Terms of Service");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!isValid) {
       return;
     }
 
+    setLoading(true);
     try {
-      const resultAction = await dispatch(signupAsync({ name, email, password }));
-      
+      const resultAction = await dispatch(signupAsync({ name, email: emailVal, password }));
+
       if (signupAsync.fulfilled.match(resultAction)) {
         toast.success("Account created successfully!");
         navigate("/dashboard");
@@ -58,28 +160,46 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
   };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form noValidate className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <FieldGroup className="gap-6">
         <div className="flex flex-col items-center gap-1 text-center mb-4">
-          <img src={LogoImage} alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
+          <img src="/assets/logo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
           <h1 className="text-2xl font-bold text-primary">Create an Account</h1>
           <p className="text-primary/70 text-sm">
             Sign up now to get started with an account.
           </p>
         </div>
-        <Field className="gap-2">
+        <Field data-invalid={!!nameError} className="gap-2">
           <FieldLabel htmlFor="name" className="text-primary/90">
             Full Name<span className="text-red-500">*</span>
           </FieldLabel>
-          <Input id="name" name="name" type="text" placeholder="John Doe" required className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" />
+          <Input 
+            id="name" 
+            name="name" 
+            type="text" 
+            placeholder="John Doe" 
+            value={name}
+            onChange={handleNameChange}
+            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" 
+          />
+          {nameError && <FieldError>{nameError}</FieldError>}
         </Field>
-        <Field className="gap-2">
+        <Field data-invalid={!!emailError} className="gap-2">
           <FieldLabel htmlFor="email" className="text-primary/90">
             Email Address<span className="text-red-500">*</span>
           </FieldLabel>
-          <Input id="email" name="email" type="email" placeholder="sarah@gmail.com" required className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" />
+          <Input 
+            id="email" 
+            name="email" 
+            type="email" 
+            placeholder="sarah@gmail.com" 
+            value={email}
+            onChange={handleEmailChange}
+            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" 
+          />
+          {emailError && <FieldError>{emailError}</FieldError>}
         </Field>
-        <Field className="gap-2">
+        <Field data-invalid={!!passwordError} className="gap-2">
           <FieldLabel htmlFor="password" className="text-primary/90">
             Password<span className="text-red-500">*</span>
           </FieldLabel>
@@ -88,10 +208,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
-              required
-              placeholder="••••••••••••"
+              placeholder="Enter Password"
               disabled={loading}
-              minLength={6}
+              value={password}
+              onChange={handlePasswordChange}
               className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 tracking-widest"
             />
             <button
@@ -103,8 +223,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
+          {passwordError && <FieldError>{passwordError}</FieldError>}
         </Field>
-        <Field className="gap-2">
+        <Field data-invalid={!!confirmPasswordError} className="gap-2">
           <FieldLabel htmlFor="confirmPassword" className="text-primary/90">
             Confirm Password<span className="text-red-500">*</span>
           </FieldLabel>
@@ -113,10 +234,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               id="confirmPassword"
               name="confirmPassword"
               type={showPassword ? "text" : "password"}
-              required
-              placeholder="••••••••••••"
+              placeholder="Confirm Password"
               disabled={loading}
-              minLength={6}
+              value={confirmPassword}
+              onChange={handleConfirmPasswordChange}
               className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 tracking-widest"
             />
             <button
@@ -128,19 +249,31 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
+          {confirmPasswordError && <FieldError>{confirmPasswordError}</FieldError>}
         </Field>
 
-        <div className="flex items-center mt-1 space-x-2">
-          <Checkbox id="terms" required className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-secondary rounded-sm w-4 h-4 bg-white" />
-          <label
-            htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primary/90"
-          >
-            I have read and agree to the <a href="#" className="font-bold underline text-primary">Terms of Service</a>
-          </label>
-        </div>
+        <Field data-invalid={!!termsError} className="gap-1.5 mt-1">
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="terms" 
+              checked={terms}
+              onCheckedChange={(checked) => {
+                setTerms(!!checked);
+                if (termsError) setTermsError("");
+              }}
+              className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-secondary rounded-sm w-4 h-4 bg-white" 
+            />
+            <label
+              htmlFor="terms"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primary/90 text-left"
+            >
+              I have read and agree to the <a href="#" className="font-semibold  text-primary">Terms of Service</a>
+            </label>
+          </div>
+          {termsError && <FieldError>{termsError}</FieldError>}
+        </Field>
         <Field className="mt-2">
-          <Button type="submit" className="cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-bold h-12 text-base" disabled={loading}>
+          <Button type="submit" className="cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-semibold h-12 text-base" disabled={loading}>
             {loading ? (
               <span className="inline-flex items-center gap-2">
                 <svg className="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -156,7 +289,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
         </Field>
         <div className="text-center text-sm text-primary/80 mt-2">
           Already have an account?{" "}
-          <Link to="/signin" className="font-bold text-primary hover:underline">
+          <Link to="/signin" className="font-semibold text-primary hover:underline">
             Log in
           </Link>
         </div>

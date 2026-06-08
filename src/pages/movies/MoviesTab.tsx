@@ -10,6 +10,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
+import TrendNow from '../HomePage/TrendNow';
 
 interface MovieItem {
   id: string;
@@ -134,101 +135,9 @@ const MovieCategoryRow = ({
         {/* Horizontal Scrollable Row */}
         <div 
           ref={rowRef}
-          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${
-            isTrending 
-              ? 'gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20' 
-              : 'gap-4 pb-1'
-          }`}
+          className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
         >
-          {displayList.map((movie, index) => {
-            if (isTrending) {
-              return (
-                <div
-                  key={movie.id}
-                  className="flex-none relative snap-start group/trending pt-4"
-                >
-                  {/* Giant rank number with thick white border */}
-                  <span 
-                    className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
-                    style={{
-                      WebkitTextStroke: '2px #fff',
-                      color: '#262626',
-                      fontFamily: 'Impact, Arial Black, sans-serif',
-                      filter: 'drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.8))',
-                      translate: '-50% 0px',
-                    }}
-                  >
-                    {index + 1}
-                  </span>
-
-                  {/* Movie Card Poster */}
-                  <div
-                    className="relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
-                    onClick={() => navigate(`/video/${movie.id}`)}
-                  >
-                      <img 
-                        src={movie.signedThumbnailUrl || "/assets/poster.png"} 
-                        alt={movie.title} 
-                        className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
-                      />
-
-                    {/* Mobile Title bar fallback */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover/card:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                      <p className="text-sm font-semibold text-white truncate text-center drop-shadow-md">
-                        {movie.title}
-                      </p>
-                    </div>
-                    
-                    {/* The theatrical hover details overlay */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                      
-                      {/* Genre/Category Badge */}
-                      <div className="flex justify-end mb-1 md:mb-2">
-                        <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                          {movie.genres && movie.genres.length > 0 ? movie.genres[0] : "Movie"}
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h4 className="text-xs md:text-sm font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
-                        {movie.title}
-                      </h4>
-
-                      {/* Metadata Row */}
-                      <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
-                        <span className="truncate">English (UK)</span>
-                        <div className="flex items-center gap-0.5">
-                          <span className="text-[8px] md:text-[9px] opacity-85">🌐</span>
-                          <span>{movie.duration || "N/A"}</span>
-                        </div>
-                      </div>
-
-                      {/* Actions row */}
-                      <div className="flex items-center gap-1 md:gap-1.5">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/video/${movie.id}`);
-                          }}
-                          className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
-                        >
-                          Play Now
-                        </button>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
-                        >
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-
+          {displayList.map((movie) => {
             // Normal Movie Row Item
             return (
               <div
@@ -505,18 +414,23 @@ const MoviesTab = () => {
           )}
 
           {/* Dynamic Category Sliders */}
-          <div className="px-4 md:px-12 lg:px-16 pt-10 pb-24 space-y-10 w-full max-w-7xl mx-auto">
+          <div className="px-4 md:px-12 lg:px-16 pt-5 md:pt-10 pb-16 md:pb-24 space-y-5 md:space-y-10 w-full max-w-7xl mx-auto">
             {Object.keys(groupedMovies).map((genreName) => {
               const list = groupedMovies[genreName];
               if (list.length === 0) return null;
               
+              const isTrendingRow = genreName === "Trending Now" || genreName === "Trending Movies" || genreName === "Trending";
+              if (isTrendingRow) {
+                return <TrendNow key={genreName} />;
+              }
+
               return (
                 <MovieCategoryRow 
                   key={genreName}
                   genreName={genreName}
                   list={list}
                   navigate={navigate}
-                  isTrending={genreName === "Trending Now" || genreName === "Trending Movies" || genreName === "Trending"}
+                  isTrending={false}
                 />
               );
             })}

@@ -5,6 +5,7 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
+  FieldError,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,25 +16,85 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import LogoImage from "@/assets/Media (3) 1.png";
+
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value.toLowerCase());
+    if (emailError) {
+      setEmailError("");
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (passwordError) {
+      setPasswordError("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    const fd = new FormData(e.currentTarget);
-    const email = (fd.get("email") as string) || "";
-    const password = (fd.get("password") as string) || "";
+    
+    setEmailError("");
+    setPasswordError("");
 
+    const emailVal = email.trim().toLowerCase();
+
+    let isValid = true;
+    let hasToastBeenShown = false;
+
+    if (!emailVal) {
+      setEmailError("Email address is required");
+      if (!hasToastBeenShown) {
+        toast.error("Please fill in all required fields");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+      setEmailError("Please enter a valid email address");
+      if (!hasToastBeenShown) {
+        toast.error("Please enter a valid email address");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!password) {
+      setPasswordError("Password is required");
+      if (!hasToastBeenShown) {
+        toast.error("Please fill in all required fields");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      if (!hasToastBeenShown) {
+        toast.error("Password must be at least 6 characters");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    setLoading(true);
     try {
       // Dispatch JWT login action
-      const resultAction = await dispatch(loginAsync({ email, password }));
+      const resultAction = await dispatch(loginAsync({ email: emailVal, password }));
 
       if (loginAsync.fulfilled.match(resultAction)) {
         toast.success("Login successful");
@@ -53,29 +114,39 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
   };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form noValidate className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <FieldGroup className="gap-6">
         <div className="flex flex-col items-center gap-1 text-center mb-4">
-          <img src={LogoImage} alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
+          <img src="/assets/logo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
           <h1 className="text-2xl font-bold text-primary">Log in to your Account</h1>
           <p className="text-primary/70 text-sm">
             Welcome back, please enter your details.
           </p>
         </div>
-        <Field className="gap-2">
+        <Field data-invalid={!!emailError} className="gap-2">
           <FieldLabel htmlFor="email" className="text-primary/90">Email Address</FieldLabel>
-          <Input id="email" name="email" type="email" placeholder="sarah@gmail.com" required className=" bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" />
+          <Input 
+            id="email" 
+            name="email" 
+            type="email" 
+            placeholder="sarah@gmail.com" 
+            value={email}
+            onChange={handleEmailChange}
+            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" 
+          />
+          {emailError && <FieldError>{emailError}</FieldError>}
         </Field>
-        <Field className="gap-2">
+        <Field data-invalid={!!passwordError} className="gap-2">
           <FieldLabel htmlFor="password" className="text-primary/90">Password</FieldLabel>
           <div className="relative">
             <Input
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
-              required
               placeholder="••••••••••••"
               disabled={loading}
+              value={password}
+              onChange={handlePasswordChange}
               className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 tracking-widest"
             />
             <button
@@ -87,6 +158,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
+          {passwordError && <FieldError>{passwordError}</FieldError>}
         </Field>
 
         <div className="flex items-center justify-between mt-1">
@@ -104,7 +176,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           </a>
         </div>
         <Field className="mt-2">
-          <Button type="submit" className="cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-bold h-12 text-base" disabled={loading}>
+          <Button type="submit" className="cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-semibold h-12 text-base" disabled={loading}>
             {loading ? (
               <span className="inline-flex items-center gap-2">
                 <svg
@@ -136,7 +208,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
         </Field>
         <div className="text-center text-sm text-primary/80 mt-2">
           Don't have an account?{" "}
-          <Link to="/signup" className="font-bold text-primary hover:underline">
+          <Link to="/signup" className="font-semibold text-primary hover:underline">
             Sign Up
           </Link>
         </div>

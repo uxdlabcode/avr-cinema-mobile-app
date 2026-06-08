@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { emailPasswordLogin, emailPasswordSignUp, getMatchingData, createDocument } from "@/Firebase";
+import { emailPasswordLogin, emailPasswordSignUp, getMatchingData, createDocument, getDocumentData } from "@/Firebase";
 
 export interface User {
   id: string;
@@ -41,8 +41,11 @@ export const loginAsync = createAsyncThunk(
         return rejectWithValue("Invalid credentials");
       }
 
-      const users = await getMatchingData("users", "email", "==", credentials.email);
-      const userDoc = users && users.length > 0 ? users[0] : null;
+      let userDoc = await getDocumentData("users", authRes.user.uid);
+      if (!userDoc) {
+        const users = await getMatchingData("users", "email", "==", credentials.email);
+        userDoc = users && users.length > 0 ? users[0] : undefined;
+      }
 
       const role = (userDoc?.role || "user").toLowerCase();
       
