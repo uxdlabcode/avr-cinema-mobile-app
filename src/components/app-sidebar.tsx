@@ -28,7 +28,6 @@ import LogoImage from "@/assets/Media (3) 1.png"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
-import { motion } from "framer-motion"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store"
 import { Link, useLocation } from "react-router-dom"

@@ -2,7 +2,6 @@ import { Wrench } from "lucide-react"
 import { Link } from "react-router-dom"
 import { SignupForm } from "@/components/signup-form"
 import loginImage from "@/assets/login.jpg"
-import { motion } from "framer-motion"
 
 
 export default function Signup() {

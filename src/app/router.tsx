@@ -16,6 +16,8 @@ import VideoDetails from "@/pages/videodetails/VideoDetails";
 import TvDetails from "@/pages/tvstreaming/TvDetails";
 import MoviesTab from "@/pages/movies/MoviesTab";
 import Membership from "@/pages/membership/Membership";
+import { GetSupportPage } from "@/pages/Profile/GetSupportPage";
+import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
 
 function RootRedirect() {
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -117,6 +119,22 @@ export const appRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
             <UpdateProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "support",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <GetSupportPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "notifications",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <NotificationsPage />
           </ProtectedRoute>
         ),
       },
