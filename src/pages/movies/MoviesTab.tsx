@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Bookmark, Share2, Play, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bookmark, Share2, Play, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMatchingData, getSignedUrl } from '@/Firebase';
@@ -44,6 +44,264 @@ const MoviesTabSkeleton = () => (
     </div>
   </div>
 );
+
+const MovieCategoryRow = ({ 
+  genreName, 
+  list, 
+  navigate,
+  isTrending = false
+}: { 
+  genreName: string; 
+  list: MovieItem[]; 
+  navigate: ReturnType<typeof useNavigate>;
+  isTrending?: boolean;
+}) => {
+  const rowRef = React.useRef<HTMLDivElement>(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(true);
+
+  const displayList = isTrending ? list.slice(0, 10) : list;
+
+  const updateScrollButtons = () => {
+    if (rowRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = rowRef.current;
+      setShowLeft(scrollLeft > 10);
+      setShowRight(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    const row = rowRef.current;
+    if (row) {
+      row.addEventListener('scroll', updateScrollButtons);
+      // Run once initially
+      updateScrollButtons();
+      
+      // Also listen to resize
+      window.addEventListener('resize', updateScrollButtons);
+      
+      // Wait a bit for image rendering and layout calculations
+      const timer = setTimeout(updateScrollButtons, 500);
+
+      return () => {
+        row.removeEventListener('scroll', updateScrollButtons);
+        window.removeEventListener('resize', updateScrollButtons);
+        clearTimeout(timer);
+      };
+    }
+  }, [list]);
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (rowRef.current) {
+      const { clientWidth } = rowRef.current;
+      const scrollAmount = direction === 'left' ? -clientWidth * 0.75 : clientWidth * 0.75;
+      rowRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-1 text-left relative group/row">
+      <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
+        {genreName}
+      </h3>
+      
+      <div className="relative w-full">
+        {/* Left Scroll Button */}
+        {showLeft && (
+          <button
+            onClick={() => handleScroll('left')}
+            className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Right Scroll Button */}
+        {showRight && (
+          <button
+            onClick={() => handleScroll('right')}
+            className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Horizontal Scrollable Row */}
+        <div 
+          ref={rowRef}
+          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${
+            isTrending 
+              ? 'gap-10 sm:gap-14 md:gap-18 pl-10 sm:pl-16 md:pl-20 lg:pl-24' 
+              : 'gap-4 pb-1'
+          }`}
+        >
+          {displayList.map((movie, index) => {
+            if (isTrending) {
+              return (
+                <div
+                  key={movie.id}
+                  className="flex-none relative snap-start group/trending pt-4"
+                >
+                  {/* Giant transparent rank number with thick white border */}
+                  <span 
+                    className="absolute left-0 bottom-[-5px] md:bottom-[-15px] text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
+                    style={{
+                      WebkitTextStroke: '2px #fff',
+                      color: 'transparent',
+                      fontFamily: 'Impact, Arial Black, sans-serif',
+                      filter: 'drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.8))',
+                      translate: '-50% 0px',
+                    }}
+                  >
+                    {index + 1}
+                  </span>
+
+                  {/* Movie Card Poster */}
+                  <div
+                    className="relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
+                    onClick={() => navigate(`/video/${movie.id}`)}
+                  >
+                      <img 
+                        src={movie.signedThumbnailUrl || "/assets/poster.png"} 
+                        alt={movie.title} 
+                        className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
+                      />
+
+                    {/* Mobile Title bar fallback */}
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover/card:opacity-0 transition-opacity duration-300 md:hidden z-1">
+                      <p className="text-sm font-semibold text-white truncate text-center drop-shadow-md">
+                        {movie.title}
+                      </p>
+                    </div>
+                    
+                    {/* The theatrical hover details overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
+                      
+                      {/* Genre/Category Badge */}
+                      <div className="flex justify-end mb-1 md:mb-2">
+                        <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                          {movie.genres && movie.genres.length > 0 ? movie.genres[0] : "Movie"}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h4 className="text-xs md:text-sm font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
+                        {movie.title}
+                      </h4>
+
+                      {/* Metadata Row */}
+                      <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
+                        <span className="truncate">English (UK)</span>
+                        <div className="flex items-center gap-0.5">
+                          <span className="text-[8px] md:text-[9px] opacity-85">🌐</span>
+                          <span>{movie.duration || "N/A"}</span>
+                        </div>
+                      </div>
+
+                      {/* Actions row */}
+                      <div className="flex items-center gap-1 md:gap-1.5">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/video/${movie.id}`);
+                          }}
+                          className="flex-1 py-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                        >
+                          Play Now
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            // Normal Movie Row Item
+            return (
+              <div
+                key={movie.id} 
+                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
+                onClick={() => navigate(`/video/${movie.id}`)}
+              >
+                <img 
+                  src={movie.signedThumbnailUrl || "/assets/poster.png"} 
+                  alt={movie.title} 
+                  className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
+                />
+
+                {/* Mobile Title bar fallback (Visible when not hovered on touch devices) */}
+                <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
+                  <p className="text-sm font-semibold text-white truncate text-center drop-shadow-md">
+                    {movie.title}
+                  </p>
+                </div>
+                
+                {/* The theatrical hover details overlay */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
+                  
+                  {/* Genre/Category Badge */}
+                  <div className="flex justify-end mb-1 md:mb-2">
+                    <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                      {movie.genres && movie.genres.length > 0 ? movie.genres[0] : "Movie"}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h4 className="text-xs md:text-sm font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
+                    {movie.title}
+                  </h4>
+
+                  {/* Metadata Row */}
+                  <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
+                    <span className="truncate">English (UK)</span>
+                    <div className="flex items-center gap-0.5">
+                      <span className="text-[8px] md:text-[9px] opacity-85">🌐</span>
+                      <span>{movie.duration || "N/A"}</span>
+                    </div>
+                  </div>
+
+                  {/* Actions row */}
+                  <div className="flex items-center gap-1 md:gap-1.5">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/video/${movie.id}`);
+                      }}
+                      className="flex-1 py-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                    >
+                      Play Now
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MoviesTab = () => {
   const navigate = useNavigate();
@@ -147,7 +405,7 @@ const MoviesTab = () => {
     <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative">
       
       {/* Semi-transparent Header */}
-      <div className="fixed top-0 left-0 right-0 h-20 bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-sm z-50 flex items-center justify-between px-4">
+      <div className="fixed top-0 left-0 right-0 h-14 bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-sm z-50 flex items-center justify-between px-4">
         {/* Back Button */}
         <Button 
           variant="ghost" 
@@ -165,23 +423,7 @@ const MoviesTab = () => {
           className="h-8 object-contain absolute left-1/2 -translate-x-1/2" 
         />
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-10 h-10 rounded-full bg-black/60 border border-zinc-900/60 hover:bg-zinc-800 text-white"
-          >
-            <Bookmark className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-10 h-10 rounded-full bg-black/60 border border-zinc-900/60 hover:bg-zinc-800 text-white"
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
-        </div>
+        
       </div>
 
       {isLoading ? (
@@ -215,8 +457,8 @@ const MoviesTab = () => {
 
                         {/* Text and buttons overlay details */}
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 pb-14 md:pb-20 z-[3] text-left">
-                          <span className="text-xs uppercase tracking-widest font-extrabold text-[#E50914] mb-2">Featured Movie</span>
-                          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight drop-shadow-md max-w-2xl mb-3">
+                          <span className="text-xs uppercase tracking-widest font-bold text-[#E50914] mb-2">Featured Movie</span>
+                          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight drop-shadow-md max-w-2xl mb-3">
                             {featuredMovie.title}
                           </h1>
                           <p className="hidden md:block text-zinc-300 text-sm max-w-xl leading-relaxed font-normal mb-6 line-clamp-3">
@@ -225,7 +467,7 @@ const MoviesTab = () => {
                           <div className="flex items-center gap-3">
                             <Button 
                               onClick={() => navigate(`/video/${featuredMovie.id}`)}
-                              className="bg-white hover:bg-white/95 text-black font-extrabold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                              className="bg-white hover:bg-white/95 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
@@ -233,7 +475,7 @@ const MoviesTab = () => {
                             <Button 
                               onClick={() => navigate(`/video/${featuredMovie.id}`)}
                               variant="outline"
-                              className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-extrabold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm"
+                              className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm"
                             >
                               <span>More Info</span>
                             </Button>
@@ -269,81 +511,13 @@ const MoviesTab = () => {
               if (list.length === 0) return null;
               
               return (
-                <div key={genreName} className="space-y-4 text-left">
-                  <h3 className="text-lg md:text-2xl font-extrabold text-white tracking-wide">
-                    {genreName}
-                  </h3>
-                  
-                  {/* Horizontal Scrollable Row */}
-                  <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-                    {list.map((movie) => (
-                      <div 
-                        key={movie.id} 
-                        className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
-                        onClick={() => navigate(`/video/${movie.id}`)}
-                      >
-                        <img 
-                          src={movie.signedThumbnailUrl || "/assets/poster.png"} 
-                          alt={movie.title} 
-                          className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
-                        />
-
-                        {/* Mobile Title bar fallback (Visible when not hovered on touch devices) */}
-                        <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                          <p className="text-[10px] font-extrabold text-white truncate text-center drop-shadow-md">
-                            {movie.title}
-                          </p>
-                        </div>
-                        
-                        {/* The theatrical hover details overlay */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                          
-                          {/* Genre/Category Badge */}
-                          <div className="flex justify-end mb-1 md:mb-2">
-                            <span className="text-[8px] md:text-[9px] font-extrabold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                              {movie.genres && movie.genres.length > 0 ? movie.genres[0] : "Movie"}
-                            </span>
-                          </div>
-
-                          {/* Title */}
-                          <h4 className="text-xs md:text-sm font-extrabold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
-                            {movie.title}
-                          </h4>
-
-                          {/* Metadata Row */}
-                          <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
-                            <span className="truncate">English (UK)</span>
-                            <div className="flex items-center gap-0.5">
-                              <span className="text-[8px] md:text-[9px] opacity-85">🌐</span>
-                              <span>{movie.duration || "N/A"}</span>
-                            </div>
-                          </div>
-
-                          {/* Actions row */}
-                          <div className="flex items-center gap-1 md:gap-1.5">
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/video/${movie.id}`);
-                              }}
-                              className="flex-1 py-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-extrabold text-[9px] md:text-[10px] rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
-                            >
-                              Play Now
-                            </button>
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <MovieCategoryRow 
+                  key={genreName}
+                  genreName={genreName}
+                  list={list}
+                  navigate={navigate}
+                  isTrending={genreName === "Trending Now" || genreName === "Trending Movies" || genreName === "Trending"}
+                />
               );
             })}
           </div>

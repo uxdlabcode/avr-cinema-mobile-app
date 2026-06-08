@@ -532,7 +532,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     >
       <div
         className="w-full h-full relative flex items-center justify-center bg-black"
-        style={isMobilePortrait ? {
+        style={(isMobilePortrait && isFullscreen) ? {
           width: '100vh',
           height: '100vw',
           position: 'fixed',
@@ -612,6 +612,9 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
                 e.stopPropagation();
                 if (videoRef.current) {
                   saveCurrentProgress(videoRef.current.currentTime);
+                }
+                if (document.fullscreenElement) {
+                  document.exitFullscreen().catch(() => {});
                 }
                 onExit();
               }}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
@@ -152,6 +152,12 @@ const VideoDetailsSkeleton = () => (
 
 const VideoDetails = () => {
   const { id } = useParams<{ id: string }>();
+  
+  // Stable random match percentage per video details session (between 90% and 99%)
+  const matchPercentage = useMemo(() => {
+    return 90 + Math.floor(Math.random() * 10);
+  }, [id]);
+
   const navigate = useNavigate();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id || "";
@@ -643,7 +649,7 @@ const VideoDetails = () => {
       
       {/* Netflix Fullscreen / Aspect box Video container */}
       <div 
-        className={isPlaying ? "fixed inset-0 z-[100] bg-black flex items-center justify-center" : "relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden group select-none border-b border-zinc-900"}
+        className="relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden group select-none border-b border-zinc-900"
       >
         {isPlaying && videoUrlToPlay ? (
           <CustomVideoPlayer
@@ -689,7 +695,7 @@ const VideoDetails = () => {
                 <Button 
                   onClick={handleStartPlayback}
                   disabled={isSigning}
-                  className="bg-white hover:bg-white/95 text-black font-bold px-8 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55"
+                  className="bg-white hover:bg-white/95 text-black font-medium px-8 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55"
                 >
                   {isSigning ? (
                     <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -707,7 +713,7 @@ const VideoDetails = () => {
                   onClick={handleToggleMyList}
                   disabled={isListToggling}
                   variant="outline"
-                  className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-bold px-6 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.02] disabled:opacity-55"
+                  className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.02] disabled:opacity-55"
                 >
                   {isInMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                   <span>{isInMyList ? "In My List" : "My List"}</span>
@@ -741,14 +747,7 @@ const VideoDetails = () => {
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-3">
-              <button className="p-2 rounded-full bg-black/50 border border-zinc-900 hover:bg-black/85 hover:border-zinc-700 text-white transition-all cursor-pointer">
-                <Cast className="w-5 h-5 text-white" />
-              </button>
-              <button className="p-2 rounded-full bg-black/50 border border-zinc-900 hover:bg-black/85 hover:border-zinc-700 text-white transition-all cursor-pointer">
-                <Share2 className="w-5 h-5 text-white" />
-              </button>
-            </div>
+          
           </div>
         )}
 
@@ -780,12 +779,12 @@ const VideoDetails = () => {
             
             {/* Mobile Title & Metadata Stack (Hidden on Web) */}
             <div className="md:hidden space-y-3">
-              <h1 className="text-2xl font-extrabold text-white text-left">{movie.title}</h1>
+              <h1 className="text-2xl font-bold text-white text-left">{movie.title}</h1>
               
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-400">
-                <span className="text-green-500 font-semibold">98% Match</span>
+                <span className="text-green-500 font-semibold">{matchPercentage}% Match</span>
                 <span>{movie.year}</span>
-                <span className="px-1.5 py-0.25 border border-zinc-700 rounded text-[10px] font-semibold uppercase">{movie.rating}</span>
+                <span className="px-1.5 py-0.25 border border-zinc-700 rounded text-sm font-semibold uppercase">{movie.rating}</span>
                 <span>{movie.duration}</span>
                 <span className="px-1.5 py-0.25 border border-zinc-700 text-zinc-350 rounded text-[9px] font-bold">HDR</span>
               </div>
@@ -796,7 +795,7 @@ const VideoDetails = () => {
               <Button 
                 onClick={handleStartPlayback}
                 disabled={isSigning}
-                className="flex-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-extrabold py-5 rounded-md cursor-pointer disabled:opacity-55"
+                className="flex-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-semibold py-5 rounded-md cursor-pointer disabled:opacity-55"
               >
                 {isSigning ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
@@ -812,7 +811,7 @@ const VideoDetails = () => {
                 onClick={handleToggleMyList}
                 disabled={isListToggling}
                 variant="outline" 
-                className="flex-1 bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-850 hover:text-white font-extrabold py-5 rounded-md cursor-pointer disabled:opacity-55"
+                className="flex-1 bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-850 hover:text-white font-semibold py-5 rounded-md cursor-pointer disabled:opacity-55"
               >
                 {isInMyList ? <Check className="w-5 h-5 mr-2" /> : <Plus className="w-5 h-5 mr-2" />}
                 {isInMyList ? "In My List" : "My List"}
@@ -821,7 +820,7 @@ const VideoDetails = () => {
 
             {/* Web Metadata info inline (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold text-zinc-400">
-              <span className="text-green-500 font-extrabold text-base">98% Match</span>
+              <span className="text-green-500  text-base">{matchPercentage}% Match</span>
               <span>{movie.year}</span>
               <span className="px-1.5 py-0.25 border border-zinc-700 rounded text-xs font-bold uppercase">{movie.rating}</span>
               <span>{movie.duration}</span>
@@ -869,7 +868,7 @@ const VideoDetails = () => {
 
         {/* Navigation Tabs (Episodes | More Like This | Details) */}
         <div className="space-y-6">
-          <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-bold text-zinc-400">
+          <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-semibold text-zinc-400">
             {movie.category === "TV Show" && (
               <button
                 onClick={() => setActiveTab('episodes')}
@@ -1035,7 +1034,7 @@ const VideoDetails = () => {
               <div className="space-y-6 text-left">
                 {movie.cast && movie.cast.length > 0 ? (
                   <div className="space-y-4">
-                    <h3 className="text-base font-bold text-zinc-400">Cast Members</h3>
+                    <h3 className="text-base font-semibold text-zinc-400">Cast Members</h3>
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
                       {movie.cast.map((person: any, idx: number) => (
                         <div key={idx} className="text-center space-y-2">
