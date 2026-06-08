@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import { LogOut, Trash2, Pencil, ChevronDown, ChevronRight } from "lucide-react";
+import { LogOut, Trash2, Pencil, ChevronDown, ChevronRight, Trophy, HelpCircle, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLogout } from "@/Firebase/FirebaseAuth/UserLogOut";
 import { deleteUserData } from "@/Firebase/FirebaseAuth/DeleteUser";
 import { useNavigate } from "react-router-dom";
 import LogoImage from "@/assets/Media (3) 1.png";
 import { db } from "@/Firebase/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { getSignedUrl } from "@/Firebase";
+import { collection, getDocs, getDoc, doc, query, where } from "firebase/firestore";
+import { getCollectionData } from "@/Firebase/CloudFirestore/GetData";
 
-const continueWatchingItems = [
-  { id: 1, title: "The Office", poster: "/assets/episode1.webp", progress: 42, timeLeft: "42m" },
-  { id: 2, title: "The Office", poster: "/assets/episode2.webp", progress: 35, timeLeft: "38m" },
-  { id: 3, title: "Breaking Bad", poster: "/assets/poster.png", progress: 70, timeLeft: "22m" },
-];
+interface ContinueItem {
+  id: string;
+  movieId: string;
+  title: string;
+  poster: string;
+  progress: number;
+}
 
 export const ProfilePage = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -27,7 +31,13 @@ export const ProfilePage = () => {
 
   const [watchlist, setWatchlist] = useState<any[]>([]);
   const [loadingWatchlist, setLoadingWatchlist] = useState(true);
+  const [continueWatching, setContinueWatching] = useState<ContinueItem[]>([]);
+  const [loadingContinue, setLoadingContinue] = useState(true);
 
+  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(true);
+
+  // Fetch Watchlist (my_list)
   useEffect(() => {
     if (!user?.id) {
       setLoadingWatchlist(false);
@@ -36,11 +46,20 @@ export const ProfilePage = () => {
 
     const fetchWatchlist = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "my_list"));
+        const q = query(collection(db, "my_list"), where("userId", "==", user.id));
+        const querySnapshot = await getDocs(q);
         const items: any[] = [];
-        querySnapshot.forEach((doc) => {
-          items.push({ id: doc.id, ...doc.data() });
-        });
+        for (const d of querySnapshot.docs) {
+          const itemData = d.data();
+          if (itemData.image) {
+            try {
+              itemData.image = await getSignedUrl(itemData.image);
+            } catch {
+              // fallback to raw url
+            }
+          }
+          items.push({ id: d.id, ...itemData });
+        }
         setWatchlist(items);
       } catch (error) {
         console.error("Error fetching watchlist:", error);
@@ -51,6 +70,81 @@ export const ProfilePage = () => {
 
     fetchWatchlist();
   }, [user?.id]);
+
+  // Fetch Continue Watching (watch_progress)
+  useEffect(() => {
+    if (!user?.id) {
+      setLoadingContinue(false);
+      return;
+    }
+
+    const fetchContinueWatching = async () => {
+      try {
+        const q = query(collection(db, "watch_progress"), where("userId", "==", user.id));
+        const snap = await getDocs(q);
+        const raw: any[] = [];
+        snap.forEach((d) => raw.push({ id: d.id, ...d.data() }));
+
+        // Sort by latest updated, show all items (only skip if duration is 0)
+        const sorted = raw
+          .filter((r) => r.duration > 0)
+          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+
+        // Enrich with media title + thumbnail
+        const enriched: ContinueItem[] = await Promise.all(
+          sorted.map(async (r) => {
+            let title = "Unknown";
+            let poster = "/assets/episode1.webp";
+            try {
+              const mediaDoc = await getDoc(doc(db, "media", r.movieId));
+              if (mediaDoc.exists()) {
+                const data = mediaDoc.data();
+                title = data.title || "Unknown";
+                if (data.thumbnailUrl) {
+                  try {
+                    poster = await getSignedUrl(data.thumbnailUrl);
+                  } catch {
+                    poster = data.thumbnailUrl;
+                  }
+                }
+              }
+            } catch {/* ignore */}
+            return {
+              id: r.id,
+              movieId: r.movieId,
+              title,
+              poster,
+              progress: Math.round((r.currentTime / r.duration) * 100),
+            };
+          })
+        );
+
+        setContinueWatching(enriched);
+      } catch (err) {
+        console.error("Error fetching continue watching:", err);
+      } finally {
+        setLoadingContinue(false);
+      }
+    };
+
+    fetchContinueWatching();
+  }, [user?.id]);
+
+  // Fetch Quizzes
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        setLoadingQuizzes(true);
+        const data = await getCollectionData("quizzes");
+        setQuizzes(data as any[]);
+      } catch (err) {
+        console.error("Error fetching quizzes:", err);
+      } finally {
+        setLoadingQuizzes(false);
+      }
+    };
+    fetchQuizzes();
+  }, []);
 
   const name = user?.name || "Super Admin";
   const initials = name
@@ -160,13 +254,27 @@ export const ProfilePage = () => {
 
           {/* Watchlist Section */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-foreground font-bold text-base">Watchlist</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-foreground font-bold text-base">Watchlist</h3>
+              {watchlist.length > 0 && (
+                <button 
+                  onClick={() => navigate("/profile/watchlist", { state: { title: "Watchlist", items: watchlist } })}
+                  className="p-1 hover:bg-muted rounded-full transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </button>
+              )}
+            </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
               {loadingWatchlist ? (
                 <div className="flex items-center justify-center h-[175px] w-full text-sm text-muted-foreground">Loading watchlist...</div>
               ) : watchlist.length > 0 ? (
-                watchlist.map((item) => (
-                  <div key={item.id} className="flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+                watchlist.slice(0, 5).map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => navigate(`/video/${item.movieId}`)}
+                  >
                     <div className="w-[130px] h-[175px] rounded-xl overflow-hidden bg-muted">
                       <img
                         src={item.image || "/assets/poster.png"}
@@ -186,32 +294,95 @@ export const ProfilePage = () => {
 
           {/* Continue Watching Section */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-foreground font-bold text-base">Continue Watching</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-foreground font-bold text-base">Continue Watching</h3>
+              {continueWatching.length > 0 && (
+                <button 
+                  onClick={() => navigate("/profile/watchlist", { state: { title: "Continue Watching", items: continueWatching } })}
+                  className="p-1 hover:bg-muted rounded-full transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </button>
+              )}
+            </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
-              {continueWatchingItems.map((item) => (
-                <div key={item.id} className="flex-shrink-0 w-[130px] flex flex-col gap-2">
-                  <div className="relative w-[130px] h-[100px] rounded-xl overflow-hidden bg-muted">
-                    <img
-                      src={item.poster}
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    {/* Time remaining badge */}
-                    <div className="absolute bottom-2 right-2 bg-secondary/70 backdrop-blur-sm text-foreground text-[10px] font-semibold px-1.5 py-0.5 rounded">
-                      {item.timeLeft}
-                    </div>
-                    {/* Progress bar */}
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
-                      <div
-                        className="h-full bg-destructive rounded-r-full"
-                        style={{ width: `${item.progress}%` }}
+              {loadingContinue ? (
+                <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">Loading...</div>
+              ) : continueWatching.length === 0 ? (
+                <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">Nothing in progress</div>
+              ) : (
+                continueWatching.slice(0, 5).map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer"
+                    onClick={() => navigate(`/video/${item.movieId}`)}
+                  >
+                    <div className="relative w-[130px] h-[100px] rounded-xl overflow-hidden bg-muted">
+                      <img
+                        src={item.poster}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
                       />
+                      {/* Progress bar */}
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
+                        <div
+                          className="h-full bg-destructive rounded-r-full"
+                          style={{ width: `${item.progress}%` }}
+                        />
+                      </div>
                     </div>
+                    <p className="text-foreground text-xs font-medium truncate">{item.title}</p>
                   </div>
-                  <p className="text-foreground text-xs font-medium truncate">{item.title}</p>
-                </div>
-              ))}
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Quizzes Section */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-foreground font-bold text-base">Quiz</h3>
+            </div>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
+              {loadingQuizzes ? (
+                <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">Loading quizzes...</div>
+              ) : quizzes.length === 0 ? (
+                <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">No quizzes available</div>
+              ) : (
+                quizzes.map((quiz) => {
+                  const qCount = quiz.questions?.length ?? 0;
+                  return (
+                    <div
+                      key={quiz.id}
+                      className="flex-shrink-0 w-[240px] flex flex-col gap-2 p-3 bg-card border border-border rounded-2xl cursor-pointer hover:border-[#DECB94]/30 hover:bg-white/[0.03] transition-all group"
+                      onClick={() => navigate(`/quizzes/${quiz.id}`)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="shrink-0 w-10 h-10 rounded-xl bg-[#DECB94]/10 flex items-center justify-center border border-[#DECB94]/15">
+                          <Trophy className="w-5 h-5 text-[#DECB94]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-foreground font-semibold text-sm truncate group-hover:text-[#DECB94] transition-colors">{quiz.title}</h4>
+                          <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full mt-1 inline-block truncate max-w-full">
+                            {quiz.category}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          {quiz.duration} mins
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <HelpCircle className="w-3 h-3" />
+                          {qCount} Qs
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 

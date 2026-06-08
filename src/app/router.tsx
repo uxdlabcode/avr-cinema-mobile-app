@@ -6,6 +6,7 @@ import Signup from "@/pages/Auth/Signup";
 import { UserDashboard } from "@/pages/Dashboard/UserDashboard";
 import { ProfilePage } from "@/pages/Profile/ProfilePage";
 import { UpdateProfilePage } from "@/pages/Profile/UpdateProfilePage";
+import { WatchlistPage } from "@/pages/Profile/WatchlistPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import GuestRoute from "@/components/GuestRoute";
 import NotFound from "@/pages/NotFound";
@@ -19,6 +20,9 @@ import Membership from "@/pages/membership/Membership";
 import Episode from "@/pages/tvstreaming/Episode";
 import { GetSupportPage } from "@/pages/Profile/GetSupportPage";
 import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
+import { QuizzesPage } from "@/pages/Quizzes/QuizzesPage";
+import { QuizDetailPage } from "@/pages/Quizzes/QuizDetailPage";
+import { QuizResultPage } from "@/pages/Quizzes/QuizResultPage";
 
 function RootRedirect() {
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -72,6 +76,22 @@ export const appRoutes: RouteObject[] = [
     ),
   },
   {
+        path: "quizzes/:id/result",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <QuizResultPage />
+          </ProtectedRoute>
+        ),
+      },
+  {
+    path: "quizzes/:id",
+    element: (
+      <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+        <QuizDetailPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/",
     element: <LayoutWrapper />,
     children: [
@@ -120,6 +140,14 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
+        path: "profile/watchlist",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <WatchlistPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "update-profile",
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
@@ -140,6 +168,14 @@ export const appRoutes: RouteObject[] = [
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
             <NotificationsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "quiz",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <QuizzesPage />
           </ProtectedRoute>
         ),
       },
