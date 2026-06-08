@@ -14,6 +14,7 @@ interface CustomVideoPlayerProps {
   onExit: () => void;
   playNextEpisode: () => void;
   userId: string;
+  playInline?: boolean;
 }
 
 export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
@@ -23,7 +24,8 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
   currentPlayingEpisodeTitle,
   onExit,
   playNextEpisode,
-  userId
+  userId,
+  playInline = false
 }) => {
   const [isCurrentlyPlaying, setIsCurrentlyPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -180,6 +182,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
 
     // Attempt native screen orientation lock
     const lockScreen = async () => {
+      if (playInline) return; // Do not lock orientation if playing inline
       try {
         if (screen.orientation && (screen.orientation as any).lock) {
           await (screen.orientation as any).lock('landscape');
@@ -202,7 +205,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         console.log("Native screen orientation unlock failed:", err);
       }
     };
-  }, []);
+  }, [playInline]);
 
   // Next Episode Countdown effect
   useEffect(() => {
@@ -473,7 +476,12 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     if (!document.fullscreenElement) {
       if (container.requestFullscreen) {
         container.requestFullscreen()
-          .then(() => setIsFullscreen(true))
+          .then(() => {
+            setIsFullscreen(true);
+            if (screen.orientation && (screen.orientation as any).lock) {
+              (screen.orientation as any).lock('landscape').catch(() => {});
+            }
+          })
           .catch(err => console.log("Request fullscreen error:", err));
       } else if (videoRef.current && (videoRef.current as any).webkitEnterFullscreen) {
         (videoRef.current as any).webkitEnterFullscreen();
@@ -481,7 +489,12 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen()
-          .then(() => setIsFullscreen(false))
+          .then(() => {
+            setIsFullscreen(false);
+            if (playInline && screen.orientation && screen.orientation.unlock) {
+              screen.orientation.unlock();
+            }
+          })
           .catch(err => console.log("Exit fullscreen error:", err));
       }
     }
@@ -532,7 +545,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     >
       <div
         className="w-full h-full relative flex items-center justify-center bg-black"
-        style={(isMobilePortrait && isFullscreen) ? {
+        style={(isMobilePortrait && (isFullscreen || !playInline)) ? {
           width: '100vh',
           height: '100vw',
           position: 'fixed',
@@ -561,7 +574,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
         {/* Loading Spinner Overlay */}
         {isVideoLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30 pointer-events-none">
-            <div className="w-12 h-12 border-4 border-zinc-800 border-t-[#E50914] rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-zinc-800 border-t-primary rounded-full animate-spin" />
           </div>
         )}
 
@@ -593,7 +606,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
               playNextEpisode();
               setNextEpisodeCountdown(null);
             }}
-            className="w-full py-2 bg-white text-black text-xs font-bold rounded hover:bg-[#E50914] hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full py-2 bg-white text-black text-xs font-bold rounded hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
             Play Now ({nextEpisodeCountdown}s)
@@ -635,9 +648,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
           </div>
           
           <div className="flex items-center gap-4 text-white">
-            <button className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer" title="Cast">
-              <Cast className="w-5 h-5" />
-            </button>
+           
             <button 
               onClick={(e) => {
                 e.stopPropagation();

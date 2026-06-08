@@ -136,7 +136,7 @@ const MovieCategoryRow = ({
           ref={rowRef}
           className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${
             isTrending 
-              ? 'gap-10 sm:gap-14 md:gap-18 pl-10 sm:pl-16 md:pl-20 lg:pl-24' 
+              ? 'gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20' 
               : 'gap-4 pb-1'
           }`}
         >
@@ -147,12 +147,12 @@ const MovieCategoryRow = ({
                   key={movie.id}
                   className="flex-none relative snap-start group/trending pt-4"
                 >
-                  {/* Giant transparent rank number with thick white border */}
+                  {/* Giant rank number with thick white border */}
                   <span 
-                    className="absolute left-0 bottom-[-5px] md:bottom-[-15px] text-8xl sm:text-9xl md:text-[10rem] lg:text-[12rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
+                    className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
                     style={{
                       WebkitTextStroke: '2px #fff',
-                      color: 'transparent',
+                      color: '#262626',
                       fontFamily: 'Impact, Arial Black, sans-serif',
                       filter: 'drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.8))',
                       translate: '-50% 0px',
@@ -210,7 +210,7 @@ const MovieCategoryRow = ({
                             e.stopPropagation();
                             navigate(`/video/${movie.id}`);
                           }}
-                          className="flex-1 py-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                          className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play Now
                         </button>
@@ -280,7 +280,7 @@ const MovieCategoryRow = ({
                         e.stopPropagation();
                         navigate(`/video/${movie.id}`);
                       }}
-                      className="flex-1 py-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                      className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                     >
                       Play Now
                     </button>
@@ -457,7 +457,7 @@ const MoviesTab = () => {
 
                         {/* Text and buttons overlay details */}
                         <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 pb-14 md:pb-20 z-[3] text-left">
-                          <span className="text-xs uppercase tracking-widest font-bold text-[#E50914] mb-2">Featured Movie</span>
+                          <span className="text-xs uppercase tracking-widest font-bold text-primary mb-2">Featured Movie</span>
                           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight drop-shadow-md max-w-2xl mb-3">
                             {featuredMovie.title}
                           </h1>
@@ -495,7 +495,7 @@ const MoviesTab = () => {
                     onClick={() => carouselApi?.scrollTo(index)}
                     className={`h-1.5 rounded-full transition-all duration-300 ${
                       currentSlide === index
-                        ? 'w-6 bg-[#E50914]'
+                        ? 'w-6 bg-primary'
                         : 'w-2 bg-zinc-650 hover:bg-zinc-400'
                     }`}
                   />

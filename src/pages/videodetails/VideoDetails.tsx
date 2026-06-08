@@ -171,6 +171,7 @@ const VideoDetails = () => {
   const [isSigning, setIsSigning] = useState(false);
   const [currentPlayingEpisodeTitle, setCurrentPlayingEpisodeTitle] = useState("");
   const [currentEpisode, setCurrentEpisode] = useState<any>(null);
+  const [forceFullscreen, setForceFullscreen] = useState(false);
   
   // Navigation tabs selection state
   const [activeTab, setActiveTab] = useState<'episodes' | 'related' | 'details'>('episodes');
@@ -576,29 +577,31 @@ const VideoDetails = () => {
   }, [id]);
 
 
-  const handlePlayClick = async (url: string, epInfo?: string) => {
+  const handlePlayClick = async (url: string, epInfo?: string, shouldFullscreen = false) => {
     if (!url) return;
     try {
       setIsSigning(true);
       setCurrentPlayingEpisodeTitle(epInfo || "");
       const signed = await getSignedUrl(url);
       setVideoUrlToPlay(signed);
+      setForceFullscreen(shouldFullscreen);
       setIsPlaying(true);
     } catch (err) {
       console.error("Error signing video stream URL:", err);
       setVideoUrlToPlay(url);
+      setForceFullscreen(shouldFullscreen);
       setIsPlaying(true);
     } finally {
       setIsSigning(false);
     }
   };
 
-  const playEpisode = (ep: any) => {
+  const playEpisode = (ep: any, shouldFullscreen = false) => {
     setCurrentEpisode(ep);
-    handlePlayClick(ep.videoUrl, `E${ep.episodeNumber || ep.id} • ${ep.title}`);
+    handlePlayClick(ep.videoUrl, `E${ep.episodeNumber || ep.id} • ${ep.title}`, shouldFullscreen);
   };
 
-  const handleStartPlayback = () => {
+  const handleStartPlayback = (shouldFullscreen = false) => {
     if (movie.category === "TV Show") {
       const lastWatchedEpId = watchProgress?.episodeId;
       const savedEp = lastWatchedEpId 
@@ -607,11 +610,11 @@ const VideoDetails = () => {
         
       const epToPlay = savedEp || movie.seasons?.[0]?.episodes?.[0];
       if (epToPlay) {
-        playEpisode(epToPlay);
+        playEpisode(epToPlay, shouldFullscreen);
       }
     } else {
       setCurrentEpisode(null);
-      handlePlayClick(movie.movieUrl, "Movie");
+      handlePlayClick(movie.movieUrl, "Movie", shouldFullscreen);
     }
   };
 
@@ -620,7 +623,7 @@ const VideoDetails = () => {
     const currentEpNum = currentEpisode.episodeNumber;
     const nextEp = movie.seasons?.[0]?.episodes?.find((e: any) => e.episodeNumber === currentEpNum + 1);
     if (nextEp) {
-      playEpisode(nextEp);
+      playEpisode(nextEp, forceFullscreen);
     }
   };
 
@@ -629,6 +632,7 @@ const VideoDetails = () => {
     setVideoUrlToPlay("");
     setCurrentPlayingEpisodeTitle("");
     setCurrentEpisode(null);
+    setForceFullscreen(false);
   };
 
   if (isLoading) {
@@ -649,7 +653,7 @@ const VideoDetails = () => {
       
       {/* Netflix Fullscreen / Aspect box Video container */}
       <div 
-        className="relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden group select-none border-b border-zinc-900"
+        className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden group select-none border-b border-zinc-900"}
       >
         {isPlaying && videoUrlToPlay ? (
           <CustomVideoPlayer
@@ -660,12 +664,13 @@ const VideoDetails = () => {
             onExit={handleExitPlayer}
             playNextEpisode={playNextEpisode}
             userId={userId}
+            playInline={!forceFullscreen}
           />
         ) : (
           <>
             {isImageLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-zinc-950 z-[4]">
-                <div className="w-10 h-10 border-4 border-zinc-800 border-t-[#E50914] rounded-full animate-spin" />
+                <div className="w-10 h-10 border-4 border-zinc-800 border-t-primary rounded-full animate-spin" />
               </div>
             )}
             <img 
@@ -693,7 +698,7 @@ const VideoDetails = () => {
               
               <div className="hidden md:flex items-center gap-4 mt-6 animate-in fade-in slide-in-from-left-4 duration-700">
                 <Button 
-                  onClick={handleStartPlayback}
+                  onClick={() => handleStartPlayback(true)}
                   disabled={isSigning}
                   className="bg-white hover:bg-white/95 text-black font-medium px-8 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55"
                 >
@@ -724,7 +729,7 @@ const VideoDetails = () => {
             {/* Play Button Overlay (Mobile Only, hidden on Web) */}
             <div className="md:hidden absolute inset-0 flex items-center justify-center z-[3]">
               <button 
-                onClick={handleStartPlayback}
+                onClick={() => handleStartPlayback(false)}
                 disabled={isSigning}
                 className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors border-2 border-white/20 cursor-pointer disabled:opacity-55 shadow-lg active:scale-95"
               >
@@ -793,9 +798,9 @@ const VideoDetails = () => {
             {/* Mobile action buttons (Hidden on Web) */}
             <div className="md:hidden flex items-center gap-3">
               <Button 
-                onClick={handleStartPlayback}
+                onClick={() => handleStartPlayback(true)}
                 disabled={isSigning}
-                className="flex-1 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-semibold py-5 rounded-md cursor-pointer disabled:opacity-55"
+                className="flex-1 bg-primary hover:bg-primary/90 text-black font-semibold py-5 rounded-md cursor-pointer disabled:opacity-55"
               >
                 {isSigning ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
@@ -831,7 +836,17 @@ const VideoDetails = () => {
             {/* Summary description paragraph */}
             <div className="space-y-2 text-left">
               <p className="text-zinc-300 text-sm md:text-base leading-relaxed font-normal">
-                {movie.description}
+                {showFullDescription || (movie.description || "").length <= 150
+                  ? (movie.description || "")
+                  : `${(movie.description || "").slice(0, 150)}...`}
+                {(movie.description || "").length > 150 && (
+                  <button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="text-white hover:text-zinc-300 font-bold ml-1.5 focus:outline-none transition-colors duration-150 cursor-pointer text-xs md:text-sm"
+                  >
+                    {showFullDescription ? "Show Less" : "More"}
+                  </button>
+                )}
               </p>
             </div>
 
@@ -873,7 +888,7 @@ const VideoDetails = () => {
               <button
                 onClick={() => setActiveTab('episodes')}
                 className={`relative pb-3 -mb-[14px] cursor-pointer transition-colors ${
-                  activeTab === 'episodes' ? "text-white border-b-2 border-[#E50914]" : "hover:text-white"
+                  activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
               >
                 Episodes
@@ -882,7 +897,7 @@ const VideoDetails = () => {
             <button
               onClick={() => setActiveTab('related')}
               className={`relative pb-3 -mb-[14px] cursor-pointer transition-colors ${
-                activeTab === 'related' ? "text-white border-b-2 border-[#E50914]" : "hover:text-white"
+                activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
               }`}
             >
               More Like This
@@ -890,7 +905,7 @@ const VideoDetails = () => {
             <button
               onClick={() => setActiveTab('details')}
               className={`relative pb-3 -mb-[14px] cursor-pointer transition-colors ${
-                activeTab === 'details' ? "text-white border-b-2 border-[#E50914]" : "hover:text-white"
+                activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
               }`}
             >
               Details
@@ -1007,7 +1022,7 @@ const VideoDetails = () => {
                             e.stopPropagation();
                             navigate(`/video/${item.id}`);
                           }}
-                          className="flex-1 py-1.5 md:py-2 bg-[#E50914] hover:bg-[#E50914]/90 text-white font-bold text-[10px] md:text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                          className="flex-1 py-1.5 md:py-2 bg-primary text-black font-bold text-[10px] md:text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play Now
                         </button>
@@ -1038,7 +1053,7 @@ const VideoDetails = () => {
                     <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
                       {movie.cast.map((person: any, idx: number) => (
                         <div key={idx} className="text-center space-y-2">
-                          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mx-auto border-2 border-zinc-800 hover:border-[#E50914] transition-colors shadow-md">
+                          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mx-auto border-2 border-zinc-800 hover:border-primary transition-colors shadow-md">
                             <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
                           </div>
                           <p className="text-xs font-semibold text-zinc-300 truncate max-w-[100px] mx-auto">{person.name}</p>
