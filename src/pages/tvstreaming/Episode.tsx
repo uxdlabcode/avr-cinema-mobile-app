@@ -31,7 +31,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false }) => {
     const groups: Record<string, TvShowItem[]> = {};
     items.forEach((item) => {
       if (item.genres && item.genres.length > 0) {
-        item.genres.forEach((genre) => {
+        item.genres.forEach((genre: string) => {
           if (!groups[genre]) {
             groups[genre] = [];
           }
