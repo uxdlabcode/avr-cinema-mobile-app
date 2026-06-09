@@ -48,7 +48,8 @@ export const createRazorpayOrder = functions.https.onCall(async (data, context) 
     return {
       orderId: order.id,
       amount: order.amount,
-      currency: order.currency
+      currency: order.currency,
+      keyId: razorpayKeyId
     };
 
   } catch (error: any) {
@@ -92,21 +93,21 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
       planId,
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
-      amountTotal: amount,
+      amountTotal: Number(amount) / 100,
       currency,
       status: 'completed',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    // Update user membership
+    // Update user membership 
     if (userId) {
-      await db.collection('users').doc(userId).update({
+      await db.collection('users').doc(userId).set({
         membershipPlanId: planId,
         membershipStatus: 'active',
         membershipStartDate: admin.firestore.FieldValue.serverTimestamp(),
         lastPaymentId: razorpay_payment_id,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      }, { merge: true });
     }
 
     console.log("Payment verified and saved");

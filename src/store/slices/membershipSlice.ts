@@ -33,7 +33,7 @@ export const createRazorpayOrderAsync = createAsyncThunk(
       const createRazorpayOrder = httpsCallable(functions, "createRazorpayOrder");
 
       const response = await createRazorpayOrder({ planId, price, name, description, userId });
-      const data = response.data as { orderId: string; amount: number; currency: string };
+      const data = response.data as { orderId: string; amount: number; currency: string; keyId?: string };
 
       if (!data.orderId) {
         return rejectWithValue("Invalid order response from server");

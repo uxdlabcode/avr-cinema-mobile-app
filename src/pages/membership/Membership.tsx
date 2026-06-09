@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, MonitorSmartphone, X, Crown, ShieldCheck, AlertTriangle } from "lucide-react";
 import { MembershipSkeleton } from "./MembershipSkeleton";
 import { Spinner } from "@/components/ui/spinner";
-import LogoImage from "@/assets/Media (3) 1.png";
 import { toast } from "sonner";
 
 interface Plan {
@@ -99,7 +98,7 @@ export default function Membership() {
             console.log("Order creation result:", resultAction);
 
             if (createRazorpayOrderAsync.fulfilled.match(resultAction)) {
-                const { orderId, amount, currency } = resultAction.payload;
+                const { orderId, amount, currency, keyId } = resultAction.payload;
 
                 console.log("Order created:", orderId, amount, currency);
 
@@ -109,7 +108,7 @@ export default function Membership() {
                 }
 
                 const options = {
-                    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+                    key: keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
                     amount: amount,
                     currency: currency as any,
                     name: "AVR Cinema",
@@ -136,7 +135,7 @@ export default function Membership() {
                         },
                     },
                     handler: async (response: any) => {
-                        console.log("Payment success response:", response);
+                        // console.log("Payment success response:", response);
 
                         const loadingToast = toast.loading("Verifying payment...");
 
@@ -206,6 +205,17 @@ export default function Membership() {
 
     return (
         <div className="min-h-screen bg-black text-primary p-6 relative pb-20">
+            {/* Payment Processing Overlay */}
+            {paymentProcessing && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4 animate-in fade-in duration-200">
+                    <Spinner size="lg" className="text-primary-foreground" />
+                    <div className="text-center">
+                        <p className="text-white font-bold text-lg mb-1">Processing Payment</p>
+                        <p className="text-zinc-400 text-sm px-4">Please do not close this window or click back.</p>
+                    </div>
+                </div>
+            )}
+
             {/* Skip Button */}
             <button
                 onClick={handleSkip}
@@ -217,7 +227,7 @@ export default function Membership() {
             {/* Logo */}
             <div className="fixed top-0 left-0 right-0 pt-4 flex justify-center z-50 pointer-events-none bg-gradient-to-b from-black/80 to-transparent pb-4">
                 <img
-                    src={LogoImage}
+                    src="/assets/logo.png"
                     alt="AVR Cinema"
                     className="h-10 md:h-14 w-auto object-contain"
                     onError={(e) => {
@@ -330,7 +340,7 @@ export default function Membership() {
                                             >
                                                 {localLoadingPlan === plan.id ? (
                                                     <>
-                                                        <Spinner className="w-4 h-4 mr-2 border-black" />
+                                                        <Spinner size="sm" className="mr-2" />
                                                         Processing...
                                                     </>
                                                 ) : (
