@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Play, ChevronRight, ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -11,7 +11,7 @@ import {
 import { getMatchingData, getSignedUrl } from '@/Firebase';
 import Header from '@/components/Header';
 import RecentTVShows from './Episode';
-import DocumentaryList from '../HomePage/DocumentaryList';
+import DocumentaryList from './DocumentaryList';
 
 interface TvShowItem {
   id: string;
@@ -91,7 +91,9 @@ const TvDetailsSkeleton = () => (
 
 const TvDetails = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('For You');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'For You';
+  const setActiveTab = (tab: string) => setSearchParams({ tab });
   const [activeDay, setActiveDay] = useState('TODAY');
   const [isLoading, setIsLoading] = useState(true);
   const [tvShows, setTvShows] = useState<TvShowItem[]>([]);
@@ -227,7 +229,7 @@ const TvDetails = () => {
       {/* Popular TV Shows */}
       {activeTab === 'For You' && tvShows.length > 0 && (
         <section className="px-4 pt-6 space-y-3">
-          <h2 
+          <h2
             className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors"
             onClick={() => setActiveTab('TV Shows')}
           >
@@ -262,14 +264,14 @@ const TvDetails = () => {
       {/* TV Shows Tab */}
       {activeTab === 'TV Shows' && (
         <div className="px-4 pt-6">
-          <RecentTVShows />
+          <RecentTVShows isGrid={true} />
         </div>
       )}
 
       {/* Documentaries Tab */}
       {activeTab === 'Documentaries' && (
         <div className="px-4 pt-6">
-          <DocumentaryList />
+          <DocumentaryList isGrid={true} />
         </div>
       )}
 

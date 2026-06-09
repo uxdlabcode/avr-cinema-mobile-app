@@ -14,12 +14,43 @@ interface TvShowItem {
   [key: string]: any;
 }
 
-const RecentTVShows = () => {
+interface Props {
+  isGrid?: boolean;
+}
+
+const RecentTVShows: React.FC<Props> = ({ isGrid = false }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<TvShowItem[]>([]);
+  const [groupedItems, setGroupedItems] = useState<Record<string, TvShowItem[]>>({});
   const rowRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    const groups: Record<string, TvShowItem[]> = {};
+    items.forEach((item) => {
+      if (item.genres && item.genres.length > 0) {
+        item.genres.forEach((genre) => {
+          if (!groups[genre]) {
+            groups[genre] = [];
+          }
+          if (!groups[genre].some(g => g.id === item.id)) {
+            groups[genre].push(item);
+          }
+        });
+      } else {
+        const fallback = "General";
+        if (!groups[fallback]) {
+          groups[fallback] = [];
+        }
+        if (!groups[fallback].some(g => g.id === item.id)) {
+          groups[fallback].push(item);
+        }
+      }
+    });
+    setGroupedItems(groups);
+  }, [items]);
 
   useEffect(() => {
     const fetchShows = async () => {
@@ -90,8 +121,81 @@ const RecentTVShows = () => {
 
   if (items.length === 0) return null;
 
+  if (isGrid) {
+    return (
+      <div className="space-y-8 w-full text-left">
+        {Object.keys(groupedItems).map((genre) => {
+          const genreItems = groupedItems[genre];
+          if (genreItems.length === 0) return null;
+          return (
+            <div key={genre} className="space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Tv className="w-4 h-4 text-primary" />
+                <h3 className="text-base md:text-xl font-bold text-white tracking-wide">
+                  {genre}
+                </h3>
+              </div>
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4 pb-4">
+                {genreItems.map((show) => (
+                  <div
+                    key={show.id}
+                    onClick={() => navigate(`/video/${show.id}`)}
+                    className="relative w-full h-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
+                  >
+                    <img
+                      src={show.signedThumbnailUrl || '/assets/poster.png'}
+                      alt={show.title}
+                      className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
+                    />
+
+                    {/* Mobile Title */}
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover/card:opacity-0 transition-opacity duration-300 md:hidden z-10">
+                      <p className="text-xs font-semibold text-white truncate text-center drop-shadow-md">
+                        {show.title}
+                      </p>
+                    </div>
+
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
+                      <div className="flex justify-end mb-1">
+                        <span className="text-[8px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                          TV Show
+                        </span>
+                      </div>
+                      <h4 className="text-xs md:text-sm font-bold text-white leading-tight mb-1 truncate drop-shadow-md">
+                        {show.title}
+                      </h4>
+                      <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-1.5">
+                        <span>{show.releaseYear || 'N/A'}</span>
+                        <span>{show.seasons ? `${show.seasons.length} S` : '1 S'}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/video/${show.id}`); }}
+                          className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                        >
+                          Play
+                        </button>
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-1 text-left relative group/row w-full">
+    <div className={`text-left relative group/row w-full space-y-1`}>
       <div className="flex items-center gap-2 mb-3">
         <Tv className="w-4 h-4 text-primary" />
         <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,7 +18,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import RecentTVShows from "../tvstreaming/Episode";
-import DocumentaryList from "../HomePage/DocumentaryList";
+import DocumentaryList from "../tvstreaming/DocumentaryList";
 
 interface TVItem {
   id: string;
@@ -326,7 +326,9 @@ const TvTab = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [tvShows, setTvShows] = useState<TVItem[]>([]);
   const [groupedTV, setGroupedTV] = useState<Record<string, TVItem[]>>({});
-  const [activeTab, setActiveTab] = useState("forYou");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "forYou";
+  const setActiveTab = (tab: string) => setSearchParams({ tab });
 
   // Featured hero carousel state
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -583,11 +585,11 @@ const TvTab = () => {
             )}
 
             {activeTab === "tvShows" && (
-              <RecentTVShows />
+              <RecentTVShows isGrid={true} />
             )}
 
             {activeTab === "documentaries" && (
-              <DocumentaryList />
+              <DocumentaryList isGrid={true} />
             )}
           </div>
         </div>

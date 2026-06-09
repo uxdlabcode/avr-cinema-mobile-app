@@ -14,13 +14,13 @@ export const addRecentSearch = async (uid: string, searchQuery: string): Promise
     uid,
     timestamp: Date.now(),
   };
-  const docRef = await addDoc(collection(db, "recentsearch"), data);
+  const docRef = await addDoc(collection(db, "searches"), data);
   return { id: docRef.id, ...data };
 };
 
 export const fetchRecentSearches = async (uid: string, limitCount: number = 7, lastTimestamp?: number): Promise<RecentSearchDoc[]> => {
   let q = query(
-    collection(db, "recentsearch"),
+    collection(db, "searches"),
     where("uid", "==", uid),
     orderBy("timestamp", "desc"),
     limit(limitCount)
@@ -29,7 +29,7 @@ export const fetchRecentSearches = async (uid: string, limitCount: number = 7, l
   if (lastTimestamp) {
     // startAfter expects the actual values of the orderBy fields
     q = query(
-      collection(db, "recentsearch"),
+      collection(db, "searches"),
       where("uid", "==", uid),
       orderBy("timestamp", "desc"),
       startAfter(lastTimestamp),
@@ -42,16 +42,16 @@ export const fetchRecentSearches = async (uid: string, limitCount: number = 7, l
 };
 
 export const deleteRecentSearch = async (docId: string): Promise<void> => {
-  await deleteDoc(doc(db, "recentsearch", docId));
+  await deleteDoc(doc(db, "searches", docId));
 };
 
 export const clearAllRecentSearches = async (uid: string): Promise<void> => {
-  const q = query(collection(db, "recentsearch"), where("uid", "==", uid));
+  const q = query(collection(db, "searches"), where("uid", "==", uid));
   const snapshot = await getDocs(q);
   
   const batch = writeBatch(db);
   snapshot.docs.forEach((document) => {
-    batch.delete(doc(db, "recentsearch", document.id));
+    batch.delete(doc(db, "searches", document.id));
   });
   
   await batch.commit();

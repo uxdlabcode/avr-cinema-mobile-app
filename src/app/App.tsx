@@ -9,12 +9,12 @@ import { auth, db } from "@/Firebase/firebase";
 
 function App() {
   const dispatch = useAppDispatch();
-  const { pathname } = useLocation();
+  const location = useLocation();
 
   // Scroll to top on route change (triggered)
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     let unsubscribeDoc: (() => void) | null = null;

@@ -13,7 +13,7 @@ import RecentWatch from "./RecentWatch";
 import TrendNow from "./TrendNow";
 import Header from "@/components/Header";
 import RecentTVShows from "../tvstreaming/Episode";
-import DocumentaryList from "./DocumentaryList";
+import DocumentaryList from "../tvstreaming/DocumentaryList";
 
 const fallbackData = [
   {
@@ -29,6 +29,8 @@ const fallbackData = [
     tags: ["Fantasy", "Epic", "Adventure", "Action"],
   }
 ];
+
+import { HomePageSkeleton } from "./HomePageSkeleton";
 
 export const HomePage = () => {
   const [featuredMovies, setFeaturedMovies] = useState<any[]>([]);
@@ -93,6 +95,15 @@ export const HomePage = () => {
 
   const navigate = useNavigate();
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#000000] text-white w-full overflow-hidden pb-20 md:pb-0">
+        <Header />
+        <HomePageSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#000000] text-white w-full overflow-hidden pb-20 md:pb-0">
       <Header />
@@ -108,8 +119,8 @@ export const HomePage = () => {
       >
         <CarouselContent className="ml-0">
           {featuredMovies.map((movie) => (
-            <CarouselItem 
-              key={movie.id} 
+            <CarouselItem
+              key={movie.id}
               className="pl-0 relative w-full h-[70vh] md:h-[85vh] flex flex-col justify-end cursor-pointer"
               onClick={() => navigate(`/video/${movie.id}`)}
             >
