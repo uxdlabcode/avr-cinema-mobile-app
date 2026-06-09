@@ -63,8 +63,8 @@ export const createRazorpayOrderAsync = createAsyncThunk(
 export const verifyRazorpayPaymentAsync = createAsyncThunk(
   "membership/verifyRazorpayPayment",
   async (
-    { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, amount, currency }:
-      { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string; userId: string; planId: string; amount: number; currency: string },
+    { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, amount, currency, billingCycle }:
+      { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string; userId: string; planId: string; amount: number; currency: string; billingCycle: string },
     { rejectWithValue }
   ) => {
     try {
@@ -72,7 +72,7 @@ export const verifyRazorpayPaymentAsync = createAsyncThunk(
       const verifyRazorpayPayment = httpsCallable(functions, "verifyRazorpayPayment");
 
       const response = await verifyRazorpayPayment({
-        razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, amount, currency
+        razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, amount, currency, billingCycle
       });
 
       return response.data;

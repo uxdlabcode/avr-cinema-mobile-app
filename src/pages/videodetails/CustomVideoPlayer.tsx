@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { serverTimestamp } from 'firebase/firestore';
 import {
   Play, Pause, ChevronLeft, Cast, Volume2, VolumeX, Maximize, Minimize,
   Settings, ChevronsLeft, ChevronsRight, Heart, Sun, X, Check,
@@ -103,7 +104,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             movieId: movie.id,
             currentTime: time,
             duration: currentDur,
-            updatedAt: Date.now()
+            updatedAt: serverTimestamp()
           };
           if (currentEpisode) {
             payload.episodeId = currentEpisode.id;

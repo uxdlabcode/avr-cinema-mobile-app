@@ -56,7 +56,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     setNameError("");
     setEmailError("");
     setPasswordError("");
@@ -163,7 +163,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     <form noValidate className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <FieldGroup className="gap-6">
         <div className="flex flex-col items-center gap-1 text-center mb-4">
-          <img src="/assets/logo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
+          <img src="/assets/headerLogo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
           <h1 className="text-2xl font-bold text-primary">Create an Account</h1>
           <p className="text-primary/70 text-sm">
             Sign up now to get started with an account.
@@ -173,14 +173,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           <FieldLabel htmlFor="name" className="text-primary/90">
             Full Name<span className="text-red-500">*</span>
           </FieldLabel>
-          <Input 
-            id="name" 
-            name="name" 
-            type="text" 
-            placeholder="John Doe" 
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="John Doe"
             value={name}
             onChange={handleNameChange}
-            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" 
+            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50"
           />
           {nameError && <FieldError>{nameError}</FieldError>}
         </Field>
@@ -188,14 +188,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           <FieldLabel htmlFor="email" className="text-primary/90">
             Email Address<span className="text-red-500">*</span>
           </FieldLabel>
-          <Input 
-            id="email" 
-            name="email" 
-            type="email" 
-            placeholder="sarah@gmail.com" 
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="sarah@gmail.com"
             value={email}
             onChange={handleEmailChange}
-            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50" 
+            className="bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50"
           />
           {emailError && <FieldError>{emailError}</FieldError>}
         </Field>
@@ -254,14 +254,14 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
         <Field data-invalid={!!termsError} className="gap-1.5 mt-1">
           <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="terms" 
+            <Checkbox
+              id="terms"
               checked={terms}
               onCheckedChange={(checked) => {
                 setTerms(!!checked);
                 if (termsError) setTermsError("");
               }}
-              className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-secondary rounded-sm w-4 h-4 bg-white" 
+              className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-secondary rounded-sm w-4 h-4 bg-white"
             />
             <label
               htmlFor="terms"

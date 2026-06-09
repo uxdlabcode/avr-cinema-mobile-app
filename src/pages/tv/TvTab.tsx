@@ -147,11 +147,10 @@ const TVCategoryRow = ({
         {/* Horizontal Scrollable Row */}
         <div
           ref={rowRef}
-          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${
-            isTrending
+          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${isTrending
               ? "gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20"
               : "gap-4 pb-1"
-          }`}
+            }`}
         >
           {displayList.map((tv, index) => {
             if (isTrending) {
@@ -442,7 +441,7 @@ const TvTab = () => {
 
         {/* Center Logo */}
         <img
-          src="/assets/logo.png"
+          src="/assets/headerLogo.png"
           alt="AVR Cinema"
           className="h-8 object-contain absolute left-1/2 -translate-x-1/2"
         />
@@ -523,11 +522,10 @@ const TvTab = () => {
                   <button
                     key={index}
                     onClick={() => carouselApi?.scrollTo(index)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      currentSlide === index
+                    className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
                         ? "w-6 bg-primary"
                         : "w-2 bg-zinc-650 hover:bg-zinc-400"
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -536,21 +534,21 @@ const TvTab = () => {
 
           {/* Category Tabs */}
           <div className="flex items-center gap-6 px-4 md:px-12 lg:px-16 pt-6 pb-0 border-b border-zinc-900 w-full max-w-7xl mx-auto">
-            <button 
+            <button
               onClick={() => setActiveTab("forYou")}
               className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "forYou" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
             >
               For You
               {activeTab === "forYou" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab("tvShows")}
               className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "tvShows" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
             >
               TV Shows
               {activeTab === "tvShows" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab("documentaries")}
               className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "documentaries" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
             >

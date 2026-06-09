@@ -39,7 +39,7 @@ export function Navbar() {
       <header className="hidden md:flex items-center justify-between h-[70px] px-6 lg:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50 sticky top-0 z-50 transition-all">
         <div className="flex items-center gap-8">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <img src="/logo.png" alt="STREAMIT Logo" className="h-6 md:h-8 object-contain" />
+            <img src="/assets/headerLogo.png" alt="AVR Logo" className="h-6 md:h-8 object-contain" />
           </Link>
           <Button className="bg-primary-foreground/10 hover:bg-primary-foreground/20 text-primary-foreground border border-primary-foreground gap-2 text-sm font-semibold rounded-md h-9 px-4">
             <Crown className="w-4 h-4 text-primary-foreground" />

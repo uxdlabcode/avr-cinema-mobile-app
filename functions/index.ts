@@ -69,7 +69,8 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
       userId,
       planId,
       amount,
-      currency
+      currency,
+      billingCycle
     } = data;
 
     // Verify signature
@@ -91,6 +92,7 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
       type: 'razorpay.payment.success',
       userId,
       planId,
+      billingCycle: billingCycle || 'monthly',
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
       amountTotal: Number(amount) / 100,
@@ -101,10 +103,17 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
 
     // Update user membership 
     if (userId) {
+      const isYearly = billingCycle === 'yearly';
+      const durationDays = isYearly ? 365 : 30;
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + durationDays);
+
       await db.collection('users').doc(userId).set({
         membershipPlanId: planId,
         membershipStatus: 'active',
+        membershipBillingCycle: billingCycle || 'monthly',
         membershipStartDate: admin.firestore.FieldValue.serverTimestamp(),
+        membershipExpiryDate: admin.firestore.Timestamp.fromDate(expiryDate),
         lastPaymentId: razorpay_payment_id,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       }, { merge: true });
@@ -117,5 +126,49 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
   } catch (error: any) {
     console.error("Verification error:", error);
     throw new functions.https.HttpsError('internal', error.message);
+  }
+});
+
+export const deleteUser = functions.https.onCall(async (data, context) => {
+  try {
+    console.log("deleteUser called");
+
+    const { uid } = data;
+
+    if (!uid) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing required user UID');
+    }
+
+    // Security check: Verify that the caller is authenticated
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');
+    }
+
+    // Check caller's role from Firestore
+    const db = admin.firestore();
+    const callerRef = db.collection('users').doc(context.auth.uid);
+    const callerSnap = await callerRef.get();
+    
+    if (!callerSnap.exists) {
+      throw new functions.https.HttpsError('permission-denied', 'Caller user document does not exist.');
+    }
+
+    const callerData = callerSnap.data();
+    if (callerData?.role !== 'admin' && callerData?.role !== 'superadmin') {
+      throw new functions.https.HttpsError('permission-denied', 'Only admin or superadmin can delete users.');
+    }
+
+    // Perform deletion in Firebase Authentication
+    await admin.auth().deleteUser(uid);
+    console.log(`Successfully deleted auth user with UID: ${uid}`);
+
+    return { success: true, message: `Successfully deleted user ${uid} from authentication.` };
+
+  } catch (error: any) {
+    console.error("Error in deleteUser function:", error);
+    if (error instanceof functions.https.HttpsError) {
+      throw error;
+    }
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to delete user.');
   }
 });

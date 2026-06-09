@@ -40,6 +40,7 @@ export default function Membership() {
     const { user } = useAppSelector((state) => state.auth);
     const [localLoadingPlan, setLocalLoadingPlan] = useState<string | null>(null);
     const [paymentError, setPaymentError] = useState<string | null>(null);
+    const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
     const { Razorpay } = useRazorpay();
 
     const isSuccess = searchParams.get("success") === "true";
@@ -84,14 +85,17 @@ export default function Membership() {
         // Set loading state for this specific plan
         setLocalLoadingPlan(plan.id);
 
+        const selectedPrice = billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+        const billingDesc = billingCycle === "monthly" ? "Monthly Subscription" : "Yearly Subscription";
+
         try {
-            console.log("Creating order for plan:", plan.id, "Price:", plan.monthlyPrice);
+            console.log("Creating order for plan:", plan.id, "Price:", selectedPrice);
 
             const resultAction = await dispatch(createRazorpayOrderAsync({
                 planId: plan.id,
-                price: plan.monthlyPrice,
+                price: selectedPrice,
                 name: plan.name,
-                description: plan.description,
+                description: `${plan.name} - ${billingDesc}`,
                 userId: user.id,
             }));
 
@@ -112,7 +116,7 @@ export default function Membership() {
                     amount: amount,
                     currency: currency as any,
                     name: "AVR Cinema",
-                    description: `${plan.name} - Monthly Subscription`,
+                    description: `${plan.name} - ${billingCycle === "monthly" ? "Monthly" : "Yearly"} Subscription`,
                     order_id: orderId,
                     prefill: {
                         name: user.displayName || user.email?.split('@')[0] || "",
@@ -123,6 +127,7 @@ export default function Membership() {
                         userId: user.id,
                         planId: plan.id,
                         planName: plan.name,
+                        billingCycle: billingCycle
                     },
                     theme: {
                         color: "#eab308",
@@ -147,7 +152,8 @@ export default function Membership() {
                                 userId: user.id,
                                 planId: plan.id,
                                 amount: amount,
-                                currency: currency
+                                currency: currency,
+                                billingCycle: billingCycle
                             }));
 
                             toast.dismiss(loadingToast);
@@ -227,7 +233,7 @@ export default function Membership() {
             {/* Logo */}
             <div className="fixed top-0 left-0 right-0 pt-4 flex justify-center z-50 pointer-events-none bg-gradient-to-b from-black/80 to-transparent pb-4">
                 <img
-                    src="/assets/logo.png"
+                    src="/assets/headerLogo.png"
                     alt="AVR Cinema"
                     className="h-10 md:h-14 w-auto object-contain"
                     onError={(e) => {
@@ -239,7 +245,38 @@ export default function Membership() {
             <div className="max-w-2xl mx-auto pt-20">
                 <div className="text-center mb-8">
                     <h1 className="text-2xl md:text-3xl font-bold mb-2 text-primary">Choose your plan</h1>
-                    <p className="text-zinc-400 text-sm">Unlock endless entertainment. Cancel anytime.</p>
+                    <p className="text-zinc-400 text-sm mb-6">Unlock endless entertainment. Cancel anytime.</p>
+                    
+                    {/* Billing Cycle Switcher */}
+                    <div className="flex justify-center items-center gap-4 mb-2">
+                        <button
+                            onClick={() => setBillingCycle("monthly")}
+                            className={`px-4 py-2 text-sm font-semibold rounded-full border transition-all cursor-pointer ${
+                                billingCycle === "monthly"
+                                    ? "bg-white text-black border-white shadow"
+                                    : "bg-transparent text-zinc-400 border-zinc-800 hover:text-white"
+                            }`}
+                        >
+                            Monthly
+                        </button>
+                        <button
+                            onClick={() => setBillingCycle("yearly")}
+                            className={`px-4 py-2 text-sm font-semibold rounded-full border transition-all flex items-center gap-1.5 cursor-pointer ${
+                                billingCycle === "yearly"
+                                    ? "bg-white text-black border-white shadow"
+                                    : "bg-transparent text-zinc-400 border-zinc-800 hover:text-white"
+                            }`}
+                        >
+                            Annually
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase transition-all ${
+                                billingCycle === "yearly"
+                                    ? "bg-black text-white font-black"
+                                    : "bg-green-500/20 text-green-400 border border-green-500/30"
+                            }`}>
+                                Save up to 33%
+                            </span>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Payment Error Banner */}
@@ -285,8 +322,12 @@ export default function Membership() {
                                             <p className="text-xs text-zinc-400 font-normal">{plan.description}</p>
                                         </div>
                                         <div className="flex flex-col items-end shrink-0 ml-4">
-                                            <span className="font-bold text-white">₹{plan.monthlyPrice}</span>
-                                            <span className="text-[10px] text-zinc-500 font-normal">/ month</span>
+                                            <span className="font-bold text-white">
+                                                ₹{billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice}
+                                            </span>
+                                            <span className="text-[10px] text-zinc-500 font-normal">
+                                                / {billingCycle === "monthly" ? "month" : "year"}
+                                            </span>
                                         </div>
                                     </div>
                                 </AccordionTrigger>
@@ -334,7 +375,7 @@ export default function Membership() {
 
                                         <div className="pt-6 border-t border-zinc-800/50">
                                             <Button
-                                                className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-10"
+                                                className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-10 cursor-pointer"
                                                 onClick={() => handleSelectPlan(plan)}
                                                 disabled={!!localLoadingPlan}
                                             >
@@ -346,13 +387,17 @@ export default function Membership() {
                                                 ) : (
                                                     <>
                                                         <Crown className="w-4 h-4 mr-2" />
-                                                        Select {plan.name}
+                                                        Select {plan.name} ({billingCycle === "monthly" ? "Monthly" : "Annually"})
                                                     </>
                                                 )}
                                             </Button>
                                             {plan.yearlyPrice > 0 && (
                                                 <p className="text-center text-xs text-zinc-500 mt-3">
-                                                    Or get yearly for ₹{plan.yearlyPrice} (Save {(100 - (plan.yearlyPrice / (plan.monthlyPrice * 12)) * 100).toFixed(0)}%)
+                                                    {billingCycle === "monthly" ? (
+                                                        `Or get yearly for ₹${plan.yearlyPrice} (Save ${(100 - (plan.yearlyPrice / (plan.monthlyPrice * 12)) * 100).toFixed(0)}%)`
+                                                    ) : (
+                                                        `Or get monthly for ₹${plan.monthlyPrice}`
+                                                    )}
                                                 </p>
                                             )}
                                         </div>

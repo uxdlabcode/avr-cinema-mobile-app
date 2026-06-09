@@ -117,7 +117,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     <form noValidate className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
       <FieldGroup className="gap-6">
         <div className="flex flex-col items-center gap-1 text-center mb-4">
-          <img src="/assets/logo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
+          <img src="/assets/headerLogo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
           <h1 className="text-2xl font-bold text-primary">Log in to your Account</h1>
           <p className="text-primary/70 text-sm">
             Welcome back, please enter your details.

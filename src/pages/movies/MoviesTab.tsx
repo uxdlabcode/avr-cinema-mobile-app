@@ -312,7 +312,7 @@ const MoviesTab = () => {
   const featuredList = movies.slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative pt-20">
+    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative ">
       <Header />
 
       {isLoading ? (
