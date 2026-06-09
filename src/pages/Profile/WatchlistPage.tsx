@@ -25,7 +25,8 @@ export const WatchlistPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-24">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border p-4 flex items-center gap-4">
+      <div className="fixed top-0 left-0 right-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border">
+        <div className="flex items-center gap-4 p-4 max-w-7xl mx-auto w-full">
         <button 
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
@@ -33,10 +34,11 @@ export const WatchlistPage = () => {
           <ChevronLeft className="w-6 h-6 text-foreground" />
         </button>
         <h1 className="text-xl font-bold text-foreground">{title}</h1>
+        </div>
       </div>
 
       {/* Grid */}
-      <div className="p-4 pt-24">
+      <div className="p-4 pt-24 max-w-7xl mx-auto w-full">
         {items.length === 0 ? (
           <div className="flex items-center justify-center h-40 text-muted-foreground">
             {title} is empty

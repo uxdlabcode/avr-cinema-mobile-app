@@ -132,12 +132,12 @@ export const QuizResultPage = () => {
 
       {/* Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px]">
+        <div className="flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
           <h1 className="text-foreground font-bold text-lg">Quiz Results</h1>
         </div>
       </div>
 
-      <div className="flex-1 pt-[64px] pb-28 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 pt-[64px] pb-28 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
 
         {/* ── Score hero ─────────────────────────────────────────────── */}
         <div
@@ -258,7 +258,8 @@ export const QuizResultPage = () => {
       </div>
 
       {/* ── Bottom CTAs ────────────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 pb-safe z-40 flex gap-3">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 pb-safe z-40">
+        <div className="max-w-[700px] mx-auto w-full flex gap-3">
         <button
           id="quiz-result-home-btn"
           onClick={() => navigate("/profile")}
@@ -275,6 +276,7 @@ export const QuizResultPage = () => {
           <RotateCcw className="w-4 h-4" />
           Try Again
         </button>
+        </div>
       </div>
     </div>
   );

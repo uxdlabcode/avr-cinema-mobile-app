@@ -5,6 +5,7 @@ import Signin from "@/pages/Auth/Signin";
 import Signup from "@/pages/Auth/Signup";
 import { UserDashboard } from "@/pages/Dashboard/UserDashboard";
 import { ProfilePage } from "@/pages/Profile/ProfilePage";
+import { UpgradePlanPage } from "@/pages/Profile/UpgradePlanPage";
 import { UpdateProfilePage } from "@/pages/Profile/UpdateProfilePage";
 import { WatchlistPage } from "@/pages/Profile/WatchlistPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -19,7 +20,7 @@ import MoviesTab from "@/pages/movies/MoviesTab";
 import Membership from "@/pages/membership/Membership";
 import Episode from "@/pages/tvstreaming/Episode";
 import { GetSupportPage } from "@/pages/Profile/GetSupportPage";
-import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
+// import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
 import { QuizzesPage } from "@/pages/Quizzes/QuizzesPage";
 import { QuizDetailPage } from "@/pages/Quizzes/QuizDetailPage";
 import { QuizResultPage } from "@/pages/Quizzes/QuizResultPage";
@@ -76,13 +77,13 @@ export const appRoutes: RouteObject[] = [
     ),
   },
   {
-        path: "quizzes/:id/result",
-        element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
-            <QuizResultPage />
-          </ProtectedRoute>
-        ),
-      },
+    path: "quizzes/:id/result",
+    element: (
+      <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+        <QuizResultPage />
+      </ProtectedRoute>
+    ),
+  },
   {
     path: "quizzes/:id",
     element: (
@@ -132,6 +133,14 @@ export const appRoutes: RouteObject[] = [
         element: <HomePage />,
       },
       {
+        path: "upgrade-plan",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <UpgradePlanPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "profile",
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
@@ -164,13 +173,21 @@ export const appRoutes: RouteObject[] = [
         ),
       },
       {
-        path: "notifications",
+        path: "support/ticket/:ticketId",
         element: (
           <ProtectedRoute allowedRoles={["superadmin", "user"]}>
-            <NotificationsPage />
+            <GetSupportPage />
           </ProtectedRoute>
         ),
       },
+      // {
+      //   path: "notifications",
+      //   element: (
+      //     <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+      //       <NotificationsPage />
+      //     </ProtectedRoute>
+      //   ),
+      // },
       {
         path: "quiz",
         element: (

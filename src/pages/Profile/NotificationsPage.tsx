@@ -83,6 +83,7 @@ export const NotificationsPage = () => {
 
       {/* ── Header & Tabs (Fixed) ── */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background">
+        <div className="max-w-[700px] mx-auto w-full">
         <div className="flex items-center gap-3 px-4 pt-5 pb-4">
           <button
             onClick={() => navigate("/profile")}
@@ -118,10 +119,11 @@ export const NotificationsPage = () => {
             )}
           </button>
         </div>
+        </div>
       </div>
 
       {/* ── Notification List ── */}
-      <div className="flex flex-col divide-y divide-white/5 pt-32">
+      <div className="flex flex-col divide-y divide-white/5 pt-32 max-w-[700px] mx-auto w-full">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-500">
             <p className="text-sm">No notifications yet</p>

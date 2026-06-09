@@ -129,7 +129,7 @@ export const QuizzesPage = () => {
 
       {/* ── Fixed Header ───────────────────────────────────────────────── */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px]">
+        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
           <button
             id="quizzes-back-btn"
             onClick={() => navigate("/dashboard")}
@@ -142,7 +142,7 @@ export const QuizzesPage = () => {
       </div>
 
       {/* ── Scrollable Body ────────────────────────────────────────────── */}
-      <div className="flex-1 pt-[64px] pb-24 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 pt-[64px] pb-24 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
 
         {/* Hero banner */}
         <div

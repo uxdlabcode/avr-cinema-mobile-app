@@ -103,7 +103,7 @@ export const UpdateProfilePage = () => {
 
       {/* Fixed Header */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px]">
+        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
           <button
             onClick={() => navigate("/profile")}
             className="absolute left-4 w-9 h-9 rounded-full flex items-center justify-center border border-border hover:bg-muted transition-colors z-10"

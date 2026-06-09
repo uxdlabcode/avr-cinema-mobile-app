@@ -146,7 +146,7 @@ export const QuizDetailPage = () => {
       <div className="min-h-screen flex flex-col bg-background">
         {/* Header */}
         <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-          <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px]">
+          <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
             <button
               id="quiz-detail-back-btn"
               onClick={() => navigate("/profile")}
@@ -161,7 +161,7 @@ export const QuizDetailPage = () => {
         </div>
 
         {/* Body */}
-        <div className="flex-1 pt-[64px] pb-8 flex flex-col gap-6 px-4 overflow-y-auto scrollbar-hide">
+        <div className="flex-1 pt-[64px] pb-8 flex flex-col gap-6 px-4 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
           {/* Hero */}
           <div
             className="mt-4 rounded-2xl p-6 flex flex-col items-center gap-3 text-center"
@@ -237,7 +237,7 @@ export const QuizDetailPage = () => {
 
       {/* Fixed header — with back button + progress */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="px-4 pt-4 pb-3">
+        <div className="px-4 pt-4 pb-3 max-w-[700px] mx-auto">
           {/* Top row: back + title + counter */}
           <div className="flex items-center gap-3 mb-3">
             <button
@@ -269,7 +269,7 @@ export const QuizDetailPage = () => {
       </div>
 
       {/* Scrollable body — pb accounts for bottom button */}
-      <div className="flex-1 pt-[88px] pb-28 px-4 overflow-y-auto scrollbar-hide">
+      <div className="flex-1 pt-[88px] pb-28 px-4 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
         {/* Question card */}
         <div className="mt-4 rounded-2xl bg-card border border-border p-5">
           <div className="flex items-start gap-3 mb-2">
@@ -350,6 +350,7 @@ export const QuizDetailPage = () => {
 
       {/* Bottom CTA — sits at the bottom of the screen */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 pb-safe z-40">
+        <div className="max-w-[700px] mx-auto w-full">
         {!showFeedback ? (
           <button
             id="quiz-confirm-btn"
@@ -373,6 +374,7 @@ export const QuizDetailPage = () => {
             <ChevronRight className="w-4 h-4" />
           </button>
         )}
+        </div>
       </div>
     </div>
   );
