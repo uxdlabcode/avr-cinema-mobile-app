@@ -296,7 +296,12 @@ const Search = () => {
                                     key={movie.id}
                                     className={`relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10 ${isLarge ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
                                         }`}
-                                    onClick={() => navigate('/video/' + movie.id)}
+                                    onClick={() => {
+                                        if (query.trim() && user?.id) {
+                                            dispatch(saveSearch({ uid: user.id, query: query.trim() }));
+                                        }
+                                        navigate('/video/' + movie.id);
+                                    }}
                                 >
                                     {thumb ? (
                                         <img
