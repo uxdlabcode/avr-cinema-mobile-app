@@ -83,7 +83,7 @@ const data = {
     },
     {
       title: "System Settings",
-      url: "/settings",
+      url: "/home",
       icon: Settings,
     },
   ],

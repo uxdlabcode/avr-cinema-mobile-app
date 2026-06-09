@@ -17,6 +17,8 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import RecentTVShows from "../tvstreaming/Episode";
+import DocumentaryList from "../HomePage/DocumentaryList";
 
 interface TVItem {
   id: string;
@@ -325,6 +327,7 @@ const TvTab = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [tvShows, setTvShows] = useState<TVItem[]>([]);
   const [groupedTV, setGroupedTV] = useState<Record<string, TVItem[]>>({});
+  const [activeTab, setActiveTab] = useState("forYou");
 
   // Featured hero carousel state
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -531,26 +534,63 @@ const TvTab = () => {
             </div>
           )}
 
-          {/* Dynamic Category Sliders */}
-          <div className="px-4 md:px-12 lg:px-16 pt-10 pb-24 space-y-10 w-full max-w-7xl mx-auto">
-            {Object.keys(groupedTV).map((genreName) => {
-              const list = groupedTV[genreName];
-              if (list.length === 0) return null;
+          {/* Category Tabs */}
+          <div className="flex items-center gap-6 px-4 md:px-12 lg:px-16 pt-6 pb-0 border-b border-zinc-900 w-full max-w-7xl mx-auto">
+            <button 
+              onClick={() => setActiveTab("forYou")}
+              className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "forYou" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
+            >
+              For You
+              {activeTab === "forYou" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
+            </button>
+            <button 
+              onClick={() => setActiveTab("tvShows")}
+              className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "tvShows" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
+            >
+              TV Shows
+              {activeTab === "tvShows" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
+            </button>
+            <button 
+              onClick={() => setActiveTab("documentaries")}
+              className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "documentaries" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
+            >
+              Documentaries
+              {activeTab === "documentaries" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
+            </button>
+          </div>
 
-              return (
-                <TVCategoryRow
-                  key={genreName}
-                  genreName={genreName}
-                  list={list}
-                  navigate={navigate}
-                  isTrending={
-                    genreName === "Trending Now" ||
-                    genreName === "Trending Shows" ||
-                    genreName === "Trending"
-                  }
-                />
-              );
-            })}
+          {/* Dynamic Content based on active tab */}
+          <div className="px-4 md:px-12 lg:px-16 pt-8 pb-24 space-y-10 w-full max-w-7xl mx-auto">
+            {activeTab === "forYou" && (
+              <>
+                {Object.keys(groupedTV).map((genreName) => {
+                  const list = groupedTV[genreName];
+                  if (list.length === 0) return null;
+
+                  return (
+                    <TVCategoryRow
+                      key={genreName}
+                      genreName={genreName}
+                      list={list}
+                      navigate={navigate}
+                      isTrending={
+                        genreName === "Trending Now" ||
+                        genreName === "Trending Shows" ||
+                        genreName === "Trending"
+                      }
+                    />
+                  );
+                })}
+              </>
+            )}
+
+            {activeTab === "tvShows" && (
+              <RecentTVShows />
+            )}
+
+            {activeTab === "documentaries" && (
+              <DocumentaryList />
+            )}
           </div>
         </div>
       )}

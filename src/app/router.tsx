@@ -128,7 +128,7 @@ export const appRoutes: RouteObject[] = [
         element: <MoviesTab />,
       },
       {
-        path: "settings",
+        path: "home",
         element: <HomePage />,
       },
       {
