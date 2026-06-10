@@ -135,12 +135,12 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false }) => {
                   {genre}
                 </h3>
               </div>
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4 pb-4">
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
                 {genreItems.map((show) => (
                   <div
                     key={show.id}
                     onClick={() => navigate(`/video/${show.id}`)}
-                    className="relative w-full h-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
+                    className="relative w-full h-full lg:h-[90%] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
                   >
                     <img
                       src={show.signedThumbnailUrl || '/assets/poster.png'}

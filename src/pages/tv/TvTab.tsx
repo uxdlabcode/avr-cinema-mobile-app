@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,10 +9,13 @@ import {
   Share2,
   Play,
   Plus,
+  Check,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getMatchingData, getSignedUrl } from "@/Firebase";
+import { getMatchingData, getSignedUrl, compoundQuery, deleteDocument, createDocument } from "@/Firebase";
 import {
   Carousel,
   CarouselContent,
@@ -62,11 +67,15 @@ const TVCategoryRow = ({
   list,
   navigate,
   isTrending = false,
+  watchlist,
+  toggleWatchlist,
 }: {
   genreName: string;
   list: TVItem[];
   navigate: ReturnType<typeof useNavigate>;
   isTrending?: boolean;
+  watchlist: string[];
+  toggleWatchlist: (movieId: string, movieData: any) => void;
 }) => {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -148,8 +157,8 @@ const TVCategoryRow = ({
         <div
           ref={rowRef}
           className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${isTrending
-              ? "gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20"
-              : "gap-4 pb-1"
+            ? "gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20"
+            : "gap-4 pb-1"
             }`}
         >
           {displayList.map((tv, index) => {
@@ -229,14 +238,19 @@ const TVCategoryRow = ({
                         >
                           Play Now
                         </button>
-                        <button
+                        {/* <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            toggleWatchlist(tv.id, tv);
                           }}
                           className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                         >
-                          <Plus className="w-3 h-3" />
-                        </button>
+                          {watchlist.includes(tv.id.toString()) ? (
+                            <Check className="w-3 h-3 text-[#DECB94]" />
+                          ) : (
+                            <Plus className="w-3 h-3" />
+                          )}
+                        </button> */}
                       </div>
                     </div>
                   </div>
@@ -302,14 +316,19 @@ const TVCategoryRow = ({
                     >
                       Play Now
                     </button>
-                    <button
+                    {/* <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        toggleWatchlist(tv.id, tv);
                       }}
                       className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                     >
-                      <Plus className="w-3 h-3" />
-                    </button>
+                      {watchlist.includes(tv.id.toString()) ? (
+                        <Check className="w-3 h-3 text-[#DECB94]" />
+                      ) : (
+                        <Plus className="w-3 h-3" />
+                      )}
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -323,6 +342,9 @@ const TVCategoryRow = ({
 
 const TvTab = () => {
   const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const userId = user?.id;
+
   const [isLoading, setIsLoading] = useState(true);
   const [tvShows, setTvShows] = useState<TVItem[]>([]);
   const [groupedTV, setGroupedTV] = useState<Record<string, TVItem[]>>({});
@@ -333,6 +355,80 @@ const TvTab = () => {
   // Featured hero carousel state
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [expandedShowId, setExpandedShowId] = useState<string | null>(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [watchlist, setWatchlist] = useState<string[]>([]);
+
+  // Fetch watchlist state
+  useEffect(() => {
+    if (!userId) {
+      try {
+        const localList = JSON.parse(localStorage.getItem("avr_my_list") || "[]");
+        setWatchlist(localList);
+      } catch { }
+      return;
+    }
+    const fetchWatchlist = async () => {
+      try {
+        const list = await compoundQuery("my_list", [
+          { key: "userId", operator: "==", value: userId },
+        ]);
+        setWatchlist(list.map((item: any) => item.movieId?.toString()));
+      } catch (err) {
+        console.error("Error fetching watchlist:", err);
+      }
+    };
+    fetchWatchlist();
+  }, [userId]);
+
+  // Toggle watchlist logic
+  const toggleWatchlist = async (movieId: string, movieData: any) => {
+    const isCurrentlyIn = watchlist.includes(movieId.toString());
+    if (userId) {
+      const docId = `${userId}_${movieId}`;
+      if (isCurrentlyIn) {
+        try {
+          await deleteDocument("my_list", docId);
+          setWatchlist(prev => prev.filter(id => id !== movieId.toString()));
+        } catch (err) {
+          console.error("Error removing from watchlist:", err);
+        }
+      } else {
+        try {
+          const payload = {
+            id: docId,
+            userId,
+            movieId: movieId.toString(),
+            addedAt: new Date(),
+            title: movieData.title,
+            image: movieData.signedThumbnailUrl || movieData.thumbnailUrl || "/assets/poster.png",
+            category: movieData.category || "TV Show",
+            year: movieData.releaseYear || "2026",
+            rating: movieData.ageRating || "U/A 13+",
+            duration: movieData.duration || "N/A"
+          };
+          await createDocument("my_list", docId, payload);
+          setWatchlist(prev => [...prev, movieId.toString()]);
+        } catch (err) {
+          console.error("Error adding to watchlist:", err);
+        }
+      }
+    } else {
+      try {
+        const localList = JSON.parse(localStorage.getItem("avr_my_list") || "[]");
+        let updatedList;
+        if (isCurrentlyIn) {
+          updatedList = localList.filter((id: string) => id !== movieId.toString());
+        } else {
+          updatedList = [...localList, movieId.toString()];
+        }
+        localStorage.setItem("avr_my_list", JSON.stringify(updatedList));
+        setWatchlist(updatedList);
+      } catch (err) {
+        console.error("Error updating local watchlist:", err);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchTVShows = async () => {
@@ -416,6 +512,9 @@ const TvTab = () => {
 
     const onSelect = () => {
       setCurrentSlide(carouselApi.selectedScrollSnap());
+      // Collapse expanded state on slide change
+      setExpandedShowId(null);
+      setShowFullDescription(false);
     };
 
     carouselApi.on("select", onSelect);
@@ -424,19 +523,19 @@ const TvTab = () => {
     };
   }, [carouselApi]);
 
-  // Auto scroll featured hero TV shows every 6 seconds
+  // Auto scroll featured hero TV shows every 6 seconds (pauses when expanded details are open)
   useEffect(() => {
-    if (!carouselApi) return;
+    if (!carouselApi || tvShows.length === 0 || expandedShowId !== null) return;
     const timer = setInterval(() => {
       carouselApi.scrollNext();
     }, 6000);
     return () => clearInterval(timer);
-  }, [carouselApi]);
+  }, [carouselApi, tvShows, expandedShowId]);
 
   const featuredList = tvShows.slice(0, 4); // Use first 4 TV shows as featured banners
 
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative">
+    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative pt-14">
       {/* Semi-transparent Header */}
       <div className="fixed top-0 left-0 right-0 h-14 bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-sm z-50 flex items-center justify-between px-4">
         {/* Back Button */}
@@ -463,83 +562,380 @@ const TvTab = () => {
         <div className="flex flex-col">
           {/* Featured Hero Slideshow Carousel */}
           {featuredList.length > 0 && (
-            <div className="relative w-full h-[55vh] md:h-[70vh] bg-black border-b border-zinc-900 overflow-hidden group/hero">
-              <Carousel
-                setApi={setCarouselApi}
-                opts={{ align: "start", loop: true }}
-                className="w-full h-full [&>[data-slot=carousel-content]]:h-full"
-              >
-                <CarouselContent className="ml-0 h-full">
-                  {featuredList.map((featuredShow) => (
+            <Carousel
+              setApi={setCarouselApi}
+              opts={{
+                align: "start",
+                loop: true,
+                duration: 60,
+              }}
+              className="w-full relative border-b border-zinc-900 overflow-hidden"
+            >
+              <CarouselContent className="ml-0">
+                {featuredList.map((featuredShow) => {
+                  const isExpanded = expandedShowId === featuredShow.id;
+                  const titleParts = featuredShow.title.split(":");
+                  const mainTitle = titleParts[0]?.trim();
+                  const subTitle = titleParts[1]?.trim();
+                  const tags = featuredShow.genres && featuredShow.genres.length > 0
+                    ? featuredShow.genres
+                    : (featuredShow.category ? [featuredShow.category] : ["Featured", "Trending"]);
+
+                  return (
                     <CarouselItem
                       key={featuredShow.id}
-                      className="pl-0 w-full h-full relative shrink-0"
+                      className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
+                      onClick={() => navigate(`/video/${featuredShow.id}`)}
                     >
-                      <div className="relative w-full h-full select-none">
-                        <img
-                          src={
-                            featuredShow.signedThumbnailUrl ||
-                            "/assets/poster.png"
-                          }
-                          alt={featuredShow.title}
-                          className="w-full h-full object-cover opacity-80"
-                        />
-                        {/* Rich cinematic fades */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-[2]" />
-                        <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-[2]" />
+                      {/* Age Rating Badge */}
+                      {featuredShow.ageRating && (
+                        <div className="absolute md:top-20 top-7 md:top-8 left-6 md:left-16 z-20 px-3 py-1 bg-black/60 border border-primary-foreground/40 rounded text-xs font-bold text-primary-foreground backdrop-blur-sm select-none">
+                          {featuredShow.ageRating}
+                        </div>
+                      )}
 
-                        {/* Text and buttons overlay details */}
-                        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-16 pb-14 md:pb-20 z-[3] text-left">
-                          <span className="text-xs uppercase tracking-widest font-bold text-primary mb-2">
-                            Featured TV Show
-                          </span>
-                          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight drop-shadow-md max-w-2xl mb-3">
+                      {/* Background Image */}
+                      <div className="absolute inset-0 w-full h-full pointer-events-none">
+                        <img
+                          src={featuredShow.signedThumbnailUrl || "/assets/poster.png"}
+                          alt={featuredShow.title}
+                          className="w-full h-full object-cover object-top"
+                        />
+                        {/* Bottom Gradient Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black via-black/80 to-transparent z-[1]" />
+                      </div>
+
+                      {/* Hero Content Overlay */}
+                      <div className="relative z-10 w-full px-6 md:px-16 pb-12 md:pb-20 flex flex-col justify-end h-full">
+
+                        {/* MOBILE & TABLET LAYOUT (Centered metadata and play buttons) */}
+                        <div className="md:hidden flex flex-col items-center text-center px-4 w-full">
+                          <h1 className="text-3xl font-bold tracking-tight mb-3 drop-shadow-xl uppercase text-[#ffffff]">
                             {featuredShow.title}
                           </h1>
-                          <p className="hidden md:block text-zinc-300 text-sm max-w-xl leading-relaxed font-normal mb-6 line-clamp-3">
-                            {featuredShow.description}
-                          </p>
-                          <div className="flex items-center gap-3">
+
+                          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#DECB94] mb-6 drop-shadow-md">
+                            {tags.map((tag: string, index: number) => (
+                              <div key={tag} className="flex items-center gap-2">
+                                <span>{tag}</span>
+                                {index < tags.length - 1 && (
+                                  <span className="w-1 h-1 rounded-full bg-zinc-500" />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="flex items-center gap-3 w-full pb-4 px-2">
                             <Button
-                              onClick={() =>
-                                navigate(`/video/${featuredShow.id}`)
-                              }
-                              className="bg-white hover:bg-white/95 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/video/${featuredShow.id}`);
+                              }}
+                              className="flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
                             </Button>
+
                             <Button
-                              onClick={() =>
-                                navigate(`/video/${featuredShow.id}`)
-                              }
                               variant="outline"
-                              className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm w-[150px]"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleWatchlist(featuredShow.id, featuredShow);
+                              }}
+                              className="flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
                             >
-                              <span>More Info</span>
+                              <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
+                              <span>{watchlist.includes(featuredShow.id.toString()) ? "In My List" : "My List"}</span>
                             </Button>
                           </div>
                         </div>
+
+                        {/* DESKTOP WEB LAYOUT */}
+                        <div className="hidden md:block w-full">
+                          {!isExpanded ? (
+                            /* Compact Desktop Layout (Image 1) */
+                            <div className="flex flex-col items-start text-left max-w-2xl animate-fade-in relative z-20">
+                              {/* New Series Badge */}
+                              <span className="text-[10px] font-bold bg-white/10 border border-white/20 text-white px-2.5 py-0.5 rounded uppercase tracking-widest mb-3">
+                                New Series
+                              </span>
+
+                              {/* Title */}
+                              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-1 drop-shadow-md text-[#ffffff] uppercase leading-tight">
+                                {mainTitle}
+                              </h1>
+                              {subTitle && (
+                                <h2 className="text-xl lg:text-2xl font-bold tracking-wide mb-3 text-white uppercase opacity-90 drop-shadow-sm">
+                                  {subTitle}
+                                </h2>
+                              )}
+
+                              {/* Sponsor Brand Logos */}
+                              <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
+                                <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
+                              </div>
+
+                              {/* Genres metadata */}
+                              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-300 mb-6 select-none">
+                                <span>{featuredShow.language || "English"}</span>
+                                <span className="text-zinc-650">|</span>
+                                <span>{featuredShow.genres?.join(", ") || tags.join(", ")}</span>
+                              </div>
+
+                              {/* Buttons Row */}
+                              <div className="flex items-center gap-4">
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/video/${featuredShow.id}`);
+                                  }}
+                                  className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                                >
+                                  <Play className="w-4 h-4 fill-current text-black" />
+                                  <span>Play</span>
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedShowId(featuredShow.id);
+                                  }}
+                                  className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
+                                >
+                                  <span>More Info</span>
+                                </Button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleWatchlist(featuredShow.id, featuredShow);
+                                  }}
+                                  className="text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                                >
+                                  <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
+                                    {watchlist.includes(featuredShow.id.toString()) ? (
+                                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                    ) : (
+                                      <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                                    )}
+                                  </div>
+                                  <span>{watchlist.includes(featuredShow.id.toString()) ? "In My List" : "Add to My List"}</span>
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Expanded Desktop Layout (Image 2 & 3) */
+                            <div className="flex flex-col items-start text-left max-w-2xl animate-fade-in relative z-20 select-text pb-6 md:pb-8">
+                              {/* New Series Badge */}
+                              <span className="text-[10px] font-bold bg-white/10 border border-white/20 text-white px-2.5 py-0.5 rounded uppercase tracking-widest mb-3">
+                                New Series
+                              </span>
+
+                              {/* Title */}
+                              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-1 drop-shadow-md text-[#ffffff] uppercase leading-tight">
+                                {mainTitle}
+                              </h1>
+                              {subTitle && (
+                                <h2 className="text-xl lg:text-2xl font-bold tracking-wide mb-3 text-white uppercase opacity-90 drop-shadow-sm">
+                                  {subTitle}
+                                </h2>
+                              )}
+
+                              {/* Sponsor Brand Logos */}
+                              <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
+                                <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
+                              </div>
+
+                              {/* Metadata Details Row */}
+                              <div className="flex items-center gap-3 text-xs font-bold text-zinc-300 mb-6 select-none">
+                                <span>
+                                  {featuredShow.seasons?.length > 0
+                                    ? `${featuredShow.seasons.length} Season${featuredShow.seasons.length > 1 ? "s" : ""} ${featuredShow.seasons.reduce((acc: number, s: any) => acc + (s.episodes?.length || 0), 0) || 6} Episodes`
+                                    : "1 Season 6 Episodes"}
+                                </span>
+                                <span className="text-zinc-650">|</span>
+                                <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-200">{featuredShow.ageRating || "U/A 13+"}</span>
+                                <span className="text-zinc-650">|</span>
+                                <span>{featuredShow.releaseYear || "2026"}</span>
+                                <span className="text-zinc-650">|</span>
+                                <span>{featuredShow.language || "English"}</span>
+                              </div>
+
+                              {/* Resume / Play & My List Buttons */}
+                              <div className="flex items-center gap-4 mb-6">
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/video/${featuredShow.id}`);
+                                  }}
+                                  className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                                >
+                                  <Play className="w-4 h-4 fill-current text-black" />
+                                  <span>Resume S1 E1</span>
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleWatchlist(featuredShow.id, featuredShow);
+                                  }}
+                                  className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
+                                >
+                                  <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
+                                    {watchlist.includes(featuredShow.id.toString()) ? (
+                                      <Check className="w-3 h-3 stroke-[2.5]" />
+                                    ) : (
+                                      <Plus className="w-3 h-3 stroke-[2.5]" />
+                                    )}
+                                  </div>
+                                  <span>{watchlist.includes(featuredShow.id.toString()) ? "In My List" : "Add to My List"}</span>
+                                </Button>
+                              </div>
+
+                              {/* Detailed Description Panel */}
+                              <div className="space-y-4 text-left w-full relative">
+                                {/* Close Expanded Info */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedShowId(null);
+                                    setShowFullDescription(false);
+                                  }}
+                                  className="absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                                  title="Close info panel"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+
+                                <h3 className="text-xl font-extrabold text-white leading-snug">
+                                  {featuredShow.title}
+                                </h3>
+
+                                <div className="space-y-1.5 text-xs font-semibold select-none">
+                                  <div>
+                                    <span className="text-zinc-500 font-bold">Genre</span>{" "}
+                                    <span className="text-zinc-200 ml-2">{featuredShow.genres?.join(", ") || tags.join(", ")}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-zinc-500 font-bold">Content Descriptor</span>{" "}
+                                    <span className="text-zinc-200 ml-2">{featuredShow.contentDescriptor || "General Audience"}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-zinc-500 font-bold">Publisher</span>{" "}
+                                    <span className="text-zinc-200 ml-2">{featuredShow.publisher || "Almighty Motion Picture"}</span>
+                                  </div>
+                                  {featuredShow.cast && featuredShow.cast.length > 0 && (
+                                    <div>
+                                      <span className="text-zinc-500 font-bold">Cast</span>{" "}
+                                      <span className="text-zinc-200 ml-2">
+                                        {featuredShow.cast.map((c: any) => typeof c === 'string' ? c : (c.name || '')).filter(Boolean).join(", ")}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="text-xs md:text-sm text-zinc-350 leading-relaxed font-normal mt-4">
+                                  {showFullDescription ? (
+                                    <div className="space-y-4 animate-fade-in select-text">
+                                      {featuredShow.description ? (
+                                        featuredShow.description.split("\n").map((p: string, idx: number) => (
+                                          <p key={idx}>{p.trim()}</p>
+                                        ))
+                                      ) : (
+                                        <p>No description available.</p>
+                                      )}
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowFullDescription(false);
+                                        }}
+                                        className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                      >
+                                        See Less
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="animate-fade-in">
+                                      <p className="line-clamp-3 select-all">{featuredShow.description || "No description available."}</p>
+                                      {featuredShow.description && featuredShow.description.length > 150 && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowFullDescription(true);
+                                          }}
+                                          className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                        >
+                                          See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                            </div>
+                          )}
+                        </div>
+
                       </div>
                     </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
+                  );
+                })}
+              </CarouselContent>
 
               {/* Slider Dots indicators */}
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20">
-                {featuredList.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => carouselApi?.scrollTo(index)}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
+              <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
+                <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
+                  {featuredList.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => carouselApi?.scrollTo(index)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
                         ? "w-6 bg-primary"
-                        : "w-2 bg-zinc-650 hover:bg-zinc-400"
-                      }`}
-                  />
-                ))}
+                        : "w-1.5 bg-white/50 hover:bg-white"
+                        }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Slider Controls (Left, Right arrows) */}
+              <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    carouselApi?.scrollPrev();
+                  }}
+                  className="w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
+                  aria-label="Previous featured banner"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    carouselApi?.scrollNext();
+                  }}
+                  className="w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
+                  aria-label="Next featured banner"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </Carousel>
           )}
 
           {/* Category Tabs */}
@@ -581,6 +977,8 @@ const TvTab = () => {
                       genreName={genreName}
                       list={list}
                       navigate={navigate}
+                      watchlist={watchlist}
+                      toggleWatchlist={toggleWatchlist}
                       isTrending={
                         genreName === "Trending Now" ||
                         genreName === "Trending Shows" ||

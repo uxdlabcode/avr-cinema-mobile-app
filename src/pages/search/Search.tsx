@@ -157,188 +157,413 @@ const Search = () => {
         );
     };
 
-    return (
-        <div className="min-h-screen bg-[#0f1014] text-white pb-24 w-full">
+    const getBadge = (index: number) => {
+        if (index % 4 === 0) {
+            return (
+                <span className="absolute top-2 left-2 z-10 bg-[#E50914] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shadow select-none">
+                    HOT
+                </span>
+            );
+        }
+        if (index % 4 === 1) {
+            return (
+                <span className="absolute top-2 left-2 z-10 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shadow select-none">
+                    TRENDING
+                </span>
+            );
+        }
+        if (index % 4 === 2) {
+            return (
+                <span className="absolute top-2 left-2 z-10 bg-[#1e40af] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shadow select-none">
+                    NEW SERIES
+                </span>
+            );
+        }
+        return (
+            <span className="absolute top-2 left-2 z-10 bg-[#d97706] text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shadow select-none">
+                HIDDEN GEMS
+            </span>
+        );
+    };
 
-            {/* STICKY TOP SECTION */}
-            <div className="sticky top-0 z-50 bg-[#0f1014] pt-4 md:pt-8 px-4 md:px-8 shadow-sm">
-                <div className="max-w-7xl mx-auto space-y-4">
-                    {/* Search Header */}
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-bold text-white">Search</h1>
-                        <p className="text-zinc-400 text-sm hidden sm:block">Find your favorite movies, TV shows, and more.</p>
+    return (
+        <>
+            {/* MOBILE LAYOUT (Remains exactly same) */}
+            <div className="md:hidden min-h-screen bg-[#0f1014] text-white pb-24 w-full">
+                {/* STICKY TOP SECTION */}
+                <div className="sticky top-0 z-50 bg-[#0f1014] pt-4 px-4 shadow-sm">
+                    <div className="max-w-7xl mx-auto space-y-4 pt-4">
+                        {/* Search Header */}
+                        <div className="space-y-1">
+                            <h1 className="text-2xl font-bold text-white">Search</h1>
+                            <p className="text-zinc-400 text-sm hidden sm:block">Find your favorite movies, TV shows, and more.</p>
+                        </div>
+
+                        {/* Search Input Bar */}
+                        <form onSubmit={handleSearchSubmit} className="relative w-full group">
+                            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-white transition-colors" />
+                            <Input
+                                type="text"
+                                value={query}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setQuery(val);
+                                    setSearchParams(val.trim() ? { q: val.trim() } : {}, { replace: true });
+                                }}
+                                placeholder="Search for movies, shows..."
+                                className="pl-12 pr-12 bg-[#0f1014] border rounded-md h-9 text-base"
+                                disabled={isLoadingMedia}
+                            />
+                            {isSearching ? (
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                    <Spinner size="sm" />
+                                </div>
+                            ) : query.length > 0 ? (
+                                <button
+                                    type="button"
+                                    onClick={clearSearchState}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            ) : null}
+                        </form>
                     </div>
 
-                    {/* Search Input Bar */}
-                    <form onSubmit={handleSearchSubmit} className="relative w-full group">
-                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-white transition-colors" />
-                        <Input
-                            type="text"
-                            value={query}
-                            onChange={(e) => {
-                                const val = e.target.value;
-                                setQuery(val);
-                                setSearchParams(val.trim() ? { q: val.trim() } : {}, { replace: true });
-                            }}
-                            placeholder="Search for movies, shows..."
-                            className="pl-12 pr-12 bg-[#0f1014] border rounded-md h-9 text-base"
-                            disabled={isLoadingMedia}
-                        />
-                        {isSearching ? (
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                <Spinner size="sm" />
-                            </div>
-                        ) : query.length > 0 ? (
-                            <button
-                                type="button"
-                                onClick={clearSearchState}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                        ) : null}
-                    </form>
+                    {/* Gradient blend */}
+                    <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-[#0f1014] to-transparent translate-y-full pointer-events-none" />
                 </div>
 
-                {/* Gradient blend so content scrolls smoothly underneath */}
-                <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-[#0f1014] to-transparent translate-y-full pointer-events-none" />
-            </div>
+                {/* SCROLLABLE MAIN CONTENT */}
+                <div className="max-w-7xl mx-auto px-4 pt-6 space-y-2">
+                    {/* Recent Searches Section - Show when query is empty */}
+                    {query.trim().length === 0 && (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
+                                {history.length > 0 && (
+                                    <button
+                                        onClick={() => user?.id && dispatch(clearHistory(user.id))}
+                                        className="text-xs font-bold text-blue-500 hover:text-blue-400"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+                            {history.length > 0 ? (
+                                <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+                                    {history.map((item) => {
+                                        const matchedMovie = allMedia.find(m => m.title?.toLowerCase() === item.query.toLowerCase() || m.title?.toLowerCase().includes(item.query.toLowerCase()));
+                                        const displayImage = matchedMovie ? getThumbnail(matchedMovie) : null;
 
-            {/* SCROLLABLE MAIN CONTENT */}
-            <div className="max-w-7xl mx-auto px-4 md:px-8 pt-6 space-y-2">
-
-                {/* Recent Searches Section - Show when query is empty */}
-                {query.trim().length === 0 && (
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
-                            {history.length > 0 && (
-                                <button
-                                    onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                    className="text-xs font-bold text-blue-500 hover:text-blue-400"
-                                >
-                                    Clear All
-                                </button>
+                                        return (
+                                            <div
+                                                key={item.id}
+                                                className="relative w-[140px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors"
+                                                onClick={() => handleChipClick(item.query)}
+                                            >
+                                                {displayImage ? (
+                                                    <img src={displayImage} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-zinc-650 group-hover:text-zinc-400 transition-colors">
+                                                        <SearchIcon className="w-6 h-6" />
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-2">
+                                                    <div className="flex justify-end">
+                                                        <button
+                                                            className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                dispatch(deleteSearch(item.id));
+                                                            }}
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="mt-auto">
+                                                        <span className="text-xs font-bold text-white line-clamp-1">{item.query}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-zinc-500 italic">Your recent searches will appear here...</p>
                             )}
                         </div>
-                        {history.length > 0 ? (
-                            <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-                                {history.map((item) => {
-                                    const matchedMovie = allMedia.find(m => m.title?.toLowerCase() === item.query.toLowerCase() || m.title?.toLowerCase().includes(item.query.toLowerCase()));
-                                    const displayImage = matchedMovie ? getThumbnail(matchedMovie) : null;
+                    )}
 
+                    {/* Filter Chips - Always Visible Now */}
+                    <div className="pt-2">
+                        <h2 className="text-lg font-bold text-white tracking-wide mb-3">Trending in</h2>
+                        {renderChips()}
+                    </div>
+
+                    {/* Default View Grid - Always used now */}
+                    {isLoadingMedia ? (
+                        <div className="grid grid-cols-3 gap-2 pb-4">
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <Skeleton
+                                    key={i}
+                                    className={`w-full aspect-[2/3] rounded-md bg-zinc-800/50 ${i % 9 === 6 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}`}
+                                />
+                            ))}
+                        </div>
+                    ) : filteredMedia.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20">
+                            <div className="bg-zinc-800/50 p-4 rounded-full mb-4">
+                                {query.trim() ? <SearchIcon className="w-8 h-8 text-zinc-500" /> : <Film className="w-8 h-8 text-zinc-500" />}
+                            </div>
+                            <h3 className="text-lg font-bold text-white mb-2">No Content Found</h3>
+                            <p className="text-zinc-400 text-sm max-w-sm">
+                                {query.trim()
+                                    ? <>We couldn't find any matches for <span className="text-white font-medium">"{query}"</span> in <span className="text-white font-medium">{activeFilter}</span>.</>
+                                    : <>We couldn't find any media matching the <span className="text-white font-medium">"{activeFilter}"</span> category.</>
+                                }
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-2 pb-4 mt-4">
+                            {filteredMedia.map((movie, index) => {
+                                const thumb = getThumbnail(movie);
+                                const isLarge = index % 9 === 6;
+                                return (
+                                    <div
+                                        key={movie.id}
+                                        className={`relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10 ${isLarge ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}`}
+                                        onClick={() => {
+                                            if (query.trim() && user?.id) {
+                                                dispatch(saveSearch({ uid: user.id, query: query.trim() }));
+                                            }
+                                            navigate('/video/' + movie.id);
+                                        }}
+                                    >
+                                        {thumb ? (
+                                            <img
+                                                src={thumb}
+                                                alt={movie.title || 'Media'}
+                                                className="w-full h-full object-cover aspect-[2/3]"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = '/assets/poster.png';
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full aspect-[2/3] bg-zinc-800 flex items-center justify-center">
+                                                <Film className="w-8 h-8 text-zinc-600" />
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                                            <span className="text-[10px] sm:text-xs font-bold text-white truncate">{movie.title}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* DESKTOP/LARGE SCREEN LAYOUT */}
+            <div className="hidden md:block fixed inset-0 bg-[#0b0c0e] text-white z-[100] overflow-y-auto pb-24 w-full">
+                <div className="max-w-6xl mx-auto px-6 pt-16 flex flex-col items-center">
+                    {/* Search Input Bar & Close Button */}
+                    <div className="flex items-center gap-6 w-full max-w-3xl mb-8">
+                        <form onSubmit={handleSearchSubmit} className="relative flex-1 group">
+                            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-white transition-colors" />
+                            <Input
+                                type="text"
+                                value={query}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setQuery(val);
+                                    setSearchParams(val.trim() ? { q: val.trim() } : {}, { replace: true });
+                                }}
+                                placeholder="Search for a TV Shows, Movie & Genre etc"
+                                className="pl-12 pr-12  h-10 text-base w-full text-white placeholder-zinc-500"
+                                disabled={isLoadingMedia}
+                            />
+                            {/* <button
+                                type="button"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                                title="Voice Search"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                            </button> */}
+                        </form>
+
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="p-2.5 text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center bg-zinc-900/60 hover:bg-zinc-800 rounded-full border border-zinc-800"
+                            aria-label="Close search"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+
+                    {/* Category Cards - Display when query is empty */}
+                    {query.trim().length === 0 && (
+                        <div className="grid grid-cols-3 gap-4 w-full max-w-3xl mb-12">
+                            <button
+                                onClick={() => navigate("/tv")}
+                                className="relative h-20 rounded-md overflow-hidden group cursor-pointer border border-purple-500/20 bg-gradient-to-br from-pink-650/40 to-purple-900/60 hover:from-pink-650/50 hover:to-purple-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none"
+                            >
+                                <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast1.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
+                                <span className="relative drop-shadow-md">TV SHOWS</span>
+                            </button>
+
+                            <button
+                                onClick={() => navigate("/movies")}
+                                className="relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none"
+                            >
+                                <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast2.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
+                                <span className="relative drop-shadow-md">MOVIES</span>
+                            </button>
+
+                            <button
+                                onClick={() => navigate("/tv?tab=Documentaries")}
+                                className="relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none"
+                            >
+                                <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast3.jpg')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
+                                <span className="relative drop-shadow-md">DOCUMENTARIES</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Recent Searches Section - Show when query is empty */}
+                    {query.trim().length === 0 && (
+                        <div className="w-full max-w-3xl space-y-4 mb-8 text-left">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
+                                {history.length > 0 && (
+                                    <button
+                                        onClick={() => user?.id && dispatch(clearHistory(user.id))}
+                                        className="text-xs font-bold text-blue-500 hover:text-blue-400 cursor-pointer"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+                            {history.length > 0 ? (
+                                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                                    {history.map((item) => {
+                                        const matchedMovie = allMedia.find(m => m.title?.toLowerCase() === item.query.toLowerCase() || m.title?.toLowerCase().includes(item.query.toLowerCase()));
+                                        const displayImage = matchedMovie ? getThumbnail(matchedMovie) : null;
+
+                                        return (
+                                            <div
+                                                key={item.id}
+                                                className="relative w-[180px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors"
+                                                onClick={() => handleChipClick(item.query)}
+                                            >
+                                                {displayImage ? (
+                                                    <img src={displayImage} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-zinc-600 group-hover:text-zinc-400 transition-colors">
+                                                        <SearchIcon className="w-6 h-6" />
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-2">
+                                                    <div className="flex justify-end">
+                                                        <button
+                                                            className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                dispatch(deleteSearch(item.id));
+                                                            }}
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="mt-auto">
+                                                        <span className="text-xs font-bold text-white line-clamp-1">{item.query}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-zinc-500 italic">Your recent searches will appear here...</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Trending / Results Section */}
+                    <div className="w-full max-w-3xl space-y-4 text-left">
+                        <div className="space-y-3">
+                            <h2 className="text-lg font-bold text-white tracking-wide">Trending in</h2>
+                            {renderChips()}
+                        </div>
+
+                        {isLoadingMedia ? (
+                            <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4 mt-4">
+                                {Array.from({ length: 12 }).map((_, i) => (
+                                    <Skeleton
+                                        key={i}
+                                        className="w-full aspect-[2/3] rounded-md bg-zinc-800/50"
+                                    />
+                                ))}
+                            </div>
+                        ) : filteredMedia.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20">
+                                <div className="bg-zinc-800/50 p-4 rounded-full mb-4">
+                                    {query.trim() ? <SearchIcon className="w-8 h-8 text-zinc-500" /> : <Film className="w-8 h-8 text-zinc-500" />}
+                                </div>
+                                <h3 className="text-lg font-bold text-white mb-2">No Content Found</h3>
+                                <p className="text-zinc-400 text-sm max-w-sm">
+                                    {query.trim()
+                                        ? <>We couldn't find any matches for <span className="text-white font-medium">"{query}"</span> in <span className="text-white font-medium">{activeFilter}</span>.</>
+                                        : <>We couldn't find any media matching the <span className="text-white font-medium">"{activeFilter}"</span> category.</>
+                                    }
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4 mt-4">
+                                {filteredMedia.map((movie, index) => {
+                                    const thumb = getThumbnail(movie);
                                     return (
                                         <div
-                                            key={item.id}
-                                            className="relative w-[140px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors"
-                                            onClick={() => handleChipClick(item.query)}
+                                            key={movie.id}
+                                            className="relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10"
+                                            onClick={() => {
+                                                if (query.trim() && user?.id) {
+                                                    dispatch(saveSearch({ uid: user.id, query: query.trim() }));
+                                                }
+                                                navigate('/video/' + movie.id);
+                                            }}
                                         >
-                                            {displayImage ? (
-                                                <img src={displayImage} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                            {getBadge(index)}
+
+                                            {thumb ? (
+                                                <img
+                                                    src={thumb}
+                                                    alt={movie.title || 'Media'}
+                                                    className="w-full h-full object-cover aspect-[2/3]"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = '/assets/poster.png';
+                                                    }}
+                                                />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-zinc-600 group-hover:text-zinc-400 transition-colors">
-                                                    <SearchIcon className="w-6 h-6" />
+                                                <div className="w-full h-full aspect-[2/3] bg-zinc-800 flex items-center justify-center">
+                                                    <Film className="w-8 h-8 text-zinc-600" />
                                                 </div>
                                             )}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-2">
-                                                <div className="flex justify-end">
-                                                    <button
-                                                        className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            dispatch(deleteSearch(item.id));
-                                                        }}
-                                                    >
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                </div>
-                                                <div className="mt-auto">
-                                                    <span className="text-xs font-bold text-white line-clamp-1">{item.query}</span>
-                                                </div>
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                                                <span className="text-[10px] sm:text-xs font-bold text-white truncate">{movie.title}</span>
                                             </div>
                                         </div>
                                     );
                                 })}
                             </div>
-                        ) : (
-                            <p className="text-sm text-zinc-500 italic">Your recent searches will appear here...</p>
                         )}
                     </div>
-                )}
-
-
-                {/* Filter Chips - Always Visible Now */}
-                <div className="pt-2">
-                    <h2 className="text-lg font-bold text-white tracking-wide mb-3">Trending in</h2>
-                    {renderChips()}
                 </div>
-
-                {/* Default View Grid - Always used now */}
-                {isLoadingMedia ? (
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3">
-                        {Array.from({ length: 18 }).map((_, i) => (
-                            <Skeleton
-                                key={i}
-                                className={`w-full aspect-[2/3] rounded-md bg-zinc-800/50 ${i % 9 === 6 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
-                                    }`}
-                            />
-                        ))}
-                    </div>
-                ) : filteredMedia.length === 0 ? (
-                    /* Empty State Component */
-                    <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20">
-                        <div className="bg-zinc-800/50 p-4 rounded-full mb-4">
-                            {query.trim() ? <SearchIcon className="w-8 h-8 text-zinc-500" /> : <Film className="w-8 h-8 text-zinc-500" />}
-                        </div>
-                        <h3 className="text-lg font-bold text-white mb-2">No Content Found</h3>
-                        <p className="text-zinc-400 text-sm max-w-sm">
-                            {query.trim()
-                                ? <>We couldn't find any matches for <span className="text-white font-medium">"{query}"</span> in <span className="text-white font-medium">{activeFilter}</span>.</>
-                                : <>We couldn't find any media matching the <span className="text-white font-medium">"{activeFilter}"</span> category.</>
-                            }
-                        </p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 mt-4">
-                        {filteredMedia.map((movie, index) => {
-                            const thumb = getThumbnail(movie);
-                            const isLarge = index % 9 === 6;
-                            return (
-                                <div
-                                    key={movie.id}
-                                    className={`relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10 ${isLarge ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
-                                        }`}
-                                    onClick={() => {
-                                        if (query.trim() && user?.id) {
-                                            dispatch(saveSearch({ uid: user.id, query: query.trim() }));
-                                        }
-                                        navigate('/video/' + movie.id);
-                                    }}
-                                >
-                                    {thumb ? (
-                                        <img
-                                            src={thumb}
-                                            alt={movie.title || 'Media'}
-                                            className="w-full h-full object-cover aspect-[2/3]"
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).src = '/assets/poster.png'; // Fallback
-                                            }}
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full aspect-[2/3] bg-zinc-800 flex items-center justify-center">
-                                            <Film className="w-8 h-8 text-zinc-600" />
-                                        </div>
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
-                                        <span className="text-[10px] sm:text-xs font-bold text-white truncate">{movie.title}</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
             </div>
-        </div>
+        </>
     );
 };
 

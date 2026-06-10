@@ -32,7 +32,7 @@ export function Navbar() {
     { label: "Home", path: "/dashboard" },
     { label: "TV", path: "/tv" },
     { label: "Movies", path: "/movies" },
-    { label: "Documentary", path: "/documentary" },
+
     { label: "Quiz", path: "/quiz" },
     { label: "Trailers", path: "/trailers" },
   ];
@@ -72,16 +72,13 @@ export function Navbar() {
             Subscribe
           </Button>
 
-          <form onSubmit={handleSearchSubmit} className="relative group flex items-center">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-zinc-900 border-zinc-800 text-sm w-[150px] lg:w-[180px] h-9 rounded-md transition-all focus:w-[200px] lg:focus:w-[240px]"
-            />
-          </form>
+          <button
+            onClick={() => navigate("/search")}
+            className="p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            aria-label="Search"
+          >
+            <Search className="w-5 h-5" />
+          </button>
 
           <Link to="/profile">
             <Avatar className="w-8 h-8 ring-2 ring-transparent hover:ring-white transition-all cursor-pointer">

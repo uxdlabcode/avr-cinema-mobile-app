@@ -473,7 +473,7 @@ export const HomePage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#000000] text-white w-full overflow-hidden pb-20 md:pb-0">
+      <div className="min-h-screen bg-secondary text-white w-full overflow-hidden pb-20 md:pb-0">
         <Header />
         <HomePageSkeleton />
       </div>
@@ -481,7 +481,7 @@ export const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#000000] text-white w-full overflow-hidden pb-20 md:pb-0">
+    <div className="min-h-screen bg-secondary text-white w-full overflow-hidden pb-5 md:pb-0 pt-16 md:pt-0">
       <Header />
 
       {/* Hero Section Carousel */}
@@ -509,7 +509,7 @@ export const HomePage = () => {
               >
                 {/* Age Rating Badge */}
                 {movie.ageRating && (
-                  <div className="absolute top-20 md:top-8 left-6 md:left-16 z-20 px-3 py-1 bg-black/60 border border-primary-foreground/40 rounded text-xs font-bold text-primary-foreground backdrop-blur-sm select-none">
+                  <div className="absolute md:top-20 top-7 md:top-8 left-6 md:left-16 z-20 px-3 py-1 bg-black/60 border border-primary-foreground/40 rounded text-xs font-bold text-primary-foreground backdrop-blur-sm select-none">
                     {movie.ageRating}
                   </div>
                 )}
@@ -521,17 +521,8 @@ export const HomePage = () => {
                     alt={movie.title}
                     className="w-full h-full object-cover object-top"
                   />
-                  {/* Left Gradient Overlay - darker for reading text details on desktop */}
-                  <div className={`absolute inset-0 bg-gradient-to-r ${isExpanded
-                      ? "from-black via-black/95 to-black/20"
-                      : "from-black via-black/80 md:via-black/50 to-transparent"
-                    } z-[1] transition-all duration-500`} />
-
-                  {/* Top Gradient Overlay */}
-                  <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-black/85 to-transparent z-[1]" />
-
                   {/* Bottom Gradient Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 h-72 bg-gradient-to-t from-black via-black/90 to-transparent z-[1]" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black via-black/80 to-transparent z-[1]" />
                 </div>
 
                 {/* Hero Content Overlay */}
@@ -822,9 +813,9 @@ export const HomePage = () => {
               <button
                 key={index}
                 onClick={() => api?.scrollTo(index)}
-                className={`h-1.5 rounded-full transition-all duration-300 ${current === index
-                  ? "w-6 bg-white animate-pulse"
-                  : "w-1.5 bg-zinc-650 hover:bg-zinc-400"
+                className={`h-1.5 text-primary/40 rounded-full transition-all duration-300 ${current === index
+                  ? "w-6 bg-primary "
+                  : "w-1.5 bg-white/50 hover:bg-white"
                   }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -870,7 +861,7 @@ export const HomePage = () => {
       </Carousel>
 
       {/* Content Rows */}
-      <section className="relative z-20 px-4 md:px-12 space-y-8 mt-2 pb-24 md:pb-8">
+      <section className="relative z-20 px-4 md:px-12 space-y-3 mt-1 pb-5 md:pb-5">
         {/* Continue Watching Row */}
         <RecentWatch />
 
