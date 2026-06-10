@@ -12,6 +12,7 @@ interface DocItem {
   duration?: string;
   genres?: string[];
   category?: string;
+  seasons?: any[];
   [key: string]: any;
 }
 
@@ -168,7 +169,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false }) => {
                       </h4>
                       <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-1.5">
                         <span>{doc.releaseYear || 'N/A'}</span>
-                        <span>{doc.duration || 'N/A'}</span>
+                        <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} S` : (doc.duration || 'N/A')}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <button
@@ -263,7 +264,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false }) => {
                 </h4>
                 <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-1.5">
                   <span>{doc.releaseYear || 'N/A'}</span>
-                  <span>{doc.duration || 'N/A'}</span>
+                  <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} S` : (doc.duration || 'N/A')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <button

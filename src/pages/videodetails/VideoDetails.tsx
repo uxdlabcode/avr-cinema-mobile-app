@@ -310,7 +310,12 @@ const VideoDetails = () => {
     if (!movie || isPlaying) return;
 
     const loadEpisodesProgress = async () => {
-      if (userId && movie.category === "TV Show") {
+      if (!(movie.category === "TV Show" || movie.category === "Documentary") || !movie.seasons || movie.seasons.length === 0) {
+        setEpisodesProgress({});
+        return;
+      }
+
+      if (userId) {
         try {
           const docs = await compoundQuery("watch_progress", [
             { key: "userId", operator: "==", value: userId },
@@ -522,7 +527,7 @@ const VideoDetails = () => {
           // Map Firestore document structure to UI model and SIGN ALL VIDEO URLs
           let mappedSeasons: any[] = [];
 
-          if (dbMovie.category === "TV Show" && dbMovie.seasons) {
+          if ((dbMovie.category === "TV Show" || dbMovie.category === "Documentary") && dbMovie.seasons) {
             mappedSeasons = await Promise.all(
               dbMovie.seasons.map(async (s: any) => {
                 let signedEpisodes: any[] = [];
@@ -569,10 +574,10 @@ const VideoDetails = () => {
             year: dbMovie.releaseYear?.toString() || "N/A",
             duration: dbMovie.duration || "N/A",
             rating: dbMovie.ageRating || "13+",
-            quality: dbMovie.category === "Movie" ? "4K" : "HD",
+            quality: dbMovie.category === "Movie" || dbMovie.category === "Documentary" ? "4K" : "HD",
             description: dbMovie.description || "",
             category: dbMovie.category,
-            movieUrl: dbMovie.movieUrl || "",
+            movieUrl: dbMovie.movieUrl || dbMovie.videoUrl || "",
             seasons: mappedSeasons,
             cast: dbMovie.cast ? dbMovie.cast.map((c: any) => ({
               name: c.name,
@@ -606,22 +611,22 @@ const VideoDetails = () => {
           }
 
           setMovie(mappedMovie);
-          setActiveTab(mappedMovie.category === "TV Show" ? "episodes" : "related");
+          setActiveTab((mappedMovie.category === "TV Show" || mappedMovie.category === "Documentary") && mappedMovie.seasons && mappedMovie.seasons.length > 0 ? "episodes" : "related");
         } else if (MOVIES_DATA[id]) {
           setMovie(MOVIES_DATA[id]);
-          setActiveTab(MOVIES_DATA[id].category === "TV Show" ? "episodes" : "related");
+          setActiveTab((MOVIES_DATA[id].category === "TV Show" || MOVIES_DATA[id].category === "Documentary") && MOVIES_DATA[id].seasons && MOVIES_DATA[id].seasons.length > 0 ? "episodes" : "related");
         } else {
           setMovie(DEFAULT_MOVIE);
-          setActiveTab(DEFAULT_MOVIE.category === "TV Show" ? "episodes" : "related");
+          setActiveTab((DEFAULT_MOVIE.category === "TV Show" || DEFAULT_MOVIE.category === "Documentary") && DEFAULT_MOVIE.seasons && DEFAULT_MOVIE.seasons.length > 0 ? "episodes" : "related");
         }
       } catch (err) {
         console.error("Error loading movie data:", err);
         if (MOVIES_DATA[id]) {
           setMovie(MOVIES_DATA[id]);
-          setActiveTab(MOVIES_DATA[id].category === "TV Show" ? "episodes" : "related");
+          setActiveTab((MOVIES_DATA[id].category === "TV Show" || MOVIES_DATA[id].category === "Documentary") && MOVIES_DATA[id].seasons && MOVIES_DATA[id].seasons.length > 0 ? "episodes" : "related");
         } else {
           setMovie(DEFAULT_MOVIE);
-          setActiveTab(DEFAULT_MOVIE.category === "TV Show" ? "episodes" : "related");
+          setActiveTab((DEFAULT_MOVIE.category === "TV Show" || DEFAULT_MOVIE.category === "Documentary") && DEFAULT_MOVIE.seasons && DEFAULT_MOVIE.seasons.length > 0 ? "episodes" : "related");
         }
       } finally {
         setIsLoading(false);
@@ -659,7 +664,7 @@ const VideoDetails = () => {
   };
 
   const handleStartPlayback = async (shouldFullscreen = false) => {
-    if (movie.category === "TV Show") {
+    if (movie.category === "TV Show" || (movie.category === "Documentary" && movie.seasons && movie.seasons.length > 0)) {
       const lastWatchedEpId = watchProgress?.episodeId;
       let epToPlay = null;
 
@@ -682,7 +687,7 @@ const VideoDetails = () => {
       }
     } else {
       setCurrentEpisode(null);
-      await handlePlayClick(movie.movieUrl, "Movie", shouldFullscreen);
+      await handlePlayClick(movie.movieUrl || movie.videoUrl || "", movie.category || "Movie", shouldFullscreen);
     }
   };
 
@@ -737,7 +742,7 @@ const VideoDetails = () => {
     );
   }
 
-  if (movie.category === "TV Show") {
+  if (movie.category === "TV Show" || movie.category === "Documentary") {
     return (
       <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative select-none">
 
@@ -828,7 +833,7 @@ const VideoDetails = () => {
               <span className="text-green-500 font-bold">{matchPercentage}% Match</span>
               <span>{movie.year}</span>
               <span className="px-1.5 py-0.5 border border-zinc-700 rounded text-[10px] uppercase">{movie.rating || "PG-13"}</span>
-              <span>{movie.seasons ? `${movie.seasons.length} Seasons` : "1 Season"}</span>
+              <span>{movie.seasons && movie.seasons.length > 0 ? `${movie.seasons.length} Seasons` : (movie.duration || "N/A")}</span>
               <span className="px-1.5 py-0.5 border border-zinc-700 text-zinc-350 rounded text-[9px] font-bold">4K</span>
             </div>
           </div>
@@ -858,7 +863,7 @@ const VideoDetails = () => {
               <span>
                 {isPlaying && isInternalPlaying
                   ? "Pause"
-                  : (watchProgress ? "Resume" : "Play S1·E1")}
+                  : (watchProgress ? "Resume" : (movie.seasons && movie.seasons.length > 0 ? "Play S1·E1" : "Play"))}
               </span>
             </Button>
             <Button

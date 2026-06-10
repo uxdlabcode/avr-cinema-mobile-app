@@ -294,10 +294,18 @@ const MoviesTab = () => {
   // Synchronize carousel slide snaps
   useEffect(() => {
     if (!carouselApi) return;
-    setCurrentSlide(carouselApi.selectedScrollSnap());
-    carouselApi.on('select', () => {
+
+    carouselApi.scrollTo(0, true);
+    setCurrentSlide(0);
+
+    const onSelect = () => {
       setCurrentSlide(carouselApi.selectedScrollSnap());
-    });
+    };
+
+    carouselApi.on('select', onSelect);
+    return () => {
+      carouselApi.off('select', onSelect);
+    };
   }, [carouselApi]);
 
   // Auto scroll featured hero movies every 6 seconds

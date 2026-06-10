@@ -410,10 +410,18 @@ const TvTab = () => {
   // Synchronize carousel slide snaps
   useEffect(() => {
     if (!carouselApi) return;
-    setCurrentSlide(carouselApi.selectedScrollSnap());
-    carouselApi.on("select", () => {
+
+    carouselApi.scrollTo(0, true);
+    setCurrentSlide(0);
+
+    const onSelect = () => {
       setCurrentSlide(carouselApi.selectedScrollSnap());
-    });
+    };
+
+    carouselApi.on("select", onSelect);
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
   }, [carouselApi]);
 
   // Auto scroll featured hero TV shows every 6 seconds
@@ -496,7 +504,7 @@ const TvTab = () => {
                               onClick={() =>
                                 navigate(`/video/${featuredShow.id}`)
                               }
-                              className="bg-white hover:bg-white/95 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                              className="bg-white hover:bg-white/95 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
@@ -506,7 +514,7 @@ const TvTab = () => {
                                 navigate(`/video/${featuredShow.id}`)
                               }
                               variant="outline"
-                              className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm"
+                              className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm w-[150px]"
                             >
                               <span>More Info</span>
                             </Button>

@@ -543,7 +543,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
   const handleEnded = () => {
     // Check if it's a show and there is a next episode
-    if (movie.category === "TV Show" && currentEpisode) {
+    if ((movie.category === "TV Show" || movie.category === "Documentary") && currentEpisode) {
       const currentEpNum = currentEpisode.episodeNumber;
       const nextEp = movie.seasons?.[0]?.episodes?.find((e: any) => e.episodeNumber === currentEpNum + 1);
       if (nextEp) {
@@ -859,7 +859,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 <div className="flex items-center justify-between text-xs md:text-sm font-semibold text-zinc-350 px-1 gap-2 overflow-hidden">
                   <div className="flex items-center gap-3 sm:gap-6 shrink">
                     {/* Episodes button for shows */}
-                    {movie.category === "TV Show" && (
+                    {(movie.category === "TV Show" || movie.category === "Documentary") && movie.seasons && movie.seasons.length > 0 && (
                       <button
                         className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
                         onClick={(e) => {
@@ -902,7 +902,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                   <div className="flex items-center gap-2 sm:gap-6 shrink-0">
                     {/* Next Episode Button */}
-                    {movie.category === "TV Show" && currentEpisode && (
+                    {(movie.category === "TV Show" || movie.category === "Documentary") && currentEpisode && (
                       (() => {
                         const currentEpNum = currentEpisode.episodeNumber;
                         const hasNext = movie.seasons?.[0]?.episodes?.some((e: any) => e.episodeNumber === currentEpNum + 1);

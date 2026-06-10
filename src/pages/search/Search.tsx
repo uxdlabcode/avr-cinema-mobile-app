@@ -13,7 +13,7 @@ import {
 } from '@/store/slices/searchSlice';
 import type { RootState, AppDispatch } from '@/store';
 import { getCollectionData } from '@/Firebase/CloudFirestore/GetData';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const ALL_GENRES = [
     'Action', 'Comedy', 'Drama', 'Sci-Fi',
@@ -33,7 +33,9 @@ const getThumbnail = (media: any) => {
 };
 
 const Search = () => {
-    const [query, setQuery] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlQuery = searchParams.get('q') || '';
+    const [query, setQuery] = useState(urlQuery);
     const [isSearching, setIsSearching] = useState(false);
 
     const [allMedia, setAllMedia] = useState<any[]>([]);
@@ -45,6 +47,10 @@ const Search = () => {
     const navigate = useNavigate();
     const { history } = useSelector((state: RootState) => state.search);
     const user = useSelector((state: RootState) => state.auth.user);
+
+    useEffect(() => {
+        setQuery(urlQuery);
+    }, [urlQuery]);
 
     useEffect(() => {
         if (user?.id) {
@@ -115,6 +121,7 @@ const Search = () => {
 
     const handleChipClick = (itemQuery: string) => {
         setQuery(itemQuery);
+        setSearchParams(itemQuery.trim() ? { q: itemQuery.trim() } : {});
         if (itemQuery.trim() && user?.id) {
             dispatch(saveSearch({ uid: user.id, query: itemQuery.trim() }));
         }
@@ -126,6 +133,7 @@ const Search = () => {
 
     const clearSearchState = () => {
         setQuery('');
+        setSearchParams({});
     };
 
     const renderChips = () => {
@@ -167,7 +175,11 @@ const Search = () => {
                         <Input
                             type="text"
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setQuery(val);
+                                setSearchParams(val.trim() ? { q: val.trim() } : {}, { replace: true });
+                            }}
                             placeholder="Search for movies, shows..."
                             className="pl-12 pr-12 bg-[#0f1014] border rounded-md h-9 text-base"
                             disabled={isLoadingMedia}

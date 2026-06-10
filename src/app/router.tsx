@@ -24,6 +24,7 @@ import { GetSupportPage } from "@/pages/Profile/GetSupportPage";
 import { QuizzesPage } from "@/pages/Quizzes/QuizzesPage";
 import { QuizDetailPage } from "@/pages/Quizzes/QuizDetailPage";
 import { QuizResultPage } from "@/pages/Quizzes/QuizResultPage";
+import Trailer from "@/pages/trailer/Trailer";
 
 function RootRedirect() {
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -119,6 +120,10 @@ export const appRoutes: RouteObject[] = [
       {
         path: "tv",
         element: <TvDetails />,
+      },
+      {
+        path: "trailers",
+        element: <Trailer />,
       },
       {
         path: "tv/episode/:id",
