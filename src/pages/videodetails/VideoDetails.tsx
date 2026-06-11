@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { getDocumentData, getMatchingData, getSignedUrl, compoundQuery, deleteDocument, createDocument } from '@/Firebase';
 import { CustomVideoPlayer, type CustomVideoPlayerRef } from './CustomVideoPlayer';
+import { FeedbackModal } from './FeedbackModal';
 
 // Static movie data store as fallback
 const MOVIES_DATA: Record<string, {
@@ -186,6 +187,7 @@ const VideoDetails = () => {
   // TV Show Specific States
   const [selectedSeason, setSelectedSeason] = useState(0);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   // Reset image loading state on id navigation changes
   useEffect(() => {
@@ -200,6 +202,60 @@ const VideoDetails = () => {
   const [isInMyList, setIsInMyList] = useState<boolean>(false);
   const [isListToggling, setIsListToggling] = useState<boolean>(false);
   const [myListIds, setMyListIds] = useState<string[]>([]);
+
+  // Dynamic feedback and average rating states
+  const [averageRating, setAverageRating] = useState<number | null>(null);
+  const [reviewCount, setReviewCount] = useState<number>(0);
+  const [hasAlreadyRated, setHasAlreadyRated] = useState<boolean>(false);
+
+  const loadFeedbackStats = async (movieId: string) => {
+    if (!movieId) return;
+    try {
+      const feedbacks = await getMatchingData("feedback", "movieId", "==", movieId);
+      if (feedbacks && feedbacks.length > 0) {
+        const total = feedbacks.reduce((acc: number, f: any) => acc + (f.rating || 0), 0);
+        const avg = total / feedbacks.length;
+        setAverageRating(avg);
+        setReviewCount(feedbacks.length);
+        
+        if (userId) {
+          const userHasRated = feedbacks.some((f: any) => f.userId === userId);
+          setHasAlreadyRated(userHasRated);
+        } else {
+          try {
+            const localFeedback = localStorage.getItem('avr_local_feedback') || '{}';
+            const localRatings = JSON.parse(localFeedback);
+            setHasAlreadyRated(!!localRatings[movieId]);
+          } catch (_) {
+            setHasAlreadyRated(false);
+          }
+        }
+      } else {
+        setAverageRating(null);
+        setReviewCount(0);
+        
+        if (userId) {
+          setHasAlreadyRated(false);
+        } else {
+          try {
+            const localFeedback = localStorage.getItem('avr_local_feedback') || '{}';
+            const localRatings = JSON.parse(localFeedback);
+            setHasAlreadyRated(!!localRatings[movieId]);
+          } catch (_) {
+            setHasAlreadyRated(false);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error loading feedback statistics:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      loadFeedbackStats(id);
+    }
+  }, [id, userId]);
 
   // Helper function to sign URLs
   const signUrl = async (url: string) => {
@@ -797,6 +853,8 @@ const VideoDetails = () => {
               playNextEpisode={playNextEpisode}
               userId={userId}
               playInline={!forceFullscreen}
+              hasAlreadyRated={hasAlreadyRated}
+              onFeedbackSubmitted={() => loadFeedbackStats(movie.id)}
             />
           ) : (
             <>
@@ -863,7 +921,15 @@ const VideoDetails = () => {
           <div className="text-left space-y-1">
             <h1 className="text-2xl font-bold text-white tracking-tight leading-tight">{movie.title}</h1>
             <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-zinc-400">
-              <span className="text-secondary-foreground font-bold flex items-center gap-0.5">⭐ {movie.rating || "4.5"}</span>
+              {reviewCount > 0 && averageRating !== null && (
+                <span
+                  onClick={() => setShowFeedbackModal(true)}
+                  className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                  title="Click to rate this title"
+                >
+                  ⭐ {averageRating.toFixed(1)} ({reviewCount})
+                </span>
+              )}
               <span className="text-green-500 font-bold">{matchPercentage}% Match</span>
               <span>{movie.year}</span>
               <span className="px-1.5 py-0.5 border border-zinc-700 rounded text-[10px] uppercase">{movie.rating || "PG-13"}</span>
@@ -1120,6 +1186,15 @@ const VideoDetails = () => {
 
           {/* Badges tag row */}
           <div className="flex items-center gap-4 text-xs font-bold text-zinc-450 select-none">
+            {reviewCount > 0 && averageRating !== null && (
+              <span
+                onClick={() => setShowFeedbackModal(true)}
+                className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                title="Click to rate this title"
+              >
+                ⭐ {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+              </span>
+            )}
             <span className="px-2 py-0.5 border border-zinc-700 bg-zinc-950 rounded uppercase text-[10px] text-zinc-350">{movie.rating}</span>
             <span>{movie.year}</span>
             <span>{currentEpisode?.duration || movie.duration || "57 min"}</span>
@@ -1367,6 +1442,8 @@ const VideoDetails = () => {
             playNextEpisode={playNextEpisode}
             userId={userId}
             playInline={!forceFullscreen}
+            hasAlreadyRated={hasAlreadyRated}
+            onFeedbackSubmitted={() => loadFeedbackStats(movie.id)}
           />
         ) : (
           <>
@@ -1427,6 +1504,8 @@ const VideoDetails = () => {
                         : (movie.category === "TV Show" ? "Play S1·E1" : "Play"))}
                   </span>
                 </Button>
+
+
 
                 <Button
                   onClick={handleToggleMyList}
@@ -1500,6 +1579,15 @@ const VideoDetails = () => {
               <h1 className="text-2xl font-bold text-white text-left">{movie.title}</h1>
 
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-400">
+                {reviewCount > 0 && averageRating !== null && (
+                  <span
+                    onClick={() => setShowFeedbackModal(true)}
+                    className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                    title="Click to rate this title"
+                  >
+                    ⭐ {averageRating.toFixed(1)} ({reviewCount})
+                  </span>
+                )}
                 <span className="text-green-500 font-semibold">{matchPercentage}% Match</span>
                 <span>{movie.year}</span>
                 <span className="px-1.5 py-0.25 border border-zinc-700 rounded text-sm font-semibold uppercase">{movie.rating}</span>
@@ -1550,6 +1638,15 @@ const VideoDetails = () => {
 
             {/* Web Metadata info inline (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold text-zinc-400">
+              {reviewCount > 0 && averageRating !== null && (
+                <span
+                  onClick={() => setShowFeedbackModal(true)}
+                  className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                  title="Click to rate this title"
+                >
+                  ⭐ {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                </span>
+              )}
               <span className="text-green-500  text-base">{matchPercentage}% Match</span>
               <span>{movie.year}</span>
               <span className="px-1.5 py-0.25 border border-zinc-700 rounded text-xs font-bold uppercase">{movie.rating}</span>
@@ -1819,6 +1916,18 @@ const VideoDetails = () => {
         </div>
 
       </div>
+
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        onSubmitSuccess={() => {
+          setShowFeedbackModal(false);
+          loadFeedbackStats(movie.id);
+        }}
+        movieId={movie.id}
+        movieTitle={movie.title}
+        userId={userId}
+      />
     </div>
   );
 };

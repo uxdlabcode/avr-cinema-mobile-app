@@ -8,6 +8,7 @@ import {
 import { createDocument, deleteDocument, getDocumentData } from '@/Firebase';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
+import { FeedbackModal } from './FeedbackModal';
 
 interface CustomVideoPlayerProps {
   movie: any;
@@ -19,6 +20,8 @@ interface CustomVideoPlayerProps {
   userId: string;
   playInline?: boolean;
   onPlayStateChange?: (isPlaying: boolean) => void;
+  hasAlreadyRated?: boolean;
+  onFeedbackSubmitted?: () => void;
 }
 
 export interface CustomVideoPlayerRef {
@@ -34,10 +37,15 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
   playNextEpisode,
   userId,
   playInline = false,
-  onPlayStateChange
+  onPlayStateChange,
+  hasAlreadyRated = false,
+  onFeedbackSubmitted
 }, ref) => {
   const [isCurrentlyPlaying, setIsCurrentlyPlaying] = useState(false);
   const navigate = useNavigate();
+
+  // User Feedback States
+  const [showFeedbackOverlay, setShowFeedbackOverlay] = useState(false);
 
   React.useImperativeHandle(ref, () => ({
     togglePlayPause: () => togglePlayPause()
@@ -551,8 +559,21 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         return;
       }
     }
-    onExit();
+    
+    // If not already rated, trigger feedback overlay
+    if (!hasAlreadyRated) {
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      setIsCurrentlyPlaying(false);
+      setShowFeedbackOverlay(true);
+      setShowControls(false);
+    } else {
+      onExit();
+    }
   };
+
+
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return "00:00:00";
@@ -1124,6 +1145,25 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 </div>
               </>
             )}
+
+            {/* Feedback / Rating Overlay Modal */}
+            <FeedbackModal
+              isOpen={showFeedbackOverlay}
+              onClose={() => {
+                setShowFeedbackOverlay(false);
+                onExit();
+              }}
+              onSubmitSuccess={() => {
+                setShowFeedbackOverlay(false);
+                if (onFeedbackSubmitted) {
+                  onFeedbackSubmitted();
+                }
+                onExit();
+              }}
+              movieId={movie.id}
+              movieTitle={movie.title}
+              userId={userId}
+            />
           </>
         )}
       </div>
