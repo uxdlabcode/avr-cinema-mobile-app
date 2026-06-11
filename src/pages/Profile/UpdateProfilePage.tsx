@@ -3,11 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { updateAuthUser } from "@/store/slices/authSlice";
 
-import { Phone, Mail, User, CheckCircle2, Pencil, ArrowLeft } from "lucide-react";
+import { Phone, Mail, User, CheckCircle2, Pencil, ArrowLeft, Camera, Crown, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { UploadImage } from "@/Firebase/CloudStorage/UploadImages";
 import { updateDocument } from "@/Firebase";
@@ -54,6 +55,11 @@ export const UpdateProfilePage = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleRemoveAvatar = () => {
+    setProfile((prev) => ({ ...prev, avatar: "" }));
+    setAvatarFile(null);
+  };
+
   const handleUpdateProfile = async () => {
     if (!user?.id) return;
     setIsUpdating(true);
@@ -98,136 +104,233 @@ export const UpdateProfilePage = () => {
     .toUpperCase()
     .slice(0, 2);
 
+  // Shared avatar section
+  const AvatarSection = ({ size = "mobile" }: { size?: "mobile" | "desktop" }) => {
+    const avatarSize = size === "desktop" ? "w-28 h-28" : "w-16 h-16";
+    const editBtnSize = size === "desktop" ? "w-9 h-9" : "w-7 h-7";
+    const editIconSize = size === "desktop" ? "w-4 h-4" : "w-3 h-3";
+    const nameSize = size === "desktop" ? "text-xl" : "text-base";
+    const emailSize = size === "desktop" ? "text-sm" : "text-sm";
+
+    return (
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <Avatar className={`${avatarSize} ring-3 ring-primary/20 shadow-xl`}>
+            <AvatarImage src={profile.avatar} className="object-cover" />
+            <AvatarFallback className="bg-muted text-foreground text-2xl font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <Button
+            size="icon"
+            onClick={() => fileInputRef.current?.click()}
+            className={`absolute -bottom-1 -right-1 ${editBtnSize} rounded-full shadow-lg`}
+            title="Change photo"
+          >
+            <Camera className={`${editIconSize}`} />
+          </Button>
+
+          <Input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAvatarChange}
+            accept="image/*"
+            className="hidden"
+            id="avatar-upload"
+          />
+        </div>
+
+        <div className="text-center">
+          <p className={`${nameSize} font-bold text-foreground`}>{profile.name}</p>
+          <p className={`${emailSize} text-muted-foreground mt-0.5`}>{user?.email || "admin@avr.com"}</p>
+          {profile.avatar && (
+            <Button
+              variant="link"
+              onClick={handleRemoveAvatar}
+              className="text-xs font-medium text-destructive hover:text-destructive hover:underline mt-2 p-0 h-auto block mx-auto"
+            >
+              Remove photo
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Shared form section
+  const FormSection = ({ isDesktop = false }: { isDesktop?: boolean }) => (
+    <Card className={`rounded-2xl ${isDesktop ? "p-8" : "p-5"} flex flex-col gap-5 shadow-sm`}>
+
+      {/* Full Name */}
+      <div className="flex flex-col gap-2">
+        <Label
+          htmlFor="edit-name"
+          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+        >
+          <User className="w-4 h-4 text-muted-foreground" />
+          Full Name
+        </Label>
+        <Input
+          id="edit-name"
+          value={profile.name}
+          onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
+          placeholder="Enter your full name"
+          className={`${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground`}
+        />
+      </div>
+
+      {/* Email (read-only) */}
+      <div className="flex flex-col gap-2">
+        <Label
+          htmlFor="edit-email"
+          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+        >
+          <Mail className="w-4 h-4 text-muted-foreground" />
+          Email
+        </Label>
+        <Input
+          id="edit-email"
+          value={user?.email || "admin@avr.com"}
+          readOnly
+          disabled
+          className={`${isDesktop ? "h-12" : "h-11"} rounded-xl bg-muted/50 text-muted-foreground cursor-not-allowed`}
+        />
+      </div>
+
+      {/* Phone */}
+      <div className="flex flex-col gap-2">
+        <Label
+          htmlFor="edit-phone"
+          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+        >
+          <Phone className="w-4 h-4 text-muted-foreground" />
+          Phone
+        </Label>
+        <Input
+          id="edit-phone"
+          value={profile.phone}
+          onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
+          placeholder="Enter your phone number"
+          type="tel"
+          className={`${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground`}
+        />
+      </div>
+
+      {/* Update Profile Button */}
+      <Button
+        id="update-profile-btn"
+        onClick={handleUpdateProfile}
+        disabled={isUpdating || saved}
+        className={`w-full ${isDesktop ? "h-12" : "h-10"} rounded-xl bg-primary hover:bg-primary/90 text-secondary font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2`}
+      >
+        {isUpdating ? "Saving…" : saved ? "Saved" : "Update Profile"}
+      </Button>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
 
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
-        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
-          <button
+      {/* ═══ MOBILE Fixed Header ═══ */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px]">
+          <Button
+            variant="outline"
+            size="icon"
             onClick={() => navigate("/profile")}
-            className="absolute left-4 w-9 h-9 rounded-full flex items-center justify-center border border-border hover:bg-muted transition-colors z-10"
+            className="absolute left-4 w-9 h-9 rounded-full z-10 border-border"
             id="edit-profile-back-btn"
           >
             <ArrowLeft className="w-4 h-4 text-foreground" />
-          </button>
+          </Button>
           <h1 className="text-foreground font-bold text-lg">Edit Profile</h1>
         </div>
       </div>
 
-      <div className="flex flex-col items-center px-4 pt-[96px] pb-10">
+      {/* ═══════════ DESKTOP LAYOUT ═══════════ */}
+      <div className="hidden md:flex flex-col px-6 lg:px-10 xl:px-16 pt-8 pb-16 max-w-[1000px] mx-auto w-full">
+        {/* Desktop inline header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate("/profile")}
+            className="w-10 h-10 rounded-xl border-border"
+            id="edit-profile-back-btn-desktop"
+          >
+            <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Edit Profile</h1>
+            <p className="text-sm text-muted-foreground">Update your personal information</p>
+          </div>
+        </div>
+
+        <div className="flex gap-8 lg:gap-10">
+          {/* Left: Avatar Card */}
+          <div className="w-[340px] lg:w-[380px] shrink-0 sticky top-[90px] self-start">
+            <Card className="rounded-2xl p-8 flex flex-col items-center gap-5 relative overflow-hidden">
+              {/* Decorative top gradient */}
+              <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-primary/10 to-transparent" />
+              <div className="relative z-10 pt-4">
+                <AvatarSection size="desktop" />
+              </div>
+
+              {/* Membership Status */}
+              <div className="w-full border-t border-border pt-4 mt-2">
+                <div className="flex flex-row items-center justify-start p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 gap-3">
+                  <div className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-primary/20">
+                    <Crown className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <p className="text-foreground font-bold text-sm">
+                      {user?.membershipPlanId ? "Premium Member" : "Free Member"}
+                    </p>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {user?.membershipPlanId ? "Enjoying exclusive perks" : "Upgrade for premium features"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Success toast (desktop) */}
+            {saved && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-emerald-500 text-sm font-medium transition-opacity duration-300 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3">
+                <CheckCircle2 className="w-4 h-4" />
+                Profile updated! Redirecting…
+              </div>
+            )}
+          </div>
+
+          {/* Right: Form */}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-foreground font-semibold text-lg mb-5">Personal Information</h2>
+            <FormSection isDesktop />
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════ MOBILE LAYOUT (unchanged) ═══════════ */}
+      <div className="md:hidden flex flex-col items-center px-4 pt-[96px] pb-10">
         <div className="w-full max-w-md flex flex-col gap-6">
 
-        {/* Avatar */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            <Avatar className="w-16 h-16 ring-2 ring-foreground/40 shadow-lg">
-              <AvatarImage src={profile.avatar} className="object-cover" />
-              <AvatarFallback className="bg-muted text-foreground text-xl font-bold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-background border border-border shadow-md flex items-center justify-center hover:bg-muted transition-colors"
-              title="Change photo"
-            >
-              <Pencil className="w-3 h-3 text-foreground" />
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-              id="avatar-upload"
-            />
-          </div>
-          <div className="text-center">
-            <p className="text-base font-bold text-foreground">{profile.name}</p>
-            <p className="text-sm text-muted-foreground mt-0.5">{user?.email || "admin@avr.com"}</p>
-          </div>
+          {/* Avatar */}
+          <AvatarSection size="mobile" />
+
+          {/* Success toast */}
+          {saved && (
+            <div className="flex items-center justify-center gap-2 text-emerald-500 text-sm font-medium transition-opacity duration-300">
+              <CheckCircle2 className="w-4 h-4" />
+              Profile updated! Redirecting…
+            </div>
+          )}
+
+          {/* Edit Form Card */}
+          <FormSection />
+
         </div>
-
-        {/* Success toast */}
-        {saved && (
-          <div className="flex items-center justify-center gap-2 text-emerald-500 text-sm font-medium transition-opacity duration-300">
-            <CheckCircle2 className="w-4 h-4" />
-            Profile updated! Redirecting…
-          </div>
-        )}
-
-        {/* Edit Form Card */}
-        <div className="bg-card border rounded-2xl p-5 flex flex-col gap-5 shadow-sm">
-
-          {/* Full Name */}
-          <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="edit-name"
-              className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
-            >
-              <User className="w-4 h-4 text-muted-foreground" />
-              Full Name
-            </Label>
-            <Input
-              id="edit-name"
-              value={profile.name}
-              onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Enter your full name"
-              className="h-11 rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground"
-            />
-          </div>
-
-          {/* Email (read-only) */}
-          <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="edit-email"
-              className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
-            >
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              Email
-            </Label>
-            <Input
-              id="edit-email"
-              value={user?.email || "admin@avr.com"}
-              readOnly
-              disabled
-              className="h-11 rounded-xl bg-muted/50 text-muted-foreground cursor-not-allowed"
-            />
-          </div>
-
-          {/* Phone */}
-          <div className="flex flex-col gap-1.5">
-            <Label
-              htmlFor="edit-phone"
-              className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
-            >
-              <Phone className="w-4 h-4 text-muted-foreground" />
-              Phone
-            </Label>
-            <Input
-              id="edit-phone"
-              value={profile.phone}
-              onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
-              placeholder="Enter your phone number"
-              type="tel"
-              className="h-11 rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground"
-            />
-          </div>
-
-          {/* Update Profile Button */}
-          <Button
-            id="update-profile-btn"
-            onClick={handleUpdateProfile}
-            disabled={isUpdating || saved}
-            className="w-full h-10 rounded-xl bg-primary hover:bg-primary/90 text-secondary font-semibold text-sm shadow-sm flex items-center justify-center gap-2"
-          >
-            {isUpdating ? "Saving…" : saved ? "Saved" : "Update Profile"}
-          </Button>
-        </div>
-
       </div>
-    </div>
 
     </div>
   );

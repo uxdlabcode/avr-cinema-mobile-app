@@ -5,6 +5,7 @@ import { db } from "@/Firebase/firebase";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { ArrowLeft, Check, X, Zap, Shield, Download, Monitor, Wifi, Crown, CrownIcon, Sparkles } from "lucide-react";
 import LogoImage from "@/assets/Media (3) 1.png";
+import { Button } from "@/components/ui/button";
 import { createRazorpayOrderAsync, verifyRazorpayPaymentAsync } from "@/store/slices/membershipSlice";
 import { useRazorpay } from "react-razorpay";
 import { toast } from "sonner";
@@ -97,9 +98,8 @@ export const UpgradePlanPage = () => {
   };
 
   /* ── Razorpay payment ── */
-  const handleSubscribe = async () => {
-    if (!selectedPlan) return;
-    const plan = upgradePlans.find((p) => p.id === selectedPlan);
+  const handleSubscribe = async (targetPlanId: string) => {
+    const plan = upgradePlans.find((p) => p.id === targetPlanId);
     if (!plan || !user) return;
 
     const upgradePrice = getUpgradePrice(plan);
@@ -140,7 +140,7 @@ export const UpgradePlanPage = () => {
             contact: user.phone || "",
           },
           notes: { userId: user.id, planId: plan.id, planName: plan.name },
-          theme: { color: "#DECB94" },
+          theme: { color: "#DECB94" }, // Keeping hex for Razorpay config compatibility
           modal: {
             ondismiss: () => {
               setProcessingPlan(null);
@@ -159,6 +159,7 @@ export const UpgradePlanPage = () => {
                   planId: plan.id,
                   amount,
                   currency,
+                  billingCycle: "monthly",
                 })
               );
               toast.dismiss(loadingToast);
@@ -197,39 +198,65 @@ export const UpgradePlanPage = () => {
   /* ────────────── UI ────────────── */
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "linear-gradient(160deg, #0a0a0f 0%, #0f0d1a 50%, #0a0a0f 100%)" }}
+      className="min-h-screen flex flex-col bg-background bg-gradient-to-br from-background via-muted/20 to-background"
     >
-      {/* ── Header ── */}
-      <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#0a0a0f]/90 border-b border-white/5">
+      {/* ── Header (mobile only) ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/90 border-b border-foreground/5">
         <div className="flex items-center justify-between px-4 pt-6 pb-4 max-w-[700px] mx-auto">
-        <button
+        <Button
+          variant="outline"
+          size="icon"
           onClick={() => navigate(-1)}
           id="back-btn"
-          className="w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+          className="w-9 h-9 rounded-full bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
-        </button>
-        <h2 className="text-lg font-semibold text-white tracking-wide">Upgrade Plan</h2>
+          <ArrowLeft className="w-5 h-5 text-foreground" />
+        </Button>
+        <h2 className="text-lg font-semibold text-foreground tracking-wide">Upgrade Plan</h2>
         <div className="w-9" />
         </div>
       </div>
 
-      <div className="flex flex-col gap-5 px-4 pb-45 pt-[88px] max-w-[700px] mx-auto w-full">
-        {/* ── Hero ── */}
-        <div className="text-center flex flex-col gap-1.5 pt-1">
-          <div
-            className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-2"
-            style={{
-              background: "linear-gradient(135deg, var(--primary-foreground) 0%, #b89a5a 100%)",
-              boxShadow: "0 8px 32px color-mix(in srgb, var(--primary-foreground) 35%, transparent)",
-            }}
+      <div className="flex flex-col gap-5 px-4 md:px-6 lg:px-10 pb-45 pt-[88px] md:pt-6 max-w-[700px] md:max-w-[1200px] mx-auto w-full">
+
+        {/* ── Desktop Header ── */}
+        <div className="hidden md:flex items-center gap-4 mb-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate("/profile")}
+            className="w-10 h-10 rounded-xl border-foreground/10 bg-foreground/5 hover:bg-foreground/10"
+            id="upgrade-plan-back-btn-desktop"
           >
-            <CrownIcon className="w-7 h-7 text-black" strokeWidth={2.5} />
+            <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
+          </Button>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-primary-foreground to-primary-foreground/80 shadow-lg shadow-primary-foreground/20"
+            >
+              <Crown className="w-5 h-5 text-background" strokeWidth={2.5} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Upgrade Your Plan</h1>
+              <p className="text-sm mt-0.5 text-foreground/40">
+                {currentPlan
+                  ? `You're on ${currentPlan.name} · Only pay the difference`
+                  : "Choose a plan to get started"}
+              </p>
+            </div>
           </div>
-          <h1 className="text-2xl font-semibold text-white tracking-tight">Upgrade Your Plan</h1>
-          <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
+        </div>
+        <div className="hidden md:block h-px bg-foreground/10 mt-1 mb-2" />
+
+        {/* ── Hero (mobile only) ── */}
+        <div className="md:hidden text-center flex flex-col gap-1.5 pt-1">
+          <div
+            className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-2 bg-gradient-to-br from-primary-foreground to-primary-foreground/80 shadow-lg shadow-primary-foreground/30"
+          >
+            <CrownIcon className="w-7 h-7 text-background" strokeWidth={2.5} />
+          </div>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Upgrade Your Plan</h1>
+          <p className="text-sm text-foreground/40">
             {currentPlan
               ? `You're on ${currentPlan.name} · Only pay the difference`
               : "Choose a plan to get started"}
@@ -250,11 +277,11 @@ export const UpgradePlanPage = () => {
               <p className="text-xs font-semibold text-primary-foreground">
                 Current Plan
               </p>
-              <p className="text-white text-sm font-semibold truncate">{currentPlan.name}</p>
+              <p className="text-foreground text-sm font-semibold truncate">{currentPlan.name}</p>
             </div>
             <div className="text-right flex-shrink-0">
-              <p className="text-white font-semibold text-base">₹{currentPlan.monthlyPrice}</p>
-              <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <p className="text-foreground font-semibold text-base">₹{currentPlan.monthlyPrice}</p>
+              <p className="text-[10px] text-foreground/30">
                 /month
               </p>
             </div>
@@ -263,16 +290,11 @@ export const UpgradePlanPage = () => {
 
         {/* ── Plans ── */}
         {loading ? (
-          <div className="flex flex-col gap-4 mt-2">
-            {[1, 2].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+            {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="rounded-3xl animate-pulse"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  height: 230,
-                }}
+                className="rounded-3xl animate-pulse bg-foreground/5 border border-foreground/10 h-[300px]"
               />
             ))}
           </div>
@@ -283,19 +305,19 @@ export const UpgradePlanPage = () => {
             >
               <Sparkles className="w-8 h-8 text-primary-foreground" />
             </div>
-            <p className="text-white font-semibold text-lg">You're on the best plan!</p>
-            <p className="text-sm text-center px-6" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <p className="text-foreground font-semibold text-lg">You're on the best plan!</p>
+            <p className="text-sm text-center px-6 text-foreground/40">
               No higher plans are available. You already have the maximum tier.
             </p>
           </div>
         ) : (
           <>
             {currentPlan && (
-              <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.3)" }}>
+              <p className="text-xs font-semibold tracking-widest uppercase text-foreground/30">
                 Available upgrades
               </p>
             )}
-            <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {upgradePlans.map((plan) => {
                 const isSelected = selectedPlan === plan.id;
                 const upgradePrice = getUpgradePrice(plan);
@@ -306,76 +328,49 @@ export const UpgradePlanPage = () => {
                     key={plan.id}
                     onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
                     id={`plan-card-${plan.id}`}
-                    className="relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300"
-                    style={{
-                      border: isSelected
-                        ? "1.5px solid var(--primary-foreground)"
-                        : plan.popular
-                          ? "1.5px solid color-mix(in srgb, var(--primary-foreground) 25%, transparent)"
-                          : "1px solid rgba(255,255,255,0.09)",
-                      background: isSelected
-                        ? "linear-gradient(135deg, color-mix(in srgb, var(--primary-foreground) 8%, transparent) 0%, rgba(184,154,90,0.04) 100%)"
-                        : "rgba(255,255,255,0.03)",
-                      boxShadow: isSelected
-                        ? "0 0 30px color-mix(in srgb, var(--primary-foreground) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--primary-foreground) 10%, transparent)"
-                        : "none",
-                      transform: isSelected ? "scale(1.01)" : "scale(1)",
-                    }}
+                    className={`relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5 shadow-[0_0_30px_rgba(var(--primary-foreground),0.12),inset_0_1px_0_rgba(var(--primary-foreground),0.1)]" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
                   >
                     {/* Popular Badge */}
                     {plan.popular && (
                       <div
-                        className="absolute top-0 right-0 px-3 py-1 rounded-bl-2xl rounded-tr-3xl text-[10px] font-semibold tracking-widest"
-                        style={{
-                          background: "linear-gradient(135deg, var(--primary-foreground) 0%, #b89a5a 100%)",
-                          color: "#000",
-                        }}
+                        className="absolute top-0 right-0 px-3 py-1 rounded-bl-2xl rounded-tr-3xl text-[10px] font-semibold tracking-widest bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background"
                       >
                         POPULAR
                       </div>
                     )}
 
-                    <div className="p-5 flex flex-col gap-4">
+                    <div className="p-5 md:p-6 flex flex-col gap-4">
                       {/* Plan Header */}
                       <div className="flex items-start justify-between">
                         <div>
-                          <h2 className="text-white font-semibold text-lg leading-tight">{plan.name}</h2>
-                          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+                          <h2 className="text-foreground font-semibold text-lg leading-tight">{plan.name}</h2>
+                          <p className="text-xs mt-0.5 text-foreground/40">
                             {plan.description}
                           </p>
                         </div>
                         {/* Selection circle */}
                         <div
-                          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-200"
-                          style={
-                            isSelected
-                              ? {
-                                background: "linear-gradient(135deg, var(--primary-foreground), #b89a5a)",
-                                boxShadow: "0 2px 8px color-mix(in srgb, var(--primary-foreground) 40%, transparent)",
-                              }
-                              : { border: "1.5px solid rgba(255,255,255,0.2)" }
-                          }
+                          className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-200 ${isSelected ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 shadow-[0_2px_8px_rgba(var(--primary-foreground),0.4)]" : "border-[1.5px] border-foreground/20"}`}
                         >
-                          {isSelected && <Check className="w-3.5 h-3.5 text-black" strokeWidth={3} />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-background" strokeWidth={3} />}
                         </div>
                       </div>
 
                       {/* Pricing block */}
                       <div
-                        className="rounded-2xl p-3 flex items-center justify-between"
-                        style={{ background: "rgba(255,255,255,0.04)" }}
+                        className="rounded-2xl p-3 flex items-center justify-between bg-foreground/5"
                       >
                         <div>
-                          <p className="text-[10px] font-semibold tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
+                          <p className="text-[10px] font-semibold tracking-widest uppercase text-foreground/30">
                             {currentPlan ? "You Pay (Upgrade)" : "Monthly Price"}
                           </p>
                           <div className="flex items-baseline gap-1 mt-0.5">
                             <span
-                              className={`text-3xl font-bold ${isSelected ? "text-primary-foreground" : "text-white"}`}
+                              className={`text-3xl font-bold ${isSelected ? "text-primary-foreground" : "text-foreground"}`}
                             >
                               ₹{upgradePrice}
                             </span>
-                            <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
+                            <span className="text-xs text-foreground/30">
                               /mo
                             </span>
                           </div>
@@ -383,15 +378,14 @@ export const UpgradePlanPage = () => {
 
                         {currentPlan && savedAmount > 0 && (
                           <div className="text-right">
-                            <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                            <p className="text-[10px] text-foreground/30">
                               Full price
                             </p>
-                            <p className="text-sm font-semibold line-through" style={{ color: "rgba(255,255,255,0.3)" }}>
+                            <p className="text-sm font-semibold line-through text-foreground/30">
                               ₹{plan.monthlyPrice}
                             </p>
                             <span
-                              className="text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 inline-block"
-                              style={{ background: "rgba(74,222,128,0.12)", color: "#4ade80" }}
+                              className="text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 inline-block bg-green-500/10 text-green-500"
                             >
                               Save ₹{savedAmount}
                             </span>
@@ -399,8 +393,7 @@ export const UpgradePlanPage = () => {
                         )}
                       </div>
 
-                      {/* Divider */}
-                      <div style={{ height: 1, background: "rgba(255,255,255,0.06)" }} />
+                      <div className="h-px bg-foreground/10" />
 
                       {/* Features */}
                       <div className="flex flex-col gap-2.5">
@@ -418,8 +411,7 @@ export const UpgradePlanPage = () => {
                               {featureIcon(key)}
                             </div>
                             <span
-                              className="text-sm flex-1"
-                              style={{ color: "rgba(255,255,255,0.75)" }}
+                              className="text-sm flex-1 text-foreground/70"
                             >
                               {label}
                             </span>
@@ -431,6 +423,35 @@ export const UpgradePlanPage = () => {
                           </div>
                         ))}
                       </div>
+
+                      {/* Card CTA */}
+                      <div className="mt-6 pt-4 border-t border-foreground/10">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (selectedPlan !== plan.id) setSelectedPlan(plan.id);
+                            handleSubscribe(plan.id);
+                          }}
+                          disabled={!!processingPlan}
+                          className={`w-full py-3.5 h-auto rounded-xl font-semibold text-sm transition-all duration-300 gap-2 ${
+                            isSelected && !processingPlan
+                              ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background shadow-lg shadow-primary-foreground/30 hover:opacity-90"
+                              : "bg-foreground/5 text-foreground hover:bg-foreground/10"
+                          }`}
+                        >
+                          {processingPlan === plan.id ? (
+                            <>
+                              <span className="w-4 h-4 rounded-full border-2 border-background/30 border-t-background animate-spin" />
+                              Processing…
+                            </>
+                          ) : (
+                            <>
+                              <Crown className="w-4 h-4" />
+                              Upgrade — Pay ₹{upgradePrice}
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -441,80 +462,13 @@ export const UpgradePlanPage = () => {
 
         {/* Fine print */}
         {upgradePlans.length > 0 && !loading && (
-          <p className="text-center text-xs mt-2" style={{ color: "rgba(255,255,255,0.55)" }}>
+          <p className="text-center text-xs mt-2 text-foreground/50">
             Cancel anytime · Secure payment via Razorpay · No hidden charges
           </p>
         )}
       </div>
 
-      {/* ── Sticky CTA ── */}
-      {upgradePlans.length > 0 && !loading && (
-        <div
-          className="fixed bottom-0 left-0 right-0 px-4 pb-20 md:pb-6 pt-4"
-          style={{ 
-            backgroundColor: "#0a0a0f", 
-            boxShadow: "0 -24px 30px #0a0a0f" 
-          }}
-        >
-          <div className="max-w-[700px] mx-auto w-full">
-          {selectedPlan && currentPlan && (
-            <div
-              className="flex items-center justify-between mb-3 px-4 py-3 rounded-2xl relative bg-[#16161d] border border-primary-foreground/20"
-            >
-              <div className="flex items-center gap-2">
-                <CrownIcon className="w-3.5 h-3.5 text-primary-foreground" />
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>
-                  {currentPlan.name}
-                </span>
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>→</span>
-                <span className="text-xs font-semibold text-white">
-                  {upgradePlans.find((p) => p.id === selectedPlan)?.name} 
-                </span>
-              </div>
-              <span className="text-sm font-semibold text-primary-foreground">
-                ₹{getUpgradePrice(upgradePlans.find((p) => p.id === selectedPlan)!)} due now
-              </span>
-            </div>
-          )}
-
-          <button
-            onClick={handleSubscribe}
-            disabled={!selectedPlan || !!processingPlan}
-            id="subscribe-btn"
-            className="w-full py-4 rounded-2xl font-semibold text-base tracking-wide transition-all duration-300 flex items-center justify-center gap-2"
-            style={
-              selectedPlan && !processingPlan
-                ? {
-                  background: "linear-gradient(135deg, var(--primary-foreground) 0%, #b89a5a 100%)",
-                  color: "#000",
-                  boxShadow: "0 8px 32px color-mix(in srgb, var(--primary-foreground) 30%, transparent)",
-                }
-                : {
-                  background: "rgba(255,255,255,0.06)",
-                  color: "rgba(255,255,255,0.3)",
-                  cursor: "not-allowed",
-                }
-            }
-          >
-            {processingPlan ? (
-              <>
-                <span
-                  className="w-4 h-4 rounded-full border-2 border-black/30 border-t-black animate-spin"
-                />
-                Processing…
-              </>
-            ) : selectedPlan ? (
-              <>
-                <Crown className="w-4 h-4" />
-                Upgrade — Pay ₹{getUpgradePrice(upgradePlans.find((p) => p.id === selectedPlan)!)}
-              </>
-            ) : (
-              "Select a Plan to Upgrade"
-            )}
-          </button>
-          </div>
-        </div>
-      )}
+      {/* ── Sticky CTA removed ── */}
     </div>
   );
 };

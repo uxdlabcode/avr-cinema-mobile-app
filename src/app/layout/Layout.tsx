@@ -11,7 +11,7 @@ export default function Layout({ children }: Props) {
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-[100vw] overflow-x-hidden">
+      <main className="flex-1 w-full max-w-[100vw] flex flex-col">
         {children}
       </main>
     </div>

@@ -11,6 +11,9 @@ import { db } from "@/Firebase/firebase";
 import { getSignedUrl } from "@/Firebase";
 import { collection, getDocs, getDoc, doc, query, where } from "firebase/firestore";
 import { getCollectionData } from "@/Firebase/CloudFirestore/GetData";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface ContinueItem {
   id: string;
@@ -195,12 +198,12 @@ export const ProfilePage = () => {
     <div className="hidden md:flex flex-col gap-5 w-[320px] lg:w-[360px] shrink-0 sticky top-[90px] self-start">
 
       {/* User Profile Card */}
-      <div className="bg-card border border-border rounded-2xl p-6 flex flex-col items-center gap-4 relative overflow-hidden">
+      <Card className="p-6 flex flex-col items-center gap-4 relative overflow-hidden rounded-2xl">
         {/* Decorative top gradient */}
-        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-primary-foreground/10 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-primary/10 to-transparent" />
 
         <div className="relative z-10 flex flex-col items-center gap-3">
-          <Avatar className="w-20 h-20 ring-3 ring-primary-foreground/30 shadow-xl">
+          <Avatar className="w-20 h-20 ring-3 ring-primary/30 shadow-xl">
             <AvatarImage src={user?.avatar || ""} className="object-cover" />
             <AvatarFallback className="bg-muted text-foreground text-2xl font-bold">
               {initials}
@@ -210,61 +213,66 @@ export const ProfilePage = () => {
             <p className="text-foreground font-bold text-lg">{name}</p>
             <p className="text-muted-foreground text-sm">{user?.email || "sarah@gmail.com"}</p>
           </div>
-          <button
+          <Button
+            variant="secondary"
             onClick={() => navigate("/update-profile")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-muted hover:bg-muted/80 text-foreground text-sm font-medium transition-colors"
+            className="rounded-xl flex items-center gap-2 px-4 py-2 bg-muted text-foreground hover:bg-muted/80"
             id="edit-profile-btn-desktop"
           >
             <Pencil className="w-3.5 h-3.5" />
             Edit Profile
-          </button>
+          </Button>
         </div>
 
         {/* Membership Badge */}
         <div className="w-full border-t border-border pt-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary-foreground/10 flex items-center justify-center">
-              <Crown className="w-4 h-4 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Crown className="w-4 h-4 text-primary" />
             </div>
             <div>
               <p className="text-foreground font-semibold text-sm">{currentPlanName}</p>
               <p className="text-muted-foreground text-xs">Current Plan</p>
             </div>
           </div>
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => navigate("/upgrade-plan")}
             id="upgrade-btn-desktop"
-            className="px-4 py-1.5 rounded-full border border-primary-foreground text-primary-foreground text-xs font-semibold hover:bg-primary-foreground/10 transition-colors"
+            className="rounded-full border-primary text-primary hover:bg-primary/10 h-8 px-4 text-xs"
           >
             Upgrade
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Quick Actions */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
         <div className="px-5 py-3 border-b border-border">
           <p className="text-foreground font-semibold text-sm">Quick Actions</p>
         </div>
         <div className="flex flex-col">
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate("/support")}
-            className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/50 transition-colors text-left group"
+            className="w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none"
             id="get-support-btn-desktop"
           >
-            <div className="w-9 h-9 rounded-xl bg-primary-foreground/10 flex items-center justify-center group-hover:bg-primary-foreground/20 transition-colors">
-              <HeadphonesIcon className="w-4 h-4 text-primary-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <HeadphonesIcon className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-foreground font-medium text-sm">Get Support</p>
               <p className="text-muted-foreground text-xs">Help center & tickets</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate("/notifications")}
-            className="hidden flex items-center gap-3 px-5 py-3.5 hover:bg-muted/50 transition-colors text-left group"
+            className="hidden w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none"
             id="notifications-btn-desktop"
           >
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
@@ -275,11 +283,12 @@ export const ProfilePage = () => {
               <p className="text-muted-foreground text-xs">No new notifications</p>
             </div>
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
             onClick={() => setShowLogoutModal(true)}
-            className="flex items-center gap-3 px-5 py-3.5 hover:bg-destructive/5 transition-colors text-left group"
+            className="w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none hover:bg-destructive/5"
             id="logout-btn-desktop"
           >
             <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/20 transition-colors">
@@ -289,9 +298,9 @@ export const ProfilePage = () => {
               <p className="text-destructive font-medium text-sm">Log Out</p>
               <p className="text-muted-foreground text-xs">Sign out of your account</p>
             </div>
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 
@@ -300,11 +309,11 @@ export const ProfilePage = () => {
     <div className="hidden md:flex flex-col gap-6 flex-1 min-w-0">
 
       {/* Watchlist Card */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
-              <Bookmark className="w-4 h-4 text-primary-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Bookmark className="w-4 h-4 text-primary" />
             </div>
             <h3 className="text-foreground font-bold text-base">Watchlist</h3>
             {watchlist.length > 0 && (
@@ -314,12 +323,13 @@ export const ProfilePage = () => {
             )}
           </div>
           {watchlist.length > 0 && (
-            <button
+            <Button
+              variant="link"
               onClick={() => navigate("/profile/watchlist", { state: { title: "Watchlist", items: watchlist } })}
-              className="text-primary-foreground text-sm font-medium hover:underline flex items-center gap-1 transition-colors"
+              className="text-primary p-0 h-auto gap-1 font-medium hover:underline"
             >
               View All <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           )}
         </div>
         <div className="p-6">
@@ -353,10 +363,10 @@ export const ProfilePage = () => {
             )}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Continue Watching Card */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
@@ -370,12 +380,13 @@ export const ProfilePage = () => {
             )}
           </div>
           {continueWatching.length > 0 && (
-            <button
+            <Button
+              variant="link"
               onClick={() => navigate("/profile/watchlist", { state: { title: "Continue Watching", items: continueWatching } })}
-              className="text-primary-foreground text-sm font-medium hover:underline flex items-center gap-1 transition-colors"
+              className="text-primary p-0 h-auto gap-1 font-medium hover:underline"
             >
               View All <ChevronRight className="w-4 h-4" />
-            </button>
+            </Button>
           )}
         </div>
         <div className="p-6">
@@ -416,14 +427,14 @@ export const ProfilePage = () => {
             )}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Quizzes Card */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary-foreground/10 flex items-center justify-center">
-              <Trophy className="w-4 h-4 text-primary-foreground" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Trophy className="w-4 h-4 text-primary" />
             </div>
             <h3 className="text-foreground font-bold text-base">Quizzes</h3>
             {quizzes.length > 0 && (
@@ -448,14 +459,14 @@ export const ProfilePage = () => {
                 return (
                   <div
                     key={quiz.id}
-                    className="flex items-center gap-4 p-4 bg-muted/30 border border-border rounded-xl cursor-pointer hover:border-primary-foreground/30 hover:bg-muted/50 transition-all group"
+                    className="flex items-center gap-4 p-4 bg-muted/30 border border-border rounded-xl cursor-pointer hover:border-primary/30 hover:bg-muted/50 transition-all group"
                     onClick={() => navigate(`/quizzes/${quiz.id}`)}
                   >
-                    <div className="shrink-0 w-12 h-12 rounded-xl bg-primary-foreground/10 flex items-center justify-center border border-primary-foreground/15">
-                      <Trophy className="w-5 h-5 text-primary-foreground" />
+                    <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/15">
+                      <Trophy className="w-5 h-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-foreground font-semibold text-sm truncate group-hover:text-primary-foreground transition-colors">{quiz.title}</h4>
+                      <h4 className="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{quiz.title}</h4>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full truncate max-w-[120px]">
                           {quiz.category}
@@ -470,17 +481,17 @@ export const ProfilePage = () => {
                         </span>
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 );
               })
             )}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Account Section - Desktop */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center">
@@ -490,21 +501,22 @@ export const ProfilePage = () => {
           </div>
         </div>
         <div className="p-6">
-          <button
+          <Button
+            variant="outline"
             onClick={() => setShowDeleteModal(true)}
-            className="flex items-center gap-4 p-4 bg-destructive/5 border border-destructive/20 rounded-xl cursor-pointer hover:bg-destructive/10 transition-all w-full text-left group"
+            className="w-full justify-start gap-4 p-4 h-auto rounded-xl text-left group border-border hover:bg-muted/50"
             id="delete-account-btn-desktop-content"
           >
-            <div className="shrink-0 w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center border border-destructive/20 group-hover:bg-destructive/20 transition-colors">
+            <div className="shrink-0 w-12 h-12 rounded-xl bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">
               <Trash2 className="w-5 h-5 text-destructive" />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-foreground font-semibold text-sm">Delete Account</h4>
               <p className="text-xs text-muted-foreground mt-0.5">Permanently remove your account and data</p>
             </div>
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 
@@ -519,23 +531,24 @@ export const ProfilePage = () => {
         </div>
 
         {/* ═══════════ MOBILE LAYOUT (unchanged) ═══════════ */}
-        <div className="md:hidden flex flex-col gap-5 px-4 pt-8 pb-24">
+        <div className="md:hidden flex flex-col gap-5 px-4 pt-[72px] pb-24">
 
           {/* Top Bar — Logo + Logout */}
-          <div className="flex items-center justify-between">
+          <div className="fixed top-0 left-0 right-0 z-50 bg-background pt-6 pb-3 flex items-center justify-between px-4">
             <img src={LogoImage} alt="AVR Cinema" className="h-10 w-auto object-contain" />
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setShowLogoutModal(true)}
-              className="flex items-center gap-1.5 text-destructive font-semibold text-sm hover:opacity-80 transition-opacity"
+              className="text-destructive hover:text-destructive hover:bg-transparent hover:opacity-80 p-0 h-auto gap-1.5 font-semibold text-sm"
               id="logout-btn"
             >
               <LogOut className="w-4 h-4" />
               Log Out
-            </button>
+            </Button>
           </div>
 
           {/* User Info Card */}
-          <div className="flex items-center gap-4 bg-card border border-border p-4 rounded-2xl">
+          <Card className="flex items-center gap-4 p-4 rounded-2xl p-4 gap-4 flex-row">
             <Avatar className="w-14 h-14 ring-2 ring-border shadow-lg">
               <AvatarImage src={user?.avatar || ""} className="object-cover" />
               <AvatarFallback className="bg-muted text-foreground text-lg font-bold">
@@ -548,33 +561,37 @@ export const ProfilePage = () => {
                 {user?.email || "sarah@gmail.com"}
               </p>
             </div>
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => navigate("/update-profile")}
-              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors"
+              className="w-8 h-8 rounded-full hover:bg-muted"
               id="edit-profile-btn"
             >
               <Pencil className="w-4 h-4 text-muted-foreground" />
-            </button>
-          </div>
+            </Button>
+          </Card>
 
           {/* Tier + Upgrade Row */}
           <div className="flex items-center justify-between">
             <div>
-              <button className="flex items-center gap-1 text-primary-foreground font-semibold text-sm">
+              <Button variant="ghost" className="text-primary p-0 h-auto hover:bg-transparent gap-1 font-semibold text-sm">
                 {currentPlanName} <ChevronDown className="w-3.5 h-3.5" />
-              </button>
+              </Button>
               <p className="text-muted-foreground text-xs mt-0.5">
                 {user?.email || "sarah@gmail.com"}
               </p>
             </div>
             <div className="text-right">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => navigate("/upgrade-plan")}
                 id="upgrade-btn"
-                className="px-5 py-1.5 rounded-full border border-primary-foreground text-primary-foreground text-xs font-semibold hover:bg-primary-foreground/10 transition-colors"
+                className="rounded-full border-primary text-primary hover:bg-primary/10 px-5 h-8 text-xs font-semibold"
               >
                 Upgrade
-              </button>
+              </Button>
               <p className="text-muted-foreground text-[10px] mt-1">
                 Upgrade for more<br />benefits
               </p>
@@ -582,19 +599,21 @@ export const ProfilePage = () => {
           </div>
 
           {/* GET SUPPORT Button */}
-          <button
+          <Button
+            variant="outline"
             onClick={() => navigate("/support")}
-            className="w-full py-3 px-4 rounded-lg bg-card border border-primary-foreground/30 flex items-center justify-between text-primary-foreground text-sm font-semibold tracking-wider hover:bg-primary-foreground/10 transition-colors"
+            className="w-full justify-between py-3 px-4 h-auto rounded-lg border-primary/30 text-primary hover:text-primary hover:bg-primary/10 tracking-wider font-semibold text-sm"
             id="get-support-btn"
           >
             <span>Get Support</span>
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Button>
 
           {/* Notifications Row */}
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate("/notifications")}
-            className="hidden flex items-center justify-between py-3 border-t border-border"
+            className="hidden w-full justify-between py-3 h-auto rounded-none border-t border-border hover:bg-transparent text-left"
             id="notifications-btn"
           >
             <div>
@@ -602,19 +621,21 @@ export const ProfilePage = () => {
               <p className="text-muted-foreground text-sm mt-0.5">No new notifications</p>
             </div>
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </button>
+          </Button>
 
           {/* Watchlist Section */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h3 className="text-foreground font-bold text-base">Watchlist</h3>
               {watchlist.length > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => navigate("/profile/watchlist", { state: { title: "Watchlist", items: watchlist } })}
-                  className="p-1 hover:bg-muted rounded-full transition-colors"
+                  className="w-8 h-8 rounded-full"
                 >
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </button>
+                </Button>
               )}
             </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
@@ -649,12 +670,14 @@ export const ProfilePage = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-foreground font-bold text-base">Continue Watching</h3>
               {continueWatching.length > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => navigate("/profile/watchlist", { state: { title: "Continue Watching", items: continueWatching } })}
-                  className="p-1 hover:bg-muted rounded-full transition-colors"
+                  className="w-8 h-8 rounded-full"
                 >
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                </button>
+                </Button>
               )}
             </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
@@ -705,17 +728,17 @@ export const ProfilePage = () => {
                 quizzes.map((quiz) => {
                   const qCount = quiz.questions?.length ?? 0;
                   return (
-                    <div
+                    <Card
                       key={quiz.id}
-                      className="flex-shrink-0 w-[240px] flex flex-col gap-2 p-3 bg-card border border-border rounded-2xl cursor-pointer hover:border-primary-foreground/30 hover:bg-white/[0.03] transition-all group"
+                      className="flex-shrink-0 w-[240px] flex flex-col gap-2 p-3 rounded-2xl cursor-pointer hover:border-primary/30 hover:bg-white/[0.03] transition-all group"
                       onClick={() => navigate(`/quizzes/${quiz.id}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="shrink-0 w-10 h-10 rounded-xl bg-primary-foreground/10 flex items-center justify-center border border-primary-foreground/15">
-                          <Trophy className="w-5 h-5 text-primary-foreground" />
+                        <div className="shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/15">
+                          <Trophy className="w-5 h-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-foreground font-semibold text-sm truncate group-hover:text-primary-foreground transition-colors">{quiz.title}</h4>
+                          <h4 className="text-foreground font-semibold text-sm truncate group-hover:text-primary transition-colors">{quiz.title}</h4>
                           <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full mt-1 inline-block truncate max-w-full">
                             {quiz.category}
                           </span>
@@ -731,7 +754,7 @@ export const ProfilePage = () => {
                           {qCount} Qs
                         </span>
                       </div>
-                    </div>
+                    </Card>
                   );
                 })
               )}
@@ -744,19 +767,20 @@ export const ProfilePage = () => {
               <h3 className="text-foreground font-bold text-base">Account</h3>
             </div>
             <div className="flex flex-col gap-3">
-              <button
+              <Button
+                variant="outline"
                 onClick={() => setShowDeleteModal(true)}
-                className="flex items-center gap-3 p-3 bg-card border border-border rounded-2xl cursor-pointer hover:border-destructive/30 hover:bg-destructive/5 transition-all w-full text-left group"
+                className="w-full justify-start gap-3 p-3 h-auto rounded-2xl border-border hover:bg-muted/50 text-left group"
                 id="delete-account-btn"
               >
-                <div className="shrink-0 w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center border border-destructive/20 group-hover:bg-destructive/20 transition-colors">
+                <div className="shrink-0 w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">
                   <Trash2 className="w-5 h-5 text-destructive" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-foreground font-semibold text-sm">Delete Account</h4>
                   <p className="text-[10px] text-muted-foreground mt-0.5">Permanently remove your account and data</p>
                 </div>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -766,7 +790,7 @@ export const ProfilePage = () => {
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+          <Card className="w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col gap-2 text-center items-center">
               <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
                 <LogOut className="w-6 h-6 text-destructive" />
@@ -777,30 +801,32 @@ export const ProfilePage = () => {
               </p>
             </div>
             <div className="flex gap-3 mt-2">
-              <button
+              <Button
+                variant="outline"
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 px-4 py-3 rounded-xl border border-border text-foreground font-semibold hover:bg-muted transition-colors"
+                className="flex-1 h-auto py-3 rounded-xl border-border hover:bg-muted font-semibold"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="destructive"
                 onClick={() => {
                   setShowLogoutModal(false);
                   logout();
                 }}
-                className="flex-1 px-4 py-3 rounded-xl bg-destructive text-white font-semibold hover:bg-destructive/90 transition-colors shadow-sm"
+                className="flex-1 h-auto py-3 rounded-xl shadow-sm hover:bg-destructive/90 font-semibold"
               >
                 Yes, Log Out
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-destructive/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+          <Card className="border-destructive/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col gap-2 text-center items-center">
               <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
                 <Trash2 className="w-6 h-6 text-destructive" />
@@ -811,22 +837,24 @@ export const ProfilePage = () => {
               </p>
             </div>
             <div className="flex gap-3 mt-2">
-              <button
+              <Button
+                variant="outline"
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-3 rounded-xl border border-border text-foreground font-semibold hover:bg-muted transition-colors disabled:opacity-50"
+                className="flex-1 h-auto py-3 rounded-xl border-border hover:bg-muted font-semibold disabled:opacity-50"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="destructive"
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-3 rounded-xl bg-destructive text-white font-semibold hover:bg-destructive/90 transition-colors shadow-sm flex justify-center items-center disabled:opacity-50"
+                className="flex-1 h-auto py-3 rounded-xl shadow-sm hover:bg-destructive/90 font-semibold disabled:opacity-50 flex justify-center items-center"
               >
                 {isDeleting ? "Deleting..." : "Yes, Delete"}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </>
