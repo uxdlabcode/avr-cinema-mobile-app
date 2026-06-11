@@ -583,13 +583,38 @@ const VideoDetails = () => {
               name: c.name,
               image: c.imageUrl || "/assets/cast1.webp"
             })) : [],
-            related: [] as { id: string; title: string; image: string }[]
+            related: [] as { id: string; title: string; image: string }[],
+            director: dbMovie.director || "Robbie Grewal",
+            contentDescriptor: dbMovie.contentDescriptor || "tobacco depictions, alcohol use, foul language",
+            language: dbMovie.language || "Hindi",
+            publisher: dbMovie.publisher || "Almighty Motion Picture",
+            genres: dbMovie.genres || (dbMovie.genre ? [dbMovie.genre] : [])
           };
 
           // Fetch related items from the same category dynamically
           try {
             const allOfCategory = await getMatchingData("media", "category", "==", dbMovie.category);
-            const filtered = allOfCategory.filter(m => m.id !== dbMovie.id).slice(0, 4);
+            
+            const currentGenres = dbMovie.genres || (dbMovie.genre ? [dbMovie.genre] : []);
+            let filtered = allOfCategory.filter(m => {
+              if (m.id === dbMovie.id) return false;
+              if (currentGenres.length === 0) return true;
+              
+              const itemGenres = m.genres || (m.genre ? [m.genre] : []);
+              return currentGenres.some((cg: string) => 
+                itemGenres.some((ig: string) => ig.toLowerCase() === cg.toLowerCase())
+              );
+            });
+
+            // Fallback: if we have fewer than 4 matches, fill in with items from same category
+            if (filtered.length < 4) {
+              const remaining = allOfCategory.filter(m => 
+                m.id !== dbMovie.id && !filtered.some(f => f.id === m.id)
+              );
+              filtered = [...filtered, ...remaining].slice(0, 4);
+            } else {
+              filtered = filtered.slice(0, 4);
+            }
 
             // Sign the thumbnails of related items
             mappedMovie.related = await Promise.all(filtered.map(async (m) => {
@@ -729,6 +754,16 @@ const VideoDetails = () => {
     setForceFullscreen(false);
   };
 
+  const handleViewAllEpisodes = () => {
+    setActiveTab('episodes');
+    setTimeout(() => {
+      const el = document.getElementById("episodes-tabs") || document.getElementById("episodes-section");
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 50);
+  };
+
   if (isLoading) {
     return <VideoDetailsSkeleton />;
   }
@@ -748,7 +783,7 @@ const VideoDetails = () => {
 
         {/* Top Video/Banner Header Section */}
         <div
-          className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video bg-black overflow-hidden border-b border-zinc-900"}
+          className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden border-b border-zinc-900"}
         >
           {isPlaying && videoUrlToPlay ? (
             <CustomVideoPlayer
@@ -814,8 +849,7 @@ const VideoDetails = () => {
                     />
                   </div>
                   <span className="text-xs text-zinc-400 font-medium">
-                    {watchProgress.episodeId ? `E${watchProgress.episodeId} • ` : ""}
-                    {formatProgressTime(watchProgress.currentTime)}
+                    {formatProgressTime(watchProgress.currentTime)} / {formatProgressTime(watchProgress.duration)}
                   </span>
                 </div>
               )}
@@ -823,8 +857,8 @@ const VideoDetails = () => {
           )}
         </div>
 
-        {/* Main Details and Sections wrapper */}
-        <div className="max-w-md mx-auto px-4 pt-4 space-y-5">
+        {/* MOBILE VIEW (block md:hidden) */}
+        <div className="block md:hidden max-w-md mx-auto px-4 pt-4 space-y-5">
           {/* Title and Metadata Details */}
           <div className="text-left space-y-1">
             <h1 className="text-2xl font-bold text-white tracking-tight leading-tight">{movie.title}</h1>
@@ -1027,8 +1061,288 @@ const VideoDetails = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* WEB VIEW (hidden md:block) */}
+        <div className="hidden md:block px-12 lg:px-16 py-6 space-y-6 text-left   mx-auto pb-16">
+
+          {/* Breadcrumbs */}
+          <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold select-none">
+            <span className="hover:text-white cursor-pointer" onClick={() => navigate("/")}>Home</span>
+            <span>&gt;</span>
+            <span className="hover:text-white cursor-pointer" onClick={() => navigate("/tv")}>Shows</span>
+            <span>&gt;</span>
+            <span className="hover:text-white cursor-pointer" onClick={() => navigate(`/video/${movie.id}`)}>{movie.title}</span>
+            {movie.seasons && movie.seasons.length > 0 && (
+              <>
+                <span>&gt;</span>
+                <span className="text-zinc-400">{movie.seasons[selectedSeason]?.label || `Season ${selectedSeason + 1}`}</span>
+              </>
+            )}
+            {currentEpisode && (
+              <>
+                <span>&gt;</span>
+                <span className="text-zinc-200">{currentEpisode.title}</span>
+              </>
+            )}
+          </div>
+
+          {/* Title inline with info & Actions */}
+          <div className="flex justify-between items-center w-full pt-2">
+            <div className="flex items-baseline gap-4">
+              <h1 className="text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight select-text uppercase">
+                {movie.title}
+              </h1>
+              {movie.seasons && movie.seasons.length > 0 && (
+                <span className="text-lg font-bold text-zinc-450 select-none">
+                  S{selectedSeason + 1} E{currentEpisode?.episodeNumber || 1} &nbsp;&nbsp;&nbsp; {currentEpisode?.title || movie.seasons[selectedSeason]?.episodes?.[0]?.title || "The Watch Project"}
+                </span>
+              )}
+            </div>
+
+            {/* Actions on the right */}
+            <div className="flex items-center gap-6">
+              <button
+                onClick={handleToggleMyList}
+                disabled={isListToggling}
+                className="flex items-center gap-2 text-sm font-bold text-zinc-300 border border-2 border-primary/40 px-4 py-2 rounded-md hover:text-white transition-colors cursor-pointer select-none disabled:opacity-55"
+              >
+                {isInMyList ? <Check className="w-5 h-5 text-green-500" /> : <Plus className="w-5 h-5 text-primary" />}
+                <span>{isInMyList ? "In My List" : "Add to My List"}</span>
+              </button>
+
+              <button className="flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer select-none">
+                <Share2 className="w-4 h-4 text-white" />
+                <span>Share</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Badges tag row */}
+          <div className="flex items-center gap-4 text-xs font-bold text-zinc-450 select-none">
+            <span className="px-2 py-0.5 border border-zinc-700 bg-zinc-950 rounded uppercase text-[10px] text-zinc-350">{movie.rating}</span>
+            <span>{movie.year}</span>
+            <span>{currentEpisode?.duration || movie.duration || "57 min"}</span>
+            <span>{movie.language || "Hindi"}</span>
+          </div>
+          {/* Description Block */}
+          <div className="text-xs md:text-sm text-zinc-450 leading-relaxed font-normal pt-2 max-w-4xl">
+            {showFullDescription ? (
+              <div className="space-y-4 animate-fade-in select-text">
+                {movie.description ? (
+                  movie.description.split("\n").map((p: string, idx: number) => (
+                    <p key={idx}>{p.trim()}</p>
+                  ))
+                ) : (
+                  <p>No description available.</p>
+                )}
+                <button
+                  onClick={() => setShowFullDescription(false)}
+                  className="text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                >
+                  See Less
+                </button>
+              </div>
+            ) : (
+              <div className="animate-fade-in">
+                <p className="line-clamp-3 select-all leading-relaxed">{movie.description || "No description available."}</p>
+                {movie.description && movie.description.length > 150 && (
+                  <button
+                    onClick={() => setShowFullDescription(true)}
+                    className="text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors"
+                  >
+                    See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+
+          {/* Details fields */}
+          <div className="space-y-1 text-xs text-zinc-450 leading-relaxed max-w-4xl">
+            <div>
+              <span className="text-zinc-500 font-bold select-none">Genre:</span>{" "}
+              <span className="text-zinc-300 select-text">{movie.genres?.join(", ") || (movie.category === "TV Show" ? "Biopic, Drama, Web Series" : "Action & Adventure, Drama")}</span>
+            </div>
+            <div>
+              <span className="text-zinc-500 font-bold select-none">Content Descriptor:</span>{" "}
+              <span className="text-zinc-300 select-text">{movie.contentDescriptor || "tobacco depictions, alcohol use, foul language"}</span>
+            </div>
+            <div>
+              <span className="text-zinc-500 font-bold select-none">Director:</span>{" "}
+              <span className="text-zinc-300 select-text">{movie.director || "Robbie Grewal"}</span>
+            </div>
+            <div>
+              <span className="text-zinc-500 font-bold select-none">Starring:</span>{" "}
+              <span className="text-zinc-300 select-text">
+                {movie.cast && movie.cast.length > 0
+                  ? movie.cast.map((c: any) => c.name).join(", ")
+                  : "Naseeruddin Shah, Jim Sarbh, Namita Dubey, Vaibhav Tatwawadi, Asif Ali Beg"}
+              </span>
+            </div>
+            <div>
+              <span className="text-zinc-500 font-bold select-none">Publisher:</span>{" "}
+              <span className="text-zinc-300 select-text">{movie.publisher || "Almighty Motion Picture"}</span>
+            </div>
+          </div>
+
+
+          {/* Seasons & Episodes Selector Header and List */}
+          {movie.seasons && movie.seasons.length > 0 && (
+            <div className="pt-6 space-y-4">
+
+              {/* Selector Header Bar */}
+              <div className="flex items-center justify-between border-b border-zinc-850 pb-3 select-none">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-bold text-white">{movie.seasons[selectedSeason]?.label || `Season ${selectedSeason + 1}`}</span>
+                  {movie.seasons.length > 1 && (
+                    <button
+                      onClick={handleViewAllEpisodes}
+                      className="text-xs font-bold text-blue-500 hover:text-blue-400 flex items-center gap-1 cursor-pointer"
+                    >
+                      View All &gt;
+                    </button>
+                  )}
+                </div>
+
+                {/* Sort Option */}
+
+              </div>
+
+              {/* Horizontal Episodes Scroller */}
+              <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
+                {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
+                  <div
+                    key={ep.id}
+                    onClick={() => playEpisode(ep, false)}
+                    className="flex-none w-56 sm:w-64 space-y-2 cursor-pointer group"
+                  >
+                    {/* Header above card */}
+                    <div className="bg-zinc-950 border border-zinc-900 px-3 py-2 rounded-t-md text-left transition-colors group-hover:bg-zinc-900/40">
+                      <h4 className="text-xs font-bold text-white group-hover:text-primary truncate">
+                        {ep.title}
+                      </h4>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="relative aspect-video rounded-b-md overflow-hidden bg-zinc-900 border-x border-b border-zinc-900">
+                      <img
+                        src={ep.image || movie.image || "/assets/poster.png"}
+                        alt={ep.title}
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-350"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Play className="w-6 h-6 text-white fill-white" />
+                      </div>
+
+                      {/* Episode specific progress bar */}
+                      {(() => {
+                        const epProgress = getEpisodeProgress(ep.id);
+                        if (epProgress) {
+                          return (
+                            <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-850">
+                              <div
+                                className="h-full bg-secondary-foreground"
+                                style={{ width: `${(epProgress.currentTime / epProgress.duration) * 100}%` }}
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+          )}
+
+          {/* Cast & Crew Section */}
+          {movie.cast && movie.cast.length > 0 && (
+            <div className="pt-8 border-t border-zinc-900/60 text-left">
+              <h3 className="text-lg font-bold text-white mb-4">Cast & Crew</h3>
+              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+                {movie.cast.map((person: any, idx: number) => (
+                  <div key={idx} className="flex flex-col items-center gap-1.5 shrink-0 select-none">
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800/80 hover:scale-105 transition-transform duration-200 shadow">
+                      <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-450 text-center w-16 truncate">
+                      {person.name}
+                    </span>
+                    {person.role && (
+                      <span className="text-[8px] text-zinc-650 text-center w-16 truncate -mt-1 font-semibold">
+                        {person.role}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Related / More Like This Section */}
+          {movie.related && movie.related.length > 0 && (
+            <div className="pt-8 border-t border-zinc-900/60 text-left">
+              <h3 className="text-lg font-bold text-white mb-4">More Like This</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 md:gap-6">
+                {movie.related.map((item: any) => (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      setIsPlaying(false);
+                      navigate(`/video/${item.id}`);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900"
+                  >
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300" />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
+                      <div className="flex justify-end mb-1">
+                        <span className="text-[8px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                          {item.category || "TV Show"}
+                        </span>
+                      </div>
+                      <h4 className="text-xs md:text-sm font-bold text-white leading-tight mb-1 truncate drop-shadow-md">
+                        {item.title}
+                      </h4>
+                      <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-1.5">
+                        <span>{item.year || "N/A"}</span>
+                        <span>{item.duration || "N/A"}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/video/${item.id}`);
+                          }}
+                          className="flex-1 py-1.5 bg-primary text-black font-bold text-[10px] rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                        >
+                          Play
+                        </button>
+                        <button
+                          onClick={(e) => handleToggleRelatedMyList(e, item)}
+                          disabled={isListToggling}
+                          className="p-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"
+                        >
+                          {myListIds.includes(item.id.toString()) ? (
+                            <Check className="w-3.5 h-3.5 text-green-500" />
+                          ) : (
+                            <Plus className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
+
       </div>
     );
   }
@@ -1094,7 +1408,7 @@ const VideoDetails = () => {
                     }
                   }}
                   disabled={isSigning}
-                  className="bg-white hover:bg-white/95 text-black font-medium px-8 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55"
+                  className="bg-white hover:bg-white/95 text-black font-medium px-8 py-6 lg:py-2 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55"
                 >
                   {isSigning ? (
                     <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -1118,7 +1432,7 @@ const VideoDetails = () => {
                   onClick={handleToggleMyList}
                   disabled={isListToggling}
                   variant="outline"
-                  className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-6 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.02] disabled:opacity-55"
+                  className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-6 lg:py-2 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.02] disabled:opacity-55"
                 >
                   {isInMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                   <span>{isInMyList ? "In My List" : "My List"}</span>
@@ -1166,15 +1480,14 @@ const VideoDetails = () => {
               />
             </div>
             <span className="text-xs text-zinc-400 font-medium">
-              {watchProgress.episodeId ? `E${watchProgress.episodeId} • ` : ""}
-              {formatProgressTime(watchProgress.currentTime)}
+              {formatProgressTime(watchProgress.currentTime)} / {formatProgressTime(watchProgress.duration)}
             </span>
           </div>
         )}
       </div>
 
       {/* Grid Content wrapper */}
-      <div className="px-4 md:px-12 lg:px-16 max-w-7xl mx-auto pt-6 space-y-8 pb-16">
+      <div className="px-4 md:px-12 lg:px-16  mx-auto pt-6 space-y-8 pb-16">
 
         {/* Main responsive splits: summary on left, detailed metadata/cast on right */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
@@ -1294,7 +1607,7 @@ const VideoDetails = () => {
         <div className="border-t border-zinc-900 my-4" />
 
         {/* Navigation Tabs (Episodes | More Like This | Details) */}
-        <div className="space-y-6">
+        <div className="space-y-6" id="episodes-tabs">
           <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-semibold text-zinc-400">
             {movie.category === "TV Show" && (
               <button
@@ -1391,7 +1704,7 @@ const VideoDetails = () => {
 
             {/* Related/More Like This Panel */}
             {activeTab === 'related' && movie.related && movie.related.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-7 lg:h-[80%] gap-4 md:gap-6">
                 {movie.related.map((item: any) => (
                   <div
                     key={item.id}
