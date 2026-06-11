@@ -51,7 +51,7 @@ const AnswerCard = ({ q, sel, idx }: { q: Quiz["questions"][number]; sel: string
   const ca = q.correctAnswers ?? [];
   const isCorrect = sel.length === ca.length && ca.every((c) => sel.includes(c));
   return (
-    <div className={`rounded-xl border p-4 ${isCorrect ? "bg-emerald-500/5 border-emerald-500/20" : "bg-rose-500/5 border-rose-500/20"}`}>
+    <div className={`rounded-xl border p-4 ${isCorrect ? "" : ""}`}>
       <div className="flex items-start gap-3 mb-3">
         <span className="shrink-0 w-6 h-6 rounded-md bg-foreground/10 text-foreground text-[10px] font-bold flex items-center justify-center mt-0.5">{idx + 1}</span>
         <p className="text-foreground text-sm font-semibold leading-snug">{q.text}</p>
@@ -66,14 +66,14 @@ const AnswerCard = ({ q, sel, idx }: { q: Quiz["questions"][number]; sel: string
           const wasSelected = sel.includes(opt.id);
           const isOpt = ca.includes(opt.id);
           let cls = "flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium ";
-          if (isOpt) cls += "bg-emerald-500/10 text-emerald-400";
-          else if (wasSelected && !isOpt) cls += "bg-rose-500/10 text-rose-400 line-through";
-          else cls += "text-muted-foreground";
+          if (isOpt) cls += "bg-primary/10 text-emerald-400";
+          else if (wasSelected && !isOpt) cls += "bg-primary/10 text-rose-400 line-through";
+          else cls += " bg-primary/10 text-muted-foreground";
           return (
             <div key={opt.id} className={cls}>
               {isOpt ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                 : wasSelected ? <XCircle className="w-3.5 h-3.5 shrink-0" />
-                : <span className="w-3.5 h-3.5 shrink-0" />}
+                  : <span className="w-3.5 h-3.5 shrink-0" />}
               {opt.text}
             </div>
           );
@@ -212,17 +212,17 @@ export const QuizResultPage = () => {
           <div className="w-[320px] lg:w-[360px] flex-shrink-0 sticky top-8 flex flex-col gap-5">
 
             {/* Score card */}
-            <Card className="p-8 flex flex-col items-center gap-5 relative overflow-hidden rounded-2xl">
+            <Card className="p-8 flex flex-col items-center gap-5 relative overflow-hidden rounded-lg">
               {/* Decorative glow */}
               <div className="absolute top-0 left-0 right-0 h-32 opacity-20 pointer-events-none"
-                style={{ background: `radial-gradient(ellipse at 50% 0%, ${ringColor}, transparent)` }} />
+              />
 
               <div className="relative z-10 flex flex-col items-center gap-3">
                 <div className="relative">
                   <ScoreRing pct={score} size={160} />
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-4xl font-black leading-none ${resultColor}`}>{score}%</span>
-                    <span className="text-muted-foreground text-xs mt-1">Score</span>
+                    <span className={`text-3xl font-semibold leading-none ${resultColor}`}>{score}%</span>
+                    <span className="text-primary text-xs mt-1">Score</span>
                   </div>
                 </div>
                 <StarRating score={score} />
@@ -237,11 +237,11 @@ export const QuizResultPage = () => {
                 {[
                   { label: "Correct", val: correct, color: "text-emerald-400", bg: "bg-emerald-500/8" },
                   { label: "Wrong", val: total - correct, color: "text-rose-400", bg: "bg-rose-500/8" },
-                  { label: "Total", val: total, color: "text-foreground", bg: "bg-muted/50" },
+                  { label: "Total", val: total, color: "text-primary", bg: "bg-muted/50" },
                 ].map((s) => (
                   <div key={s.label} className={`flex flex-col items-center py-3 rounded-xl ${s.bg}`}>
-                    <span className={`${s.color} font-black text-2xl leading-none`}>{s.val}</span>
-                    <span className="text-muted-foreground text-xs mt-1">{s.label}</span>
+                    <span className={`${s.color} font-bold text-lg leading-none`}>{s.val}</span>
+                    <span className="text-primary text-xs mt-1">{s.label}</span>
                   </div>
                 ))}
               </div>
@@ -250,11 +250,11 @@ export const QuizResultPage = () => {
             {/* CTAs */}
             <div className="flex flex-col gap-3">
               <Button id="quiz-result-retry-btn" onClick={() => navigate(`/quizzes/${quiz.id}`)}
-                className="w-full h-auto py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2"
+                className="w-full h-10 py-3 rounded-lg font-semibold text-secondary flex items-center justify-center gap-2"
               ><RotateCcw className="w-4 h-4" /> Try Again</Button>
               <Button id="quiz-result-home-btn" variant="outline" onClick={() => navigate("/profile")}
-                className="w-full h-auto py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border-border"
-              ><Home className="w-4 h-4" /> All Quizzes</Button>
+                className="w-full h-10 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 border-border"
+              ><Home className="w-4 h-10 rounded-lg" /> All Quizzes</Button>
             </div>
           </div>
 

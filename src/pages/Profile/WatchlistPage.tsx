@@ -12,7 +12,7 @@ export const WatchlistPage = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <p className="text-muted-foreground mb-4">No data found.</p>
-        <Button 
+        <Button
           onClick={() => navigate(-1)}
           className="rounded-lg font-semibold"
         >
@@ -44,7 +44,7 @@ export const WatchlistPage = () => {
       </div>
 
       {/* ═══ DESKTOP Header (inline) ═══ */}
-      <div className="hidden md:block max-w-[1400px] mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
+      <div className="hidden md:block  mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
         <div className="flex items-center gap-4 mb-2">
           <Button
             variant="outline"
@@ -56,11 +56,13 @@ export const WatchlistPage = () => {
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <div className="">
               {isContinueWatching ? (
-                <Play className="w-5 h-5 text-primary" />
+                // <Play className="w-5 h-5 text-primary" />
+                ""
               ) : (
-                <Bookmark className="w-5 h-5 text-primary" />
+                // <Bookmark className="w-5 h-5 text-primary" />
+                ""
               )}
             </div>
             <div>
@@ -91,30 +93,31 @@ export const WatchlistPage = () => {
               return (
                 <Card
                   key={item.id}
-                  className="flex flex-col overflow-hidden cursor-pointer group border-border shadow-sm hover:shadow-md transition-all bg-card/60"
+                  className="relative aspect-[2/3] w-full overflow-hidden cursor-pointer group border-border shadow-sm bg-card p-0 gap-0"
                   onClick={() => navigate(`/video/${movieId}`)}
                 >
-                  <div className="relative aspect-[2/3] w-full bg-muted">
-                    <img
-                      src={posterUrl}
-                      alt={titleText}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                    {isContinue && item.progress > 0 && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted">
-                        <div
-                          className="h-full bg-destructive"
-                          style={{ width: `${item.progress}%` }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <CardContent className="p-2.5 sm:p-3 pb-3">
-                    <p className="text-foreground text-xs sm:text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                  <img
+                    src={posterUrl}
+                    alt={titleText}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+
+                  {/* Text Overlay at the bottom */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent p-2 pb-2.5 pt-8 flex items-end justify-center">
+                    <p className="text-white text-[10px] sm:text-xs font-semibold truncate text-center w-full drop-shadow-md">
                       {titleText}
                     </p>
-                  </CardContent>
+                  </div>
+
+                  {isContinue && item.progress > 0 && (
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-muted/30">
+                      <div
+                        className="h-full bg-destructive"
+                        style={{ width: `${item.progress}%` }}
+                      />
+                    </div>
+                  )}
                 </Card>
               );
             })}
@@ -123,13 +126,14 @@ export const WatchlistPage = () => {
       </div>
 
       {/* ═══ DESKTOP Grid ═══ */}
-      <div className="hidden md:block max-w-[1400px] mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
+      <div className="hidden md:block  mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground gap-3">
             {isContinueWatching ? (
               <Play className="w-12 h-12 opacity-30" />
             ) : (
-              <Bookmark className="w-12 h-12 opacity-30" />
+              // <Bookmark className="w-12 h-12 opacity-30" />
+              ""
             )}
             <p className="text-lg">{title} is empty</p>
             <p className="text-sm">Start exploring to add items here.</p>
@@ -145,37 +149,38 @@ export const WatchlistPage = () => {
               return (
                 <Card
                   key={item.id}
-                  className="flex flex-col overflow-hidden cursor-pointer group border-border shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 bg-card/60"
+                  className="relative aspect-[2/3] w-full overflow-hidden cursor-pointer group border-border shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 bg-card p-0 gap-0"
                   onClick={() => navigate(`/video/${movieId}`)}
                 >
-                  <div className="relative aspect-[2/3] w-full bg-muted overflow-hidden">
-                    <img
-                      src={posterUrl}
-                      alt={titleText}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-                    {isContinue && item.progress > 0 && (
-                      <>
-                        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-muted/60">
-                          <div
-                            className="h-full bg-destructive"
-                            style={{ width: `${item.progress}%` }}
-                          />
-                        </div>
-                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[10px] font-semibold backdrop-blur-sm">
-                          {item.progress}%
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <CardContent className="p-3.5">
-                    <p className="text-foreground text-sm font-semibold truncate group-hover:text-primary transition-colors">
+                  <img
+                    src={posterUrl}
+                    alt={titleText}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+                  {/* Text Overlay at the bottom */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent p-3 pb-3.5 pt-10 flex items-end justify-center">
+                    <p className="text-white text-xs lg:text-sm font-semibold truncate text-center w-full drop-shadow-md">
                       {titleText}
                     </p>
-                  </CardContent>
+                  </div>
+
+                  {isContinue && item.progress > 0 && (
+                    <>
+                      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-muted/30">
+                        <div
+                          className="h-full bg-destructive"
+                          style={{ width: `${item.progress}%` }}
+                        />
+                      </div>
+                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/60 text-white text-[10px] font-semibold backdrop-blur-sm">
+                        {item.progress}%
+                      </div>
+                    </>
+                  )}
                 </Card>
               );
             })}

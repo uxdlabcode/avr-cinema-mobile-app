@@ -118,10 +118,10 @@ export const QuizDetailPage = () => {
         {/* MOBILE Header */}
         <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
           <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
-            <Button 
+            <Button
               variant="outline"
               size="icon"
-              id="quiz-detail-back-btn" 
+              id="quiz-detail-back-btn"
               onClick={() => navigate("/profile")}
               className="absolute left-4 w-9 h-9 rounded-full border-border"
             >
@@ -132,44 +132,44 @@ export const QuizDetailPage = () => {
         </div>
 
         {/* MOBILE Body */}
-        <div className="md:hidden flex-1 pt-[64px] pb-8 flex flex-col gap-6 px-4 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
-          <div className="mt-4 rounded-2xl p-6 flex flex-col items-center gap-3 text-center bg-gradient-to-br from-background via-muted/30 to-background">
-            <div className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center border border-primary/20"><Trophy className="w-8 h-8 text-primary" /></div>
-            <h2 className="text-white font-bold text-xl">{quiz.title}</h2>
-            {quiz.description && <p className="text-white/50 text-sm leading-relaxed">{quiz.description}</p>}
+        <div className="md:hidden flex-1 pt-[64px] pb-8 flex flex-col gap-3 px-4 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
+          <div className="mt-4 rounded-2xl p-2 flex flex-col items-center gap-2 text-center bg-gradient-to-br from-background via-muted/30 to-background">
+            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center border border-primary/20"><Trophy className="w-6 h-6 text-primary" /></div>
+            <h2 className="text-primary font-bold text-md">{quiz.title}</h2>
+            {quiz.description && <p className="text-primary/50 text-xs leading-relaxed">{quiz.description}</p>}
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
               { icon: <HelpCircle className="w-5 h-5 text-primary" />, value: qCount, label: "Questions" },
               { icon: <Trophy className="w-5 h-5 text-primary" />, value: quiz.category, label: "Category" },
             ].map(({ icon, value, label }) => (
-              <Card key={label} className="flex flex-col items-center gap-1.5 p-3 rounded-xl">
+              <Card key={label} className="flex flex-col items-center gap-1.5 p-3 rounded-lg">
                 {icon}<span className="text-foreground font-bold text-sm text-center">{value}</span>
                 <span className="text-muted-foreground text-[10px]">{label}</span>
               </Card>
             ))}
           </div>
-          <Card className="rounded-xl p-4 space-y-3">
+          <Card className="rounded-lg p-2 space-y-1">
             <h3 className="text-foreground font-semibold text-sm">How to Play</h3>
             {["Read each question carefully.", "Select the correct answer(s) and tap Confirm.", `Answer all ${qCount} questions to complete the quiz.`, "Your final score will be shown at the end."].map((tip, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="shrink-0 w-5 h-5 rounded-full bg-primary/15 text-primary text-[10px] font-bold flex items-center justify-center mt-0.5">{i + 1}</span>
+              <div key={i} className="flex items-start gap-3">
+                <span className="shrink-0 w-5 h-5 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center ">{i + 1}</span>
                 <p className="text-muted-foreground text-sm">{tip}</p>
               </div>
             ))}
           </Card>
           <Button id="quiz-start-btn" onClick={() => setStarted(true)}
-            className="w-full h-auto py-4 rounded-2xl font-bold text-base active:scale-[0.98]"
+            className="w-full h-auto py-3 rounded-lg font-semibold text-secondary bg-primary active:scale-[0.98]"
           >Start Quiz</Button>
         </div>
 
         {/* ═══════════ DESKTOP INTRO ═══════════ */}
         <div className="hidden md:flex flex-1 max-w-[1100px] mx-auto w-full px-6 lg:px-10 py-8 gap-8">
           {/* Left column — quiz info */}
-          <div className="flex-1 flex flex-col gap-6">
+          <div className="flex-1 flex flex-col gap-4">
             {/* Back + title */}
             <div className="flex items-center gap-4">
-              <Button 
+              <Button
                 variant="outline"
                 size="icon"
                 onClick={() => navigate("/profile")}
@@ -184,14 +184,14 @@ export const QuizDetailPage = () => {
             </div>
 
             {/* Hero banner */}
-            <div className="rounded-2xl overflow-hidden relative bg-gradient-to-br from-background via-muted/30 to-background">
-              <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-primary/8 blur-3xl pointer-events-none" />
-              <div className="relative z-10 p-8 flex items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl bg-primary/15 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Trophy className="w-10 h-10 text-primary" />
+            <div className="rounded-lg overflow-hidden relative bg-gradient-to-br from-background via-muted/30 to-background">
+              <div className="absolute top-0 right-0 w-40 h-35 rounded-full bg-primary/8 blur-3xl pointer-events-none" />
+              <div className="relative z-10 p-4 flex items-start gap-6">
+                <div className="w-10 h-10 mt-3 rounded-md bg-primary/15 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Trophy className="w-6 h-6  text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-white font-bold text-2xl leading-tight">{quiz.title}</h2>
+                  {/* <h2 className="text-white font-bold text-2xl leading-tight">{quiz.title}</h2> */}
                   {quiz.description && <p className="text-white/55 text-sm mt-2 leading-relaxed max-w-lg">{quiz.description}</p>}
                   <div className="flex items-center gap-4 mt-4">
                     <span className="inline-flex items-center gap-1.5 text-primary text-sm font-medium">
@@ -209,9 +209,9 @@ export const QuizDetailPage = () => {
             </div>
 
             {/* How to play */}
-            <Card className="rounded-2xl p-6">
-              <h3 className="text-foreground font-semibold text-base mb-4">How to Play</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <Card className="rounded-md p-4">
+              <h3 className="text-foreground font-semibold text-base ">How to Play</h3>
+              <div className="grid grid-cols-2 gap-3">
                 {["Read each question carefully.", "Select correct answer(s) and click Confirm.", `Answer all ${qCount} questions to complete.`, "Your score is shown at the end."].map((tip, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <span className="shrink-0 w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-bold flex items-center justify-center mt-0.5">{i + 1}</span>
@@ -223,22 +223,22 @@ export const QuizDetailPage = () => {
           </div>
 
           {/* Right column — start card */}
-          <div className="w-[300px] lg:w-[340px] flex-shrink-0 self-start sticky top-8">
-            <Card className="rounded-2xl p-6 flex flex-col gap-5">
+          <div className="w-[300px] lg:w-[340px] flex-shrink-0 self-start sticky top-27">
+            <Card className="rounded-xl p-4 flex flex-col gap-5">
               <h3 className="text-foreground font-bold text-lg">Ready to start?</h3>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 {[
                   { label: "Questions", value: qCount, icon: <HelpCircle className="w-4 h-4 text-primary" /> },
                   { label: "Duration", value: `${quiz.duration}m`, icon: <Clock className="w-4 h-4 text-primary" /> },
                   { label: "Category", value: quiz.category, icon: <Trophy className="w-4 h-4 text-primary" /> },
                   { label: "Type", value: "Mixed", icon: <ChevronRight className="w-4 h-4 text-primary" /> },
                 ].map(({ label, value, icon }) => (
-                  <div key={label} className="flex items-center gap-2 p-3 rounded-xl bg-muted/50">
+                  <div key={label} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
                     {icon}
                     <div>
-                      <p className="text-muted-foreground text-[10px]">{label}</p>
+                      <p className="text-muted-foreground text-sm">{label}</p>
                       <p className="text-foreground text-sm font-semibold truncate">{value}</p>
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export const QuizDetailPage = () => {
               </div>
 
               <Button id="quiz-start-btn" onClick={() => setStarted(true)}
-                className="w-full h-auto py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2"
+                className="w-full h-auto py-3 rounded-md font-semibold text-secondary flex items-center justify-center gap-2"
               >
                 <Trophy className="w-4 h-4" /> Start Quiz
               </Button>
@@ -274,10 +274,10 @@ export const QuizDetailPage = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
         <div className="px-4 pt-4 pb-3 max-w-[700px] mx-auto">
           <div className="flex items-center gap-3 mb-3">
-            <Button 
+            <Button
               variant="outline"
               size="icon"
-              id="quiz-active-back-btn" 
+              id="quiz-active-back-btn"
               onClick={() => navigate("/profile")}
               className="shrink-0 w-9 h-9 rounded-full border-border"
             >
@@ -349,19 +349,19 @@ export const QuizDetailPage = () => {
         <div className="flex-1 flex flex-col gap-6">
           {/* Desktop header */}
           <div className="flex items-center gap-4">
-            <Button 
+            <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate("/profile")} 
-              className="w-10 h-10 rounded-xl border-border flex-shrink-0"
+              onClick={() => navigate("/profile")}
+              className="w-10 h-10 rounded-lg border-border flex-shrink-0"
             >
               <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
             </Button>
             <div className="flex-1">
               <p className="text-muted-foreground text-sm truncate">{quiz.title}</p>
               <div className="flex items-center gap-3 mt-1">
-                <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-500 bg-primary" style={{ width: `${progress}%` }} />
+                <div className="flex-1 h-2 bg-muted rounded-lg overflow-hidden">
+                  <div className="h-full rounded-lg transition-all duration-500 bg-primary" style={{ width: `${progress}%` }} />
                 </div>
                 <span className="text-sm text-muted-foreground font-medium shrink-0">{currentIdx + 1} / {quiz.questions.length}</span>
               </div>
@@ -369,12 +369,12 @@ export const QuizDetailPage = () => {
           </div>
 
           {/* Question card */}
-          <Card className="rounded-2xl p-7">
+          <Card className="rounded-lg p-4">
             <div className="flex items-start gap-4">
-              <span className="shrink-0 w-9 h-9 rounded-xl bg-primary/15 border border-primary/20 text-primary text-sm font-bold flex items-center justify-center mt-0.5">{currentIdx + 1}</span>
+              <span className="shrink-0 w-7 h-7 rounded-lg bg-primary/15 border border-primary/20 text-primary text-sm font-bold flex items-center justify-center mt-0.5">{currentIdx + 1}</span>
               <div>
                 <p className="text-foreground font-semibold text-lg leading-snug">{currentQ.text}</p>
-                {isMulti && <p className="text-sm text-primary mt-2 font-medium">★ Select all correct answers</p>}
+                {isMulti && <p className="text-sm text-primary mt-1 font-medium">★ Select all correct answers</p>}
               </div>
             </div>
           </Card>
@@ -384,7 +384,7 @@ export const QuizDetailPage = () => {
             {currentQ.options.map((opt) => {
               const sel = isSelected(opt.id);
               const correct = isCorrectOpt(opt.id);
-              let base = "w-full text-left flex items-center gap-4 p-5 rounded-xl border transition-all cursor-pointer ";
+              let base = "w-full text-left flex items-center gap-4 p-4 rounded-lg border transition-all cursor-pointer ";
               if (showFeedback) {
                 if (correct) base += "bg-emerald-500/8 border-emerald-500/40 text-emerald-400";
                 else if (sel && !correct) base += "bg-rose-500/8 border-rose-500/40 text-rose-400";
@@ -407,8 +407,8 @@ export const QuizDetailPage = () => {
         </div>
 
         {/* Right — confirm panel */}
-        <div className="w-[280px] lg:w-[300px] flex-shrink-0 self-start sticky top-8">
-          <Card className="rounded-2xl p-6 flex flex-col gap-4">
+        <div className="w-[280px] lg:w-[300px] flex-shrink-0 self-start sticky top-25">
+          <Card className="rounded-lg p-4 flex flex-col gap-4">
             <h3 className="text-foreground font-bold text-base">Question {currentIdx + 1} of {quiz.questions.length}</h3>
             <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all duration-500 bg-primary" style={{ width: `${progress}%` }} />
@@ -418,7 +418,7 @@ export const QuizDetailPage = () => {
             </div>
             {!showFeedback ? (
               <Button id="quiz-confirm-btn" onClick={handleConfirmAnswer} disabled={!hasSelected}
-                className="w-full h-auto py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
+                className="w-full h-auto py-3 text-secondary rounded-lg font-semibold text-sm flex items-center justify-center gap-2"
               >Confirm Answer</Button>
             ) : (
               <Button id="quiz-next-btn" onClick={handleNext}

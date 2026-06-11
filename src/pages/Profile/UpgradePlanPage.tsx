@@ -202,22 +202,22 @@ export const UpgradePlanPage = () => {
     >
       {/* ── Header (mobile only) ── */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/90 border-b border-foreground/5">
-        <div className="flex items-center justify-between px-4 pt-6 pb-4 max-w-[700px] mx-auto">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => navigate(-1)}
-          id="back-btn"
-          className="w-9 h-9 rounded-full bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
-        >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </Button>
-        <h2 className="text-lg font-semibold text-foreground tracking-wide">Upgrade Plan</h2>
-        <div className="w-9" />
+        <div className="flex items-center justify-between px-4 pt-3 pb-4 max-w-[700px] mx-auto">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate(-1)}
+            id="back-btn"
+            className="w-9 h-9 rounded-full bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </Button>
+          <h2 className="text-lg font-semibold text-foreground tracking-wide">Upgrade Plan</h2>
+          <div className="w-9" />
         </div>
       </div>
 
-      <div className="flex flex-col gap-5 px-4 md:px-6 lg:px-10 pb-45 pt-[88px] md:pt-6 max-w-[700px] md:max-w-[1200px] mx-auto w-full">
+      <div className="flex flex-col gap-5 px-4 md:px-6 lg:px-10 pb-45 pt-20 md:pt-6 max-w-[700px] md:max-w-[1200px] mx-auto w-full">
 
         {/* ── Desktop Header ── */}
         <div className="hidden md:flex items-center gap-4 mb-2">
@@ -225,7 +225,7 @@ export const UpgradePlanPage = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate("/profile")}
-            className="w-10 h-10 rounded-xl border-foreground/10 bg-foreground/5 hover:bg-foreground/10"
+            className="w-7 h-7 rounded-lg border-foreground/10 bg-foreground/5 hover:bg-foreground/10"
             id="upgrade-plan-back-btn-desktop"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
@@ -251,11 +251,11 @@ export const UpgradePlanPage = () => {
         {/* ── Hero (mobile only) ── */}
         <div className="md:hidden text-center flex flex-col gap-1.5 pt-1">
           <div
-            className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-2 bg-gradient-to-br from-primary-foreground to-primary-foreground/80 shadow-lg shadow-primary-foreground/30"
+            className="mx-auto w-10 h-10 rounded-xl flex items-center justify-center mb-2 bg-gradient-to-br from-primary-foreground to-primary-foreground/80 shadow-lg shadow-primary-foreground/30"
           >
             <CrownIcon className="w-7 h-7 text-background" strokeWidth={2.5} />
           </div>
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Upgrade Your Plan</h1>
+          <h1 className="text-xl font-semibold text-foreground ">Upgrade Your Plan</h1>
           <p className="text-sm text-foreground/40">
             {currentPlan
               ? `You're on ${currentPlan.name} · Only pay the difference`
@@ -266,10 +266,10 @@ export const UpgradePlanPage = () => {
         {/* ── Current Plan Pill ── */}
         {currentPlan && !loading && (
           <div
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary-foreground/[0.06] border border-primary-foreground/20"
+            className="flex items-center gap-3 px-4 py-2 rounded-lg bg-primary-foreground/[0.06] border border-primary-foreground/20"
           >
             <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary-foreground/[0.15]"
+              className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary-foreground/[0.08] border border-primary-foreground/[0.15]"
             >
               <Crown className="w-4 h-4 text-primary-foreground" />
             </div>
@@ -294,16 +294,16 @@ export const UpgradePlanPage = () => {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="rounded-3xl animate-pulse bg-foreground/5 border border-foreground/10 h-[300px]"
+                className="rounded-lg animate-pulse bg-foreground/5 border border-foreground/10 h-[300px]"
               />
             ))}
           </div>
         ) : upgradePlans.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center bg-primary-foreground/[0.08] border border-primary-foreground/[0.15]"
+              className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary-foreground/[0.08] border border-primary-foreground/[0.15]"
             >
-              <Sparkles className="w-8 h-8 text-primary-foreground" />
+              <Sparkles className="w-6 h-6 text-primary-foreground" />
             </div>
             <p className="text-foreground font-semibold text-lg">You're on the best plan!</p>
             <p className="text-sm text-center px-6 text-foreground/40">
@@ -433,11 +433,10 @@ export const UpgradePlanPage = () => {
                             handleSubscribe(plan.id);
                           }}
                           disabled={!!processingPlan}
-                          className={`w-full py-3.5 h-auto rounded-xl font-semibold text-sm transition-all duration-300 gap-2 ${
-                            isSelected && !processingPlan
-                              ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background hover:opacity-90"
-                              : "bg-foreground/5 text-foreground hover:bg-foreground/10"
-                          }`}
+                          className={`w-full py-3.5 h-auto rounded-xl font-semibold text-sm transition-all duration-300 gap-2 ${isSelected && !processingPlan
+                            ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background hover:opacity-90"
+                            : "bg-foreground/5 text-foreground hover:bg-foreground/10"
+                            }`}
                         >
                           {processingPlan === plan.id ? (
                             <>

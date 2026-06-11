@@ -129,7 +129,7 @@ export const QuizzesPage = () => {
           <Button
             variant="outline"
             size="icon"
-            id="quizzes-back-btn" 
+            id="quizzes-back-btn"
             onClick={() => navigate("/dashboard")}
             className="absolute left-4 w-9 h-9 rounded-full z-10 border-border"
           >
@@ -164,7 +164,7 @@ export const QuizzesPage = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search quiz..."
-              className="w-full h-11 pl-10 pr-4 bg-card border-border rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+              className="w-full h-9 "
             />
           </div>
         </div>
@@ -172,10 +172,10 @@ export const QuizzesPage = () => {
           <div className="mt-4 px-4 flex gap-2 overflow-x-auto scrollbar-hide pb-1">
             {categories.map((cat) => (
               <Button
-                key={cat} 
+                key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 variant={selectedCategory === cat ? "default" : "outline"}
-                className={`shrink-0 rounded-full text-xs font-semibold h-8 px-4 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:bg-card" : ""}`}
+                className={`shrink-0 rounded-lg text-secondary text-xs font-semibold h-8 px-4 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:bg-card" : ""}`}
               >{cat}</Button>
             ))}
           </div>
@@ -228,20 +228,20 @@ export const QuizzesPage = () => {
 
         {/* Search + filters row */}
         <div className="flex items-center gap-4 mb-6">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="relative flex-1 hap-3 max-w-sm">
+            {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /> */}
             <Input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search quizzes..."
-              className="w-full h-11 pl-10 pr-4 bg-card border-border rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:ring-offset-0"
+              className="w-full h-11 "
             />
           </div>
           {!loading && categories.length > 1 && (
             <div className="flex items-center gap-2 flex-wrap">
               {categories.map((cat) => (
                 <Button
-                  key={cat} 
+                  key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   variant={selectedCategory === cat ? "default" : "outline"}
-                  className={`rounded-xl text-sm font-semibold h-auto py-2 px-4 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-card" : ""}`}
+                  className={`rounded-lg text-sm font-semibold text-secondary  h-auto py-2 px-4 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-card" : ""}`}
                 >{cat}</Button>
               ))}
             </div>
@@ -256,9 +256,9 @@ export const QuizzesPage = () => {
         )}
         {error && !loading && (
           <div className="flex flex-col items-center justify-center flex-1 gap-4">
-            <HelpCircle className="w-12 h-12 text-rose-400/50" />
+            <HelpCircle className="w-10 h-10 text-rose-400/50" />
             <p className="text-muted-foreground">{error}</p>
-            <Button onClick={() => window.location.reload()} className="rounded-xl px-5 py-2.5 h-auto text-sm font-semibold">Retry</Button>
+            <Button onClick={() => window.location.reload()} className="rounded-md px-5 py-2.5 h-auto text-sm font-semibold">Retry</Button>
           </div>
         )}
         {!loading && !error && filtered.length === 0 && (

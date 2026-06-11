@@ -198,7 +198,7 @@ export const ProfilePage = () => {
     <div className="hidden md:flex flex-col gap-5 w-[320px] lg:w-[360px] shrink-0 sticky top-[90px] self-start">
 
       {/* User Profile Card */}
-      <Card className="p-6 flex flex-col items-center gap-4 relative overflow-hidden rounded-2xl">
+      <Card className="p-6 flex flex-col items-center gap-4 relative overflow-hidden rounded-lg">
         {/* Decorative top gradient */}
         <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-primary/10 to-transparent" />
 
@@ -240,7 +240,7 @@ export const ProfilePage = () => {
             size="sm"
             onClick={() => navigate("/upgrade-plan")}
             id="upgrade-btn-desktop"
-            className="rounded-full border-primary text-primary hover:bg-primary/10 h-8 px-4 text-xs"
+            className="rounded-full border-primary text-primary-foreground hover:bg-primary-foreground h-8 px-4 text-xs"
           >
             Upgrade
           </Button>
@@ -248,7 +248,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Quick Actions */}
-      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
+      <Card className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="px-5 py-3 border-b border-border">
           <p className="text-foreground font-semibold text-sm">Quick Actions</p>
         </div>
@@ -309,7 +309,7 @@ export const ProfilePage = () => {
     <div className="hidden md:flex flex-col gap-6 flex-1 min-w-0">
 
       {/* Watchlist Card */}
-      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
+      <Card className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -366,11 +366,11 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Continue Watching Card */}
-      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
+      <Card className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
-              <Play className="w-4 h-4 text-blue-400" />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Play className="w-4 h-4 text-primary" />
             </div>
             <h3 className="text-foreground font-bold text-base">Continue Watching</h3>
             {continueWatching.length > 0 && (
@@ -430,7 +430,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Quizzes Card */}
-      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
+      <Card className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -447,9 +447,9 @@ export const ProfilePage = () => {
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {loadingQuizzes ? (
-              <div className="col-span-full flex items-center justify-center h-[100px] text-sm text-muted-foreground">Loading quizzes...</div>
+              <div className="col-span-full flex items-center justify-center h-32 text-sm text-muted-foreground">Loading quizzes...</div>
             ) : quizzes.length === 0 ? (
-              <div className="col-span-full flex flex-col items-center justify-center h-[100px] text-muted-foreground gap-2">
+              <div className="col-span-full flex flex-col items-center justify-center h-32 text-muted-foreground gap-2">
                 <Trophy className="w-8 h-8 opacity-40" />
                 <p className="text-sm">No quizzes available</p>
               </div>
@@ -491,7 +491,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Account Section - Desktop */}
-      <Card className="rounded-2xl overflow-hidden p-0 gap-0">
+      <Card className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center">
@@ -504,10 +504,10 @@ export const ProfilePage = () => {
           <Button
             variant="outline"
             onClick={() => setShowDeleteModal(true)}
-            className="w-full justify-start gap-4 p-4 h-auto rounded-xl text-left group border-border hover:bg-muted/50"
+            className="w-full justify-start gap-4 p-4 h-auto rounded-lg text-left group border-border hover:bg-muted/50"
             id="delete-account-btn-desktop-content"
           >
-            <div className="shrink-0 w-12 h-12 rounded-xl bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">
+            <div className="shrink-0 w-10 h-10 rounded-lg bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">
               <Trash2 className="w-5 h-5 text-destructive" />
             </div>
             <div className="flex-1 min-w-0">
@@ -525,13 +525,13 @@ export const ProfilePage = () => {
       <div className="min-h-screen flex flex-col bg-background">
 
         {/* ═══════════ DESKTOP LAYOUT ═══════════ */}
-        <div className="hidden md:flex gap-6 lg:gap-8 px-6 lg:px-10 xl:px-16 pt-8 pb-16 max-w-[1400px] mx-auto w-full">
+        <div className="hidden md:flex gap-6 lg:gap-8 px-6 lg:px-10 xl:px-16 pt-8 pb-16 max-w-7xl mx-auto w-full">
           <DesktopSidebar />
           <DesktopContent />
         </div>
 
         {/* ═══════════ MOBILE LAYOUT (unchanged) ═══════════ */}
-        <div className="md:hidden flex flex-col gap-5 px-4 pt-[72px] pb-24">
+        <div className="md:hidden flex flex-col gap-5 px-4 pt-[72px] pb-7">
 
           {/* Top Bar — Logo + Logout */}
           <div className="fixed top-0 left-0 right-0 z-50 bg-background pt-6 pb-3 flex items-center justify-between px-4">
@@ -575,11 +575,11 @@ export const ProfilePage = () => {
           {/* Tier + Upgrade Row */}
           <div className="flex items-center justify-between">
             <div>
-              <Button variant="ghost" className="text-primary p-0 h-auto hover:bg-transparent gap-1 font-semibold text-sm">
+              <Button variant="ghost" className="text-primary text-left !p-0 flex justify-start h-auto hover:bg-transparent gap-1 font-semibold text-sm">
                 {currentPlanName} <ChevronDown className="w-3.5 h-3.5" />
               </Button>
               <p className="text-muted-foreground text-xs mt-0.5">
-                {user?.email || "sarah@gmail.com"}
+                {user?.email || ""}
               </p>
             </div>
             <div className="text-right">
@@ -588,7 +588,7 @@ export const ProfilePage = () => {
                 size="sm"
                 onClick={() => navigate("/upgrade-plan")}
                 id="upgrade-btn"
-                className="rounded-full border-primary text-primary hover:bg-primary/10 px-5 h-8 text-xs font-semibold"
+                className="rounded-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-5 h-8 text-xs font-semibold"
               >
                 Upgrade
               </Button>
@@ -770,7 +770,7 @@ export const ProfilePage = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowDeleteModal(true)}
-                className="w-full justify-start gap-3 p-3 h-auto rounded-2xl border-border hover:bg-muted/50 text-left group"
+                className="w-full justify-start gap-3 p-3 h-auto rounded-lg border-border hover:bg-muted/50 text-left group"
                 id="delete-account-btn"
               >
                 <div className="shrink-0 w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">

@@ -67,7 +67,10 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4 lg:gap-6">
-          <Button className="bg-white/10 hover:bg-white/20 text-white border border-white/20 gap-2 text-sm font-semibold rounded-md h-9 px-3 lg:px-4 cursor-pointer">
+          <Button 
+            onClick={() => navigate("/upgrade-plan")}
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 gap-2 text-sm font-semibold rounded-md h-9 px-3 lg:px-4 cursor-pointer"
+          >
             <Crown className="w-4 h-4 text-white" />
             Subscribe
           </Button>

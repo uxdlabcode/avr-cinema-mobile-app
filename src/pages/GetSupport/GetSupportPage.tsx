@@ -269,17 +269,17 @@ export const GetSupportPage = () => {
               ? <ChevronLeft className="w-4 h-4 text-foreground" />
               : <ArrowLeft className="w-4 h-4 text-foreground" />}
           </Button>
-          <h1 className="text-foreground font-semibold text-lg">{headerTitle()}</h1>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setViewState({ view: "my-tickets" })}
-              className="absolute right-4 flex items-center gap-1.5 h-8 text-xs font-semibold px-3 rounded-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary transition-colors"
-              id="my-tickets-btn"
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              My Tickets
-            </Button>
+          <h1 className="text-foreground font-bold text-lg">{headerTitle()}</h1>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewState({ view: "my-tickets" })}
+            className="absolute right-4 flex items-center gap-1.5 h-8 text-xs font-semibold px-3 rounded-lg bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary transition-colors"
+            id="my-tickets-btn"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            My Tickets
+          </Button>
         </div>
       </div>
 
@@ -292,7 +292,7 @@ export const GetSupportPage = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => setViewState({ view: "list" })}
-                  className="w-10 h-10 rounded-xl border-border"
+                  className="w-10 h-10 rounded-lg border-border"
                 >
                   <ArrowLeft className="w-4 h-4 text-foreground" />
                 </Button>
@@ -303,13 +303,13 @@ export const GetSupportPage = () => {
                   </p>
                 </div>
               </div>
-            <Button 
-              onClick={() => { setInitialTopic(""); setIsNewTicketSheetOpen(true); }}
-              className="flex items-center gap-2 text-sm font-semibold rounded-xl bg-primary text-secondary hover:bg-primary/90 transition-colors shadow-lg"
-            >
-              <Plus className="w-4 h-4" />
-              New Ticket
-            </Button>
+              <Button
+                onClick={() => { setInitialTopic(""); setIsNewTicketSheetOpen(true); }}
+                className="flex items-center gap-2 text-sm font-semibold rounded-lg bg-primary text-secondary hover:bg-primary/90 transition-colors shadow-lg"
+              >
+                <Plus className="w-4 h-4" />
+                New Ticket
+              </Button>
             </div>
 
             <div className="flex flex-1 min-h-0">
@@ -327,7 +327,7 @@ export const GetSupportPage = () => {
                     </div>
                     <Button
                       onClick={() => setIsNewTicketSheetOpen(true)}
-                      className="mt-1 rounded-xl bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 transition-colors"
+                      className="mt-1 rounded-lg bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 transition-colors"
                     >
                       Create a Ticket
                     </Button>
@@ -375,7 +375,7 @@ export const GetSupportPage = () => {
                 )}
               </div>
 
-              <DesktopChatPanel 
+              <DesktopChatPanel
                 activeTicket={activeTicket}
                 selectedTicketId={selectedTicketId}
                 chatInput={chatInput}
@@ -395,7 +395,7 @@ export const GetSupportPage = () => {
                   variant="outline"
                   size="icon"
                   onClick={handleBack}
-                  className="w-10 h-10 rounded-xl border-border"
+                  className="w-10 h-10 rounded-lg border-border"
                 >
                   <ArrowLeft className="w-4 h-4 text-foreground" />
                 </Button>
@@ -404,58 +404,58 @@ export const GetSupportPage = () => {
               <Button
                 variant="outline"
                 onClick={() => setViewState({ view: "my-tickets" })}
-                className="flex items-center gap-2 text-sm font-semibold rounded-xl bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-sm font-semibold rounded-lg bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary transition-colors"
               >
                 <MessageSquare className="w-4 h-4" />
                 My Tickets
               </Button>
             </div>
-            <h2 className="text-xl md:text-2xl font-semibold text-foreground italic">How can we help you Today?</h2>
+            <h2 className="text-xl md:text-2xl font-semibold text-foreground ">How can we help you Today?</h2>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /> */}
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for help or topics..."
-                className="w-full h-11 pl-10 pr-4 bg-card border-border rounded-lg text-foreground text-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0"
+                className="w-full h-9 md:h-11 "
               />
             </div>
             <h3 className="text-sm font-semibold text-foreground">Top Categories</h3>
             {topicsLoading ? (
-                <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredCategories.map((cat) => {
-                    const idx = supportData.findIndex((c) => c.title === cat.title);
-                    return (
-                      <Card
-                        key={cat.id || cat.title}
-                        onClick={() => {
-                          if (cat.content && cat.content.length > 0) {
-                            setViewState({ view: "detail", categoryIndex: idx });
-                          } else {
-                            setInitialTopic(cat.title);
-                            setIsNewTicketSheetOpen(true);
-                          }
-                        }}
-                        className="flex flex-row items-center justify-between gap-4 p-4 rounded-xl hover:bg-muted/50 transition-colors group cursor-pointer border border-border shadow-sm bg-card/60"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
-                          <MessageSquare className="w-5 h-5 text-primary" />
-                        </div>
-                        <div className="flex-1 text-left min-w-0">
-                          <span className="text-sm md:text-base text-foreground font-semibold truncate block">{cat.title}</span>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
-                      </Card>
-                    );
-                  })}
-                  {filteredCategories.length === 0 && (
-                    <p className="text-sm text-muted-foreground col-span-2 text-center py-10">No categories found matching your search.</p>
-                  )}
-                </div>
-              )}
+              <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredCategories.map((cat) => {
+                  const idx = supportData.findIndex((c) => c.title === cat.title);
+                  return (
+                    <Card
+                      key={cat.id || cat.title}
+                      onClick={() => {
+                        if (cat.content && cat.content.length > 0) {
+                          setViewState({ view: "detail", categoryIndex: idx });
+                        } else {
+                          setInitialTopic(cat.title);
+                          setIsNewTicketSheetOpen(true);
+                        }
+                      }}
+                      className="flex flex-row items-center justify-between gap-4 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors group cursor-pointer border border-border shadow-sm bg-card/60"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                        <MessageSquare className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 text-left min-w-0">
+                        <span className="text-sm md:text-base text-foreground font-semibold truncate block">{cat.title}</span>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+                    </Card>
+                  );
+                })}
+                {filteredCategories.length === 0 && (
+                  <p className="text-sm text-muted-foreground col-span-2 text-center py-10">No categories found matching your search.</p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -466,7 +466,7 @@ export const GetSupportPage = () => {
                 variant="outline"
                 size="icon"
                 onClick={handleBack}
-                className="w-10 h-10 rounded-xl border-border"
+                className="w-10 h-10 rounded-lg border-border"
               >
                 <ArrowLeft className="w-4 h-4 text-foreground" />
               </Button>
@@ -492,7 +492,7 @@ export const GetSupportPage = () => {
               <Button
                 size="sm"
                 onClick={() => setIsNewTicketSheetOpen(true)}
-                className="flex items-center gap-1.5 rounded-full h-8 px-3"
+                className="flex items-center gap-1.5 rounded-lg h-8 px-3"
               >
                 <Plus className="w-3.5 h-3.5" /> New Ticket
               </Button>
@@ -510,7 +510,7 @@ export const GetSupportPage = () => {
                 </div>
                 <Button
                   onClick={() => setIsNewTicketSheetOpen(true)}
-                  className="mt-2 rounded-xl px-6"
+                  className="mt-2 rounded-lg text-secondary bg-primary px-6"
                 >
                   Create a Ticket
                 </Button>
@@ -521,7 +521,7 @@ export const GetSupportPage = () => {
                   <Card
                     key={ticket.id}
                     onClick={() => navigate(`/support/ticket/${ticket.id}`)}
-                    className="flex flex-col gap-2 p-4 rounded-xl hover:bg-muted/40 transition-colors text-left cursor-pointer border-border shadow-sm"
+                    className="flex flex-col gap-2 p-4 rounded-lg hover:bg-muted/40 transition-colors text-left cursor-pointer border-border shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-semibold text-foreground leading-snug flex-1">{ticket.subject}</p>
@@ -622,15 +622,15 @@ export const GetSupportPage = () => {
           </div>
         )}
       </div>
-      <NewTicketSheet 
-        isOpen={isNewTicketSheetOpen} 
-        onOpenChange={setIsNewTicketSheetOpen} 
+      <NewTicketSheet
+        isOpen={isNewTicketSheetOpen}
+        onOpenChange={setIsNewTicketSheetOpen}
         initialTopic={initialTopic}
         onSuccess={(ticketId) => {
           setSelectedTicketId(ticketId);
           setActiveTicket(null);
           navigate(`/support/ticket/${ticketId}`);
-        }} 
+        }}
       />
     </div>
   );

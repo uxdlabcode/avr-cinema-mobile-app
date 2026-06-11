@@ -67,7 +67,7 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
       setTicketSubject("");
       setTicketTopic(supportData.length > 0 ? supportData[0].title : "");
       setTicketDesc("");
-      
+
       if (onSuccess) {
         onSuccess(docRef.id);
       } else {
@@ -95,7 +95,7 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
           <h1 className="text-2xl font-bold text-foreground">New Support Ticket</h1>
         </div>
       )}
-      
+
       {!isDesktop && (
         <div className="text-center">
           <h2 className="text-xl font-semibold text-foreground">Create a Support Ticket</h2>
@@ -109,13 +109,13 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
           value={ticketSubject}
           onChange={(e) => setTicketSubject(e.target.value)}
           placeholder="Brief summary of your issue..."
-          className="w-full h-11 px-3 bg-card border-border rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0"
+          className="w-full h-9"
         />
       </div>
       <div className="flex flex-col gap-2">
         <Label className="text-sm font-semibold text-foreground">Topic</Label>
         <Select value={ticketTopic} onValueChange={(val) => setTicketTopic(val)}>
-          <SelectTrigger className="w-full bg-card border-border text-foreground rounded-xl h-11">
+          <SelectTrigger className="w-full text-foreground  h-9">
             <SelectValue placeholder="Select a topic" />
           </SelectTrigger>
           <SelectContent side="bottom">
@@ -130,26 +130,34 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
         </Select>
       </div>
       <div className="flex flex-col gap-2">
-        <Label className="text-sm font-semibold text-foreground">Describe your issue</Label>
+        <Label className="text-xs  text-foreground">Describe your issue</Label>
         <Textarea
           value={ticketDesc}
           onChange={(e) => setTicketDesc(e.target.value)}
           placeholder="Describe your problem in detail so we can help you faster..."
-          className="w-full p-3 bg-card border-border rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-primary focus-visible:ring-offset-0 resize-none h-[150px] md:h-[200px]"
+          className="w-full text-md "
         />
       </div>
-      <div className="flex flex-col gap-3 mt-auto pt-4">
+      <div className="flex items-center gap-3 mt-auto pt-3">
         <Button
           onClick={handleSubmitTicket}
           disabled={submitting}
-          className="w-full h-12 rounded-xl bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 flex items-center justify-center gap-2"
+          className="flex-1 h-10 rounded-md bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 flex items-center justify-center gap-2"
         >
-          {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : "Submit Ticket"}
+          {submitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            "Submit Ticket"
+          )}
         </Button>
+
         <Button
           variant="outline"
           onClick={onCancel}
-          className="w-full h-12 rounded-xl bg-card border border-border text-foreground font-semibold text-sm hover:bg-muted/50"
+          className="flex-1 h-10 rounded-md bg-card border border-border text-foreground font-semibold text-sm hover:bg-muted/50"
         >
           Cancel
         </Button>
