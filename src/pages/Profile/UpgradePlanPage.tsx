@@ -328,7 +328,7 @@ export const UpgradePlanPage = () => {
                     key={plan.id}
                     onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
                     id={`plan-card-${plan.id}`}
-                    className={`relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5 shadow-[0_0_30px_rgba(var(--primary-foreground),0.12),inset_0_1px_0_rgba(var(--primary-foreground),0.1)]" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
+                    className={`relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
                   >
                     {/* Popular Badge */}
                     {plan.popular && (
@@ -435,7 +435,7 @@ export const UpgradePlanPage = () => {
                           disabled={!!processingPlan}
                           className={`w-full py-3.5 h-auto rounded-xl font-semibold text-sm transition-all duration-300 gap-2 ${
                             isSelected && !processingPlan
-                              ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background shadow-lg shadow-primary-foreground/30 hover:opacity-90"
+                              ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background hover:opacity-90"
                               : "bg-foreground/5 text-foreground hover:bg-foreground/10"
                           }`}
                         >
