@@ -103,7 +103,13 @@ export const QuizDetailPage = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-3 px-6">
         <AlertCircle className="w-10 h-10 text-rose-400" />
         <p className="text-muted-foreground text-sm text-center">{error ?? "Something went wrong."}</p>
-        <Button onClick={() => navigate("/profile")} className="mt-2 rounded-xl px-5 h-auto py-2.5 text-sm font-semibold">Go Back</Button>
+        <Button onClick={() => {
+          if (window.history.length > 1) {
+            navigate(-1);
+          } else {
+            navigate("/quiz");
+          }
+        }} className="mt-2 rounded-xl px-5 h-auto py-2.5 text-sm font-semibold">Go Back</Button>
       </div>
     );
   }
@@ -122,7 +128,13 @@ export const QuizDetailPage = () => {
               variant="outline"
               size="icon"
               id="quiz-detail-back-btn"
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate("/quiz");
+                }
+              }}
               className="absolute left-4 w-9 h-9 rounded-full border-border"
             >
               <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -159,7 +171,7 @@ export const QuizDetailPage = () => {
             ))}
           </Card>
           <Button id="quiz-start-btn" onClick={() => setStarted(true)}
-            className="w-full h-auto py-3 rounded-lg font-semibold text-secondary bg-primary active:scale-[0.98]"
+            className="w-full h-9 py-2 rounded-md font-semibold !text-secondary bg-primary active:scale-[0.98]"
           >Start Quiz</Button>
         </div>
 
@@ -172,7 +184,13 @@ export const QuizDetailPage = () => {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => navigate("/profile")}
+                onClick={() => {
+                  if (window.history.length > 1) {
+                    navigate(-1);
+                  } else {
+                    navigate("/quiz");
+                  }
+                }}
                 className="w-10 h-10 rounded-xl border-border flex-shrink-0"
               >
                 <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
@@ -246,7 +264,7 @@ export const QuizDetailPage = () => {
               </div>
 
               <Button id="quiz-start-btn" onClick={() => setStarted(true)}
-                className="w-full h-auto py-3 rounded-md font-semibold text-secondary flex items-center justify-center gap-2"
+                className="w-full h-9 py-3 rounded-md font-semibold !text-secondary flex items-center justify-center gap-2"
               >
                 <Trophy className="w-4 h-4" /> Start Quiz
               </Button>
@@ -278,7 +296,13 @@ export const QuizDetailPage = () => {
               variant="outline"
               size="icon"
               id="quiz-active-back-btn"
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate("/quiz");
+                }
+              }}
               className="shrink-0 w-9 h-9 rounded-full border-border"
             >
               <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -296,7 +320,7 @@ export const QuizDetailPage = () => {
       <div className="md:hidden flex-1 pt-[88px] pb-28 px-4 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
         <Card className="mt-4 rounded-2xl p-5">
           <div className="flex items-start gap-3 mb-2">
-            <span className="shrink-0 w-7 h-7 rounded-lg bg-primary/15 border border-primary/20 text-primary text-xs font-bold flex items-center justify-center mt-0.5">{currentIdx + 1}</span>
+            <span className="shrink-0 w-7 h-7 rounded-md bg-primary/15 border border-primary/20 text-primary text-xs font-bold flex items-center justify-center mt-0.5">{currentIdx + 1}</span>
             <p className="text-foreground font-semibold text-base leading-snug">{currentQ.text}</p>
           </div>
           {isMulti && <p className="text-xs text-primary mt-2 font-medium pl-10">★ Select all correct answers</p>}
@@ -305,7 +329,7 @@ export const QuizDetailPage = () => {
           {currentQ.options.map((opt) => {
             const sel = isSelected(opt.id);
             const correct = isCorrectOpt(opt.id);
-            let base = "w-full text-left flex items-center gap-3 p-4 rounded-xl border transition-all active:scale-[0.98] ";
+            let base = "w-full text-left flex items-center gap-3 p-4 rounded-md border transition-all active:scale-[0.98] ";
             if (showFeedback) {
               if (correct) base += "bg-emerald-500/10 border-emerald-500/40 text-emerald-400";
               else if (sel && !correct) base += "bg-rose-500/10 border-rose-500/40 text-rose-400";
@@ -315,10 +339,10 @@ export const QuizDetailPage = () => {
             }
             return (
               <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={base} disabled={showFeedback}>
-                <span className={`shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${showFeedback ? correct ? "border-emerald-400" : sel ? "border-rose-400" : "border-border" : sel ? "border-primary bg-primary" : "border-border"}`}>
+                <span className={`shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${showFeedback ? correct ? "border-emerald-400" : sel ? "border-rose-400" : "border-border" : sel ? "border-primary bg-primary" : "border-border"}`}>
                   {showFeedback && correct && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
                   {showFeedback && sel && !correct && <XCircle className="w-3.5 h-3.5 text-rose-400" />}
-                  {!showFeedback && sel && <span className="w-2 h-2 rounded-full bg-background" />}
+                  {!showFeedback && sel && <span className="w-2 h-2 rounded-md bg-background" />}
                 </span>
                 <span className="text-sm font-medium leading-snug">{opt.text}</span>
               </button>
@@ -332,7 +356,7 @@ export const QuizDetailPage = () => {
         <div className="max-w-[700px] mx-auto w-full">
           {!showFeedback ? (
             <Button id="quiz-confirm-btn" onClick={handleConfirmAnswer} disabled={!hasSelected}
-              className="w-full h-auto py-3.5 rounded-xl font-bold text-base active:scale-[0.98]"
+              className="w-full h-10 py-3 rounded-md font-semibold text-secondary active:scale-[0.98]"
             >Confirm Answer</Button>
           ) : (
             <Button id="quiz-next-btn" onClick={handleNext}
@@ -352,7 +376,13 @@ export const QuizDetailPage = () => {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate("/profile")}
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate("/quiz");
+                }
+              }}
               className="w-10 h-10 rounded-lg border-border flex-shrink-0"
             >
               <ArrowLeft className="w-4.5 h-4.5 text-foreground" />

@@ -12,7 +12,7 @@ import {
   TicketX,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -118,19 +118,40 @@ import { DesktopChatPanel } from "./DesktopChatPanel";
 
 export const GetSupportPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { ticketId: urlTicketId } = useParams<{ ticketId?: string }>();
   const { user } = useAppSelector((state) => state.auth);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewState, setViewState] = useState<ViewState>(
-    urlTicketId ? { view: "chat", ticketId: urlTicketId } : { view: "list" }
-  );
+  const [viewState, setViewState] = useState<ViewState>(() => {
+    if (urlTicketId) {
+      return { view: "chat", ticketId: urlTicketId };
+    }
+    const state = location.state as { view?: ViewState["view"] } | null;
+    if (state?.view) {
+      return { view: state.view } as ViewState;
+    }
+    return { view: "list" };
+  });
 
   useEffect(() => {
     if (urlTicketId) {
       setViewState({ view: "chat", ticketId: urlTicketId });
     }
   }, [urlTicketId]);
+
+  useEffect(() => {
+    if (!urlTicketId) {
+      const currentState = location.state as { view?: string } | null;
+      if (currentState?.view !== viewState.view) {
+        if (viewState.view === "my-tickets") {
+          navigate("/support", { replace: true, state: { view: "my-tickets" } });
+        } else if (viewState.view === "list") {
+          navigate("/support", { replace: true, state: { view: "list" } });
+        }
+      }
+    }
+  }, [viewState.view, urlTicketId, navigate, location.state]);
 
   const [myTickets, setMyTickets] = useState<SupportTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
@@ -220,7 +241,13 @@ export const GetSupportPage = () => {
   }, [user, chatInput, activeTicket]);
 
   const handleBack = () => {
-    if (viewState.view === "list") navigate("/profile");
+    if (viewState.view === "list") {
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate("/profile");
+      }
+    }
     else if (viewState.view === "new-ticket") {
       const from = (viewState as { view: "new-ticket"; from: string }).from;
       if (from === "my-tickets") setViewState({ view: "my-tickets" });
@@ -229,8 +256,7 @@ export const GetSupportPage = () => {
     }
     else if (viewState.view === "chat") {
       if (urlTicketId) {
-        navigate("/support");
-        setViewState({ view: "my-tickets" });
+        navigate("/support", { state: { view: "my-tickets" } });
       } else {
         setViewState({ view: "my-tickets" });
       }
@@ -270,16 +296,6 @@ export const GetSupportPage = () => {
               : <ArrowLeft className="w-4 h-4 text-foreground" />}
           </Button>
           <h1 className="text-foreground font-bold text-lg">{headerTitle()}</h1>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setViewState({ view: "my-tickets" })}
-            className="absolute right-4 flex items-center gap-1.5 h-8 text-xs font-semibold px-3 rounded-lg bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary transition-colors"
-            id="my-tickets-btn"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            My Tickets
-          </Button>
         </div>
       </div>
 
@@ -404,7 +420,7 @@ export const GetSupportPage = () => {
               <Button
                 variant="outline"
                 onClick={() => setViewState({ view: "my-tickets" })}
-                className="flex items-center gap-2 text-sm font-semibold rounded-lg bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary transition-colors"
+                className="flex items-center gap-2 text-sm font-semibold rounded-lg !bg-primary !text-secondary "
               >
                 <MessageSquare className="w-4 h-4" />
                 My Tickets
@@ -488,14 +504,7 @@ export const GetSupportPage = () => {
         {viewState.view === "my-tickets" && (
           <div className="md:hidden flex flex-col gap-4 px-4 pb-28 pt-4 max-w-[700px] mx-auto w-full">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-foreground">Your Tickets</h2>
-              <Button
-                size="sm"
-                onClick={() => setIsNewTicketSheetOpen(true)}
-                className="flex items-center gap-1.5 rounded-lg h-8 px-3"
-              >
-                <Plus className="w-3.5 h-3.5" /> New Ticket
-              </Button>
+              <h2 className="text-base font-semibold text-secondary">Your Tickets</h2>
             </div>
             {ticketsLoading ? (
               <div className="flex items-center justify-center py-20">
@@ -553,72 +562,15 @@ export const GetSupportPage = () => {
             className="md:hidden fixed inset-x-0 flex flex-col z-30 bg-gradient-to-b from-background to-card"
             style={{ top: "64px", bottom: "64px" }}
           >
-            <div className="max-w-[700px] mx-auto w-full flex flex-col flex-1 min-h-0 relative">
-              {activeTicket && (
-                <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-foreground/10 backdrop-blur-md border border-foreground/10">
-                    <p className="text-[10px] text-foreground/70">{formatDate(activeTicket.createdAt)}</p>
-                    <div className="w-1 h-1 rounded-full bg-foreground/20" />
-                    <Badge variant="outline" className={`text-[9px] font-bold tracking-wider px-2 py-0.5 rounded-full uppercase ${statusColor(activeTicket.status)}`}>
-                      {activeTicket.status}
-                    </Badge>
-                  </div>
-                </div>
-              )}
-              <div className="flex-1 overflow-y-auto px-4 pt-12 pb-4 flex flex-col gap-3 scrollbar-hide">
-                {!activeTicket ? (
-                  <div className="flex items-center justify-center h-full">
-                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                  </div>
-                ) : activeTicket.messages?.length === 0 ? (
-                  <div className="flex items-center justify-center h-full text-muted-foreground text-sm">No messages yet.</div>
-                ) : (
-                  activeTicket.messages.map((msg, idx) => {
-                    const isUser = msg.senderRole === "user";
-                    return (
-                      <div key={msg.id || idx} className={`flex gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
-                        <div
-                          className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${isUser ? "rounded-br-sm text-background bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20" : "rounded-bl-sm text-foreground border border-foreground/10 bg-foreground/5"}`}
-                        >
-                          <p className="whitespace-pre-wrap">{msg.text}</p>
-                          <p className={`text-[9px] mt-1 text-right ${isUser ? "text-background/50" : "text-foreground/40"}`}>{formatTime(msg.createdAt)}</p>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-                <div ref={chatEndRef} />
-              </div>
-              {activeTicket?.status === "open" ? (
-                <div className="flex-shrink-0 px-3 py-2 pb-safe border-t border-foreground/5 bg-background/90">
-                  <div className="flex items-end gap-2 bg-foreground/5 border border-foreground/10 rounded-2xl p-1.5 pl-4 focus-within:border-primary/40 transition-colors">
-                    <Textarea
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-                      placeholder="Message support..."
-                      rows={1}
-                      style={{ lineHeight: "1.4", minHeight: "24px", maxHeight: "80px" }}
-                      className="flex-1 py-2 bg-transparent border-none focus-visible:ring-0 text-foreground text-sm placeholder:text-foreground/40 resize-none scrollbar-hide shadow-none"
-                    />
-                    <Button
-                      size="icon"
-                      onClick={handleSendMessage}
-                      disabled={sending || !chatInput.trim()}
-                      className={`w-9 h-9 rounded-full shrink-0 transition-all ${chatInput.trim() && !sending ? "bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20" : "bg-foreground/10 hover:bg-foreground/10 text-foreground/40"}`}
-                    >
-                      {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className={`w-4 h-4 ml-0.5 ${chatInput.trim() ? "text-background" : ""}`} />}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex-shrink-0 px-4 py-3 border-t border-foreground/5 bg-background/90">
-                  <p className="text-center text-xs text-foreground/50">
-                    This ticket is <span className="text-white font-semibold">{activeTicket?.status}</span>. Chat is closed.
-                  </p>
-                </div>
-              )}
-            </div>
+            <DesktopChatPanel
+              activeTicket={activeTicket}
+              selectedTicketId={selectedTicketId}
+              chatInput={chatInput}
+              setChatInput={setChatInput}
+              sending={sending}
+              onSendMessage={handleSendMessage}
+              isMobile={true}
+            />
           </div>
         )}
       </div>
@@ -632,6 +584,32 @@ export const GetSupportPage = () => {
           navigate(`/support/ticket/${ticketId}`);
         }}
       />
+
+      {/* Mobile Floating Action Buttons */}
+      {viewState.view === "list" && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setViewState({ view: "my-tickets" })}
+          className="md:hidden fixed bottom-24 right-4 z-40 flex items-center gap-1.5 h-8 text-xs font-semibold px-3 rounded-lg !bg-primary !text-secondary "
+          id="mobile-floating-my-tickets-btn"
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          My Tickets
+        </Button>
+      )}
+
+      {viewState.view === "my-tickets" && (
+        <Button
+          size="sm"
+          onClick={() => { setInitialTopic(""); setIsNewTicketSheetOpen(true); }}
+          className="md:hidden fixed bottom-24 right-4 z-40 flex items-center gap-1.5 rounded-lg h-8 px-3 text-secondary bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+          id="mobile-floating-new-ticket-btn"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          New Ticket
+        </Button>
+      )}
     </div>
   );
 };

@@ -130,7 +130,13 @@ export const QuizzesPage = () => {
             variant="outline"
             size="icon"
             id="quizzes-back-btn"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate("/dashboard");
+              }
+            }}
             className="absolute left-4 w-9 h-9 rounded-full z-10 border-border"
           >
             <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -197,7 +203,13 @@ export const QuizzesPage = () => {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1);
+                } else {
+                  navigate("/dashboard");
+                }
+              }}
               className="w-10 h-10 rounded-xl border-border"
             >
               <ArrowLeft className="w-4.5 h-4.5 text-foreground" />

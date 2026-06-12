@@ -72,12 +72,12 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   return (
     <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in p-2">
-      <Card className="max-w-sm  w-full bg-zinc-900/90 border-zinc-800  p-3   flex flex-col items-center justify-center animate-in zoom-in-95 duration-300 border">
-        <CardHeader className="flex flex-col items-center justify-center text-center p-0 gap-4 w-full">
+      <Card className="max-w-[280px] xs:max-w-xs sm:max-w-sm w-full bg-zinc-900/95 border-zinc-800 p-3.5 sm:p-5 flex flex-col items-center justify-center animate-in zoom-in-95 duration-300 border gap-3 sm:gap-4">
+        <CardHeader className="flex flex-col items-center justify-center text-center p-0 gap-2.5 sm:gap-4 w-full">
           <div className="flex justify-center">
-            <div className="rounded-full bg-yellow-500/10 w-12 h-12 flex items-center justify-center border border-yellow-500/25">
+            <div className="rounded-full bg-yellow-500/10 w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center border border-yellow-500/25">
               <svg
-                className="w-8 h-8 text-priamary-foreground  fill-primary-foreground animate-pulse"
+                className="w-5 h-5 sm:w-8 sm:h-8 text-primary-foreground fill-primary-foreground animate-pulse"
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -87,11 +87,11 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <CardTitle className="font-bold text-white tracking-tight text-xl leading-none">
+          <div className="space-y-1 sm:space-y-1">
+            <CardTitle className="font-bold text-white tracking-tight text-base sm:text-xl leading-none">
               How was your experience?
             </CardTitle>
-            <CardDescription className="text-zinc-400 text-xs md:text-sm max-w-sm mx-auto text-center leading-normal">
+            <CardDescription className="hidden sm:block text-zinc-400 text-[10px] sm:text-xs md:text-sm max-w-[240px] sm:max-w-xs mx-auto text-center leading-normal">
               Please rate <span className="text-white font-semibold">{movieTitle}</span> to help us suggest better content for you.
             </CardDescription>
           </div>
@@ -99,7 +99,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
         <CardContent className="p-0 flex flex-col items-center justify-center w-full">
           {/* 5-Star Interactive Rating Picker */}
-          <div className="flex items-center gap-2 ">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {[1, 2, 3, 4, 5].map((starValue) => {
               const isHighlighted = (hoveredStar || userRatingSelection) >= starValue;
               return (
@@ -109,10 +109,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   onMouseEnter={() => setHoveredStar(starValue)}
                   onMouseLeave={() => setHoveredStar(0)}
                   onClick={() => setUserRatingSelection(starValue)}
-                  className="p-1 cursor-pointer transition-transform duration-150 active:scale-90 focus:outline-none"
+                  className="p-0.5  cursor-pointer transition-transform duration-150 active:scale-90 focus:outline-none"
                 >
                   <svg
-                    className={`w-10 h-10 transition-colors duration-150 ${isHighlighted ? "text-primary-foreground fill-primary-foreground" : "text-zinc-600 hover:text-primary-foreground"
+                    className={`w-7 h-7 sm:w-10 sm:h-10 transition-colors duration-150 ${isHighlighted ? "text-primary-foreground fill-primary-foreground" : "text-zinc-600 hover:text-primary-foreground"
                       }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
@@ -126,22 +126,22 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col w-full gap-3 p-0">
+        <CardFooter className="flex flex-row w-full gap-2 sm:gap-3 p-0">
           <button
             onClick={handleSubmitFeedback}
             disabled={userRatingSelection === 0 || isSubmitting}
-            className="w-full py-2 bg-primary-foreground hover:bg-primary-foreground  disabled:bg-zinc-800 disabled:text-zinc-500 text-secondary rounded-md transition-all shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
+            className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm bg-primary-foreground hover:bg-primary-foreground/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-secondary font-bold rounded-md transition-all shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
           >
             {isSubmitting ? (
-              <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             ) : (
-              <span>Submit Feedback</span>
+              <span>Submit</span>
             )}
           </button>
 
           <button
             onClick={onClose}
-            className="w-full py-3 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white font-semibold rounded-lg transition-all active:scale-[0.98] cursor-pointer text-center"
+            className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm bg-zinc-950 border border-zinc-800/80 hover:bg-zinc-900 text-white font-semibold rounded-md transition-all active:scale-[0.98] cursor-pointer text-center"
           >
             Skip
           </button>

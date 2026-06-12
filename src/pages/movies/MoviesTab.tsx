@@ -390,13 +390,45 @@ const MoviesTab = () => {
     };
   }, [carouselApi]);
 
-  // Auto scroll featured hero movies every 6 seconds (pauses when expanded details are open)
+  // Auto scroll featured hero movies every 6 seconds (pauses when expanded details are open or tab is hidden)
   useEffect(() => {
     if (!carouselApi || movies.length === 0 || expandedMovieId !== null) return;
-    const timer = setInterval(() => {
-      carouselApi.scrollNext();
-    }, 6000);
-    return () => clearInterval(timer);
+
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const startTimer = () => {
+      if (!timer) {
+        timer = setInterval(() => {
+          carouselApi.scrollNext();
+        }, 6000);
+      }
+    };
+
+    const stopTimer = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [carouselApi, movies, expandedMovieId]);
 
   const featuredList = movies.slice(0, 4);

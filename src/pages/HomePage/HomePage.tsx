@@ -462,13 +462,45 @@ export const HomePage = () => {
     };
   }, [api]);
 
-  // Auto scroll featured hero movies every 3 seconds (pauses when expanded details are open)
+  // Auto scroll featured hero movies every 6 seconds (pauses when expanded details are open or tab is hidden)
   useEffect(() => {
     if (!api || featuredMovies.length === 0 || expandedMovieId !== null) return;
-    const timer = setInterval(() => {
-      api.scrollNext();
-    }, 6000);
-    return () => clearInterval(timer);
+
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const startTimer = () => {
+      if (!timer) {
+        timer = setInterval(() => {
+          api.scrollNext();
+        }, 6000);
+      }
+    };
+
+    const stopTimer = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [api, featuredMovies, expandedMovieId]);
 
   if (isLoading) {
@@ -565,7 +597,7 @@ export const HomePage = () => {
                         }}
                         className="flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
                       >
-                        <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
+                        <Plus className="w-4 h-4 mr-1 text-primary  " />
                         <span>{watchlist.includes(movie.id.toString()) ? "In My List" : "My List"}</span>
                       </Button>
                     </div>

@@ -396,7 +396,13 @@ const Search = () => {
                         </form>
 
                         <button
-                            onClick={() => navigate('/dashboard')}
+                            onClick={() => {
+                                if (window.history.length > 1) {
+                                    navigate(-1);
+                                } else {
+                                    navigate('/dashboard');
+                                }
+                            }}
                             className="p-2.5 text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center bg-zinc-900/60 hover:bg-zinc-800 rounded-full border border-zinc-800"
                             aria-label="Close search"
                         >

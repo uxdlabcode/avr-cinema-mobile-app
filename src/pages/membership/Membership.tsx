@@ -12,7 +12,9 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { CheckCircle2, MonitorSmartphone, X, Crown, ShieldCheck, AlertTriangle } from "lucide-react";
 import { MembershipSkeleton } from "./MembershipSkeleton";
 import { Spinner } from "@/components/ui/spinner";
@@ -225,9 +227,9 @@ export default function Membership() {
             {/* Skip Button */}
             <button
                 onClick={handleSkip}
-                className="absolute top-6 right-6 text-zinc-400 hover:text-white font-medium text-sm transition-colors z-10 flex items-center gap-1 bg-zinc-900/50 py-1.5 px-3 rounded-full border border-zinc-800"
+                className="absolute top-6 right-6 text-primary font-medium text-sm transition-colors z-10 flex items-center gap-1 "
             >
-                Skip for now
+                Skip
             </button>
 
             {/* Logo */}
@@ -242,40 +244,41 @@ export default function Membership() {
                 />
             </div>
 
-            <div className="max-w-2xl mx-auto pt-20">
+            <div className="max-w-2xl md:max-w-6xl mx-auto pt-20">
                 <div className="text-center mb-8">
                     <h1 className="text-2xl md:text-3xl font-bold mb-2 text-primary">Choose your plan</h1>
                     <p className="text-zinc-400 text-sm mb-6">Unlock endless entertainment. Cancel anytime.</p>
-                    
+
                     {/* Billing Cycle Switcher */}
-                    <div className="flex justify-center items-center gap-4 mb-2">
-                        <button
-                            onClick={() => setBillingCycle("monthly")}
-                            className={`px-4 py-2 text-sm font-semibold rounded-full border transition-all cursor-pointer ${
-                                billingCycle === "monthly"
-                                    ? "bg-white text-black border-white shadow"
-                                    : "bg-transparent text-zinc-400 border-zinc-800 hover:text-white"
-                            }`}
+                    <div className="flex justify-center items-center mb-4">
+                        <ToggleGroup
+                            type="single"
+                            value={billingCycle}
+                            onValueChange={(value) => {
+                                if (value) setBillingCycle(value as "monthly" | "yearly");
+                            }}
+                            className="bg-zinc-950/80  rounded-md border border-zinc-800"
                         >
-                            Monthly
-                        </button>
-                        <button
-                            onClick={() => setBillingCycle("yearly")}
-                            className={`px-4 py-2 text-sm font-semibold rounded-full border transition-all flex items-center gap-1.5 cursor-pointer ${
-                                billingCycle === "yearly"
-                                    ? "bg-white text-black border-white shadow"
-                                    : "bg-transparent text-zinc-400 border-zinc-800 hover:text-white"
-                            }`}
-                        >
-                            Annually
-                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase transition-all ${
-                                billingCycle === "yearly"
-                                    ? "bg-black text-white font-black"
-                                    : "bg-green-500/20 text-green-400 border border-green-500/30"
-                            }`}>
-                                Save up to 33%
-                            </span>
-                        </button>
+                            <ToggleGroupItem
+                                value="monthly"
+                                className="rounded-md px-5 !py-1 text-sm font-semibold cursor-pointer data-[state=on]:bg-primary data-[state=on]:text-secondary text-zinc-400 hover:text-white hover:bg-transparent data-[state=on]:hover:bg-primary transition-all"
+                            >
+                                Monthly
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                                value="yearly"
+                                className="rounded-md px-5 text-sm font-semibold cursor-pointer data-[state=on]:bg-primary data-[state=on]:text-secondary text-zinc-400 hover:text-white hover:bg-transparent data-[state=on]:hover:bg-primary transition-all flex items-center gap-1.5"
+                            >
+                                Annually
+                                {/* <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase transition-all ${
+                                    billingCycle === "yearly"
+                                        ? "bg-secondary text-primary font-black"
+                                        : "bg-green-500/20 text-green-400 border border-green-500/30"
+                                }`}>
+                                    Save up to 33%
+                                </span> */}
+                            </ToggleGroupItem>
+                        </ToggleGroup>
                     </div>
                 </div>
 
@@ -301,111 +304,226 @@ export default function Membership() {
                 {loading ? (
                     <MembershipSkeleton />
                 ) : (
-                    <Accordion type="single" collapsible className="w-full">
-                        {plans.map((plan) => (
-                            <AccordionItem
-                                key={plan.id}
-                                value={plan.id}
-                                className={plan.popular ? "border-primary/50 relative" : ""}
-                            >
-                                <AccordionTrigger className="hover:no-underline">
-                                    <div className="flex items-center justify-between w-full text-left pr-4">
-                                        <div className="flex flex-col">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-semibold text-white">{plan.name}</span>
-                                                {plan.popular && (
-                                                    <span className="bg-primary/20 text-primary text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full border border-primary/30">
-                                                        Popular
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-xs text-zinc-400 font-normal">{plan.description}</p>
+                    <>
+                        {/* Desktop Cards Grid View */}
+                        <div className="hidden md:grid md:grid-cols-3 gap-6 mt-8">
+                            {plans.map((plan) => (
+                                <Card
+                                    key={plan.id}
+                                    className={`bg-zinc-900/40 border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between relative overflow-hidden ${plan.popular ? "border-primary/60 ring-1 ring-primary/30" : ""
+                                        }`}
+                                >
+                                    {plan.popular && (
+                                        <div className="absolute top-0 right-0 bg-primary text-secondary text-[10px] uppercase font-black px-3 py-1 rounded-bl-lg tracking-wider">
+                                            Popular
                                         </div>
-                                        <div className="flex flex-col items-end shrink-0 ml-4">
-                                            <span className="font-bold text-white">
-                                                ₹{billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice}
-                                            </span>
-                                            <span className="text-[10px] text-zinc-500 font-normal">
-                                                / {billingCycle === "monthly" ? "month" : "year"}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </AccordionTrigger>
-
-                                <AccordionContent>
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="flex items-start gap-3">
-                                                <MonitorSmartphone className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                                <div>
-                                                    <p className="font-semibold text-sm">Resolution</p>
-                                                    <p className="text-zinc-400 text-sm">{plan.resolution}</p>
-                                                </div>
+                                    )}
+                                    <div>
+                                        <CardHeader className="pb-4">
+                                            <CardTitle className="text-xl font-bold text-primary flex items-center gap-2">
+                                                {plan.name}
+                                            </CardTitle>
+                                            <CardDescription className="text-zinc-400 text-xs mt-1">
+                                                {plan.description}
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            {/* Price Section */}
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-3xl font-black text-primary">
+                                                    ₹{billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice}
+                                                </span>
+                                                <span className="text-xs text-zinc-500 font-medium">
+                                                    / {billingCycle === "monthly" ? "month" : "year"}
+                                                </span>
                                             </div>
 
-                                            <div className="flex items-start gap-3">
-                                                <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                                <div>
-                                                    <p className="font-semibold text-sm">Active Screens</p>
-                                                    <p className="text-zinc-400 text-sm">{plan.screens} devices at once</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            {/* Separator */}
+                                            <div className="h-px bg-zinc-800/60 w-full" />
 
-                                        <div className="space-y-2 pt-2">
-                                            {plan.adFree && (
-                                                <div className="flex items-center gap-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-primary-foreground shrink-0" />
-                                                    <span className="text-sm text-zinc-300">Ad-free streaming</span>
+                                            {/* Features List */}
+                                            <div className="space-y-4">
+                                                <div className="flex items-start gap-3">
+                                                    <MonitorSmartphone className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                                    <div>
+                                                        <p className="font-semibold text-xs text-white">Resolution</p>
+                                                        <p className="text-zinc-400 text-xs">{plan.resolution}</p>
+                                                    </div>
                                                 </div>
-                                            )}
-                                            {plan.downloads && (
-                                                <div className="flex items-center gap-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-primary-foreground shrink-0" />
-                                                    <span className="text-sm text-zinc-300">Download for offline viewing</span>
-                                                </div>
-                                            )}
-                                            {plan.dolbyAtmos && (
-                                                <div className="flex items-center gap-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-                                                    <span className="text-sm text-zinc-300">Dolby Atmos audio support</span>
-                                                </div>
-                                            )}
-                                        </div>
 
-                                        <div className="pt-6 border-t border-zinc-800/50">
-                                            <Button
-                                                className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-10 cursor-pointer"
-                                                onClick={() => handleSelectPlan(plan)}
-                                                disabled={!!localLoadingPlan}
-                                            >
-                                                {localLoadingPlan === plan.id ? (
-                                                    <>
-                                                        <Spinner size="sm" className="mr-2" />
-                                                        Processing...
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Crown className="w-4 h-4 mr-2" />
-                                                        Select {plan.name} ({billingCycle === "monthly" ? "Monthly" : "Annually"})
-                                                    </>
-                                                )}
-                                            </Button>
-                                            {plan.yearlyPrice > 0 && (
-                                                <p className="text-center text-xs text-zinc-500 mt-3">
-                                                    {billingCycle === "monthly" ? (
-                                                        `Or get yearly for ₹${plan.yearlyPrice} (Save ${(100 - (plan.yearlyPrice / (plan.monthlyPrice * 12)) * 100).toFixed(0)}%)`
-                                                    ) : (
-                                                        `Or get monthly for ₹${plan.monthlyPrice}`
+                                                <div className="flex items-start gap-3">
+                                                    <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                                    <div>
+                                                        <p className="font-semibold text-xs text-white">Active Screens</p>
+                                                        <p className="text-zinc-400 text-xs">{plan.screens} devices at once</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2.5 pt-2">
+                                                    {plan.adFree && (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                                            <span className="text-xs text-zinc-300">Ad-free streaming</span>
+                                                        </div>
                                                     )}
-                                                </p>
-                                            )}
-                                        </div>
+                                                    {plan.downloads && (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                                            <span className="text-xs text-zinc-300">Download for offline viewing</span>
+                                                        </div>
+                                                    )}
+                                                    {plan.dolbyAtmos && (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                                                            <span className="text-xs text-zinc-300">Dolby Atmos audio support</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </CardContent>
                                     </div>
-                                </AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
+
+                                    <CardFooter className="pt-6 border-t border-zinc-800/40 flex flex-col gap-3">
+                                        <Button
+                                            className="w-full bg-primary-foreground text-secondary hover:bg-primary-foreground/90 font-bold h-10 cursor-pointer text-sm"
+                                            onClick={() => handleSelectPlan(plan)}
+                                            disabled={!!localLoadingPlan}
+                                        >
+                                            {localLoadingPlan === plan.id ? (
+                                                <>
+                                                    <Spinner size="sm" className="mr-2" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Crown className="w-4 h-4 mr-2" />
+                                                    Select {plan.name}
+                                                </>
+                                            )}
+                                        </Button>
+                                        {plan.yearlyPrice > 0 && (
+                                            <p className="text-center text-[10px] text-zinc-500">
+                                                {billingCycle === "monthly" ? (
+                                                    `Or get yearly for ₹${plan.yearlyPrice} (Save ${(100 - (plan.yearlyPrice / (plan.monthlyPrice * 12)) * 100).toFixed(0)}%)`
+                                                ) : (
+                                                    `Or get monthly for ₹${plan.monthlyPrice}`
+                                                )}
+                                            </p>
+                                        )}
+                                    </CardFooter>
+                                </Card>
+                            ))}
+                        </div>
+
+                        {/* Mobile Accordion View */}
+                        <div className="block md:hidden">
+                            <Accordion type="single" collapsible className="w-full">
+                                {plans.map((plan) => (
+                                    <AccordionItem
+                                        key={plan.id}
+                                        value={plan.id}
+                                        className={plan.popular ? "border-primary/50 relative" : ""}
+                                    >
+                                        <AccordionTrigger className="hover:no-underline">
+                                            <div className="flex items-center justify-between w-full text-left pr-4">
+                                                <div className="flex flex-col">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-semibold text-white">{plan.name}</span>
+                                                        {plan.popular && (
+                                                            <span className="bg-primary/20 text-primary text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-full border border-primary/30">
+                                                                Popular
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs text-zinc-400 font-normal">{plan.description}</p>
+                                                </div>
+                                                <div className="flex flex-col items-end shrink-0 ml-4">
+                                                    <span className="font-bold text-white">
+                                                        ₹{billingCycle === "monthly" ? plan.monthlyPrice : plan.yearlyPrice}
+                                                    </span>
+                                                    <span className="text-[10px] text-zinc-500 font-normal">
+                                                        / {billingCycle === "monthly" ? "month" : "year"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </AccordionTrigger>
+
+                                        <AccordionContent>
+                                            <div className="space-y-4">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="flex items-start gap-3">
+                                                        <MonitorSmartphone className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <p className="font-semibold text-sm">Resolution</p>
+                                                            <p className="text-zinc-400 text-sm">{plan.resolution}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-start gap-3">
+                                                        <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <p className="font-semibold text-sm">Active Screens</p>
+                                                            <p className="text-zinc-400 text-sm">{plan.screens} devices at once</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2 pt-2">
+                                                    {plan.adFree && (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                                            <span className="text-sm text-zinc-300">Ad-free streaming</span>
+                                                        </div>
+                                                    )}
+                                                    {plan.downloads && (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                                                            <span className="text-sm text-zinc-300">Download for offline viewing</span>
+                                                        </div>
+                                                    )}
+                                                    {plan.dolbyAtmos && (
+                                                        <div className="flex items-center gap-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                                                            <span className="text-sm text-zinc-300">Dolby Atmos audio support</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="pt-6 border-t border-zinc-800/50">
+                                                    <Button
+                                                        className="w-full bg-primary-foreground text-secondary hover:bg-primary-foreground/90 font-bold h-10 cursor-pointer"
+                                                        onClick={() => handleSelectPlan(plan)}
+                                                        disabled={!!localLoadingPlan}
+                                                    >
+                                                        {localLoadingPlan === plan.id ? (
+                                                            <>
+                                                                <Spinner size="sm" className="mr-2" />
+                                                                Processing...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Crown className="w-4 h-4 mr-2" />
+                                                                Select {plan.name} ({billingCycle === "monthly" ? "Monthly" : "Annually"})
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                    {plan.yearlyPrice > 0 && (
+                                                        <p className="text-center text-xs text-zinc-500 mt-3">
+                                                            {billingCycle === "monthly" ? (
+                                                                `Or get yearly for ₹${plan.yearlyPrice} (Save ${(100 - (plan.yearlyPrice / (plan.monthlyPrice * 12)) * 100).toFixed(0)}%)`
+                                                            ) : (
+                                                                `Or get monthly for ₹${plan.monthlyPrice}`
+                                                            )}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

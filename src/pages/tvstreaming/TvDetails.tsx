@@ -471,13 +471,45 @@ const TvDetails = () => {
     };
   }, [carouselApi]);
 
-  // Auto scroll featured hero TV shows every 6 seconds (pauses when expanded details are open)
+  // Auto scroll featured hero TV shows every 6 seconds (pauses when expanded details are open or tab is hidden)
   useEffect(() => {
     if (!carouselApi || tvShows.length === 0 || expandedShowId !== null) return;
-    const timer = setInterval(() => {
-      carouselApi.scrollNext();
-    }, 6000);
-    return () => clearInterval(timer);
+
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const startTimer = () => {
+      if (!timer) {
+        timer = setInterval(() => {
+          carouselApi.scrollNext();
+        }, 6000);
+      }
+    };
+
+    const stopTimer = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    };
+
+    if (!document.hidden) {
+      startTimer();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopTimer();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [carouselApi, tvShows, expandedShowId]);
 
   if (isLoading) return <TvDetailsSkeleton />;

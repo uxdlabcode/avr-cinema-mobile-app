@@ -9,6 +9,7 @@ import { createDocument, deleteDocument, getDocumentData } from '@/Firebase';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
 import { FeedbackModal } from './FeedbackModal';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 interface CustomVideoPlayerProps {
   movie: any;
@@ -559,7 +560,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         return;
       }
     }
-    
+
     // If not already rated, trigger feedback overlay
     if (!hasAlreadyRated) {
       if (videoRef.current) {
@@ -744,7 +745,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                 <div className="flex items-center gap-4 text-white">
 
-                  <button
+                  {/* <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSettingsOverlay(true);
@@ -754,7 +755,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     title="Audio & Subtitles"
                   >
                     <MessageSquare className="w-5 h-5" />
-                  </button>
+                  </button> */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -969,204 +970,142 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 />
 
                 <div
-                  className="absolute top-16 right-4 w-80 max-w-[calc(100vw-2rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-4 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left"
+                  className="absolute top-3 right-3 sm:top-16 sm:right-4 w-72 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3.5 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {/* Tabs header */}
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-3 text-xs font-semibold w-full">
-                    <button
-                      onClick={() => setActiveSettingTab('quality')}
-                      className={`pb-2 -mb-[9px] transition-colors cursor-pointer ${activeSettingTab === 'quality'
-                          ? "text-white border-b-2 border-blue-500 font-bold"
-                          : "text-zinc-400 hover:text-white"
-                        }`}
-                    >
-                      Quality
-                    </button>
-                    <button
-                      onClick={() => setActiveSettingTab('audio')}
-                      className={`pb-2 -mb-[9px] transition-colors cursor-pointer ${activeSettingTab === 'audio'
-                          ? "text-white border-b-2 border-blue-500 font-bold"
-                          : "text-zinc-400 hover:text-white"
-                        }`}
-                    >
-                      Audio & Subs
-                    </button>
-                    <button
-                      onClick={() => setActiveSettingTab('speed')}
-                      className={`pb-2 -mb-[9px] transition-colors cursor-pointer ${activeSettingTab === 'speed'
-                          ? "text-white border-b-2 border-blue-500 font-bold"
-                          : "text-zinc-400 hover:text-white"
-                        }`}
-                    >
-                      Speed
-                    </button>
-                  </div>
+                  <Tabs defaultValue="quality" value={activeSettingTab} onValueChange={(val) => setActiveSettingTab(val as any)} className="w-full flex flex-col flex-1 min-h-0">
+                    <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
+                      <TabsTrigger value="quality" className="rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center">
+                        Quality
+                      </TabsTrigger>
+                      <TabsTrigger value="speed" className="rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center">
+                        Speed
+                      </TabsTrigger>
+                    </TabsList>
 
-                  {/* Content Options */}
-                  <div className="max-h-60 overflow-y-auto w-full my-2 pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-                    {activeSettingTab === 'quality' && (
-                      <div className="flex flex-col gap-1 w-full text-zinc-300">
-                        {qualities.length > 0 ? (
-                          qualities.map((q) => {
-                            const isActive = currentQuality === q.id;
-                            let label = q.name;
-                            if (q.id === -1) label = "Auto (Recommended)";
-                            else if (q.name === "1080p") label = "Full HD (1080p)";
-                            else if (q.name === "720p") label = "HD (720p)";
-                            else if (q.name === "480p") label = "Data Saver (480p)";
+                    {/* Content Options */}
+                    <div className="overflow-y-auto w-full my-0.5 pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent flex-1 min-h-0">
+                      <TabsContent value="quality" className="mt-0 outline-none w-full">
+                        <div className="flex flex-col gap-1 w-full text-zinc-300">
+                          {qualities.length > 0 ? (
+                            qualities.map((q) => {
+                              const isActive = currentQuality === q.id;
+                              let label = q.name;
+                              if (q.id === -1) label = "Auto (Recommended)";
+                              else if (q.name === "1080p") label = "Full HD (1080p)";
+                              else if (q.name === "720p") label = "HD (720p)";
+                              else if (q.name === "480p") label = "Data Saver (480p)";
+                              return (
+                                <button
+                                  key={q.id}
+                                  onClick={() => {
+                                    handleQualityChange(q.id);
+                                    setShowSettingsOverlay(false);
+                                  }}
+                                  className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
+                                >
+                                  <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                  <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-400"}>{label}</span>
+                                </button>
+                              );
+                            })
+                          ) : (
+                            // Simulated Quality Options for static MP4
+                            [
+                              { id: -1, label: "Auto (Recommended)" },
+                              { id: 1080, label: "Full HD (1080p)" },
+                              { id: 720, label: "HD (720p)" },
+                              { id: 480, label: "Data Saver (480p)" }
+                            ].map((opt) => {
+                              const isActive = currentQuality === opt.id;
+                              return (
+                                <button
+                                  key={opt.id}
+                                  onClick={() => {
+                                    setCurrentQuality(opt.id);
+                                    setShowSettingsOverlay(false);
+                                  }}
+                                  className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
+                                >
+                                  <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                  <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>{opt.label}</span>
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="speed" className="mt-0 outline-none w-full">
+                        <div className="flex flex-col gap-1 w-full text-zinc-350">
+                          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((sp) => {
+                            const isActive = playbackSpeed === sp;
                             return (
                               <button
-                                key={q.id}
+                                key={sp}
                                 onClick={() => {
-                                  handleQualityChange(q.id);
+                                  handleSpeedChange(sp);
                                   setShowSettingsOverlay(false);
                                 }}
                                 className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
                               >
-                                <span className={`text-blue-500 font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>{label}</span>
-                              </button>
-                            );
-                          })
-                        ) : (
-                          // Simulated Quality Options for static MP4
-                          [
-                            { id: -1, label: "Auto (Recommended)" },
-                            { id: 1080, label: "Full HD (1080p)" },
-                            { id: 720, label: "HD (720p)" },
-                            { id: 480, label: "Data Saver (480p)" }
-                          ].map((opt) => {
-                            const isActive = currentQuality === opt.id;
-                            return (
-                              <button
-                                key={opt.id}
-                                onClick={() => {
-                                  setCurrentQuality(opt.id);
-                                  setShowSettingsOverlay(false);
-                                }}
-                                className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
-                              >
-                                <span className={`text-blue-500 font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>{opt.label}</span>
-                              </button>
-                            );
-                          })
-                        )}
-                      </div>
-                    )}
-
-                    {activeSettingTab === 'audio' && (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs w-full">
-                        {/* Audio Column */}
-                        <div className="flex flex-col gap-1">
-                          <h4 className="text-[10px] uppercase tracking-wider font-bold text-zinc-550 mb-1 px-2">Audio</h4>
-                          {["English [Original]", "Spanish", "French", "German"].map((lang) => {
-                            const isActive = audioLanguage === lang;
-                            return (
-                              <button
-                                key={lang}
-                                onClick={() => setAudioLanguage(lang)}
-                                className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer py-1 px-2 rounded hover:bg-white/5 w-full text-left"
-                              >
-                                <span className={`text-blue-500 font-bold text-sm w-3.5 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                <span className={`${isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"} truncate`} title={lang}>
-                                  {lang.replace(" [Original]", "")}
+                                <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
+                                  {sp === 1 ? "1x (Normal)" : `${sp}x`}
                                 </span>
                               </button>
                             );
                           })}
                         </div>
-
-                        {/* Subtitles Column */}
-                        <div className="flex flex-col gap-1">
-                          <h4 className="text-[10px] uppercase tracking-wider font-bold text-zinc-550 mb-1 px-2">Subtitles</h4>
-                          {["Off", "English", "Spanish", "French", "German"].map((sub) => {
-                            const isActive = subtitleLanguage === sub;
-                            return (
-                              <button
-                                key={sub}
-                                onClick={() => setSubtitleLanguage(sub)}
-                                className="flex items-center gap-1.5 text-xs font-semibold cursor-pointer py-1 px-2 rounded hover:bg-white/5 w-full text-left"
-                              >
-                                <span className={`text-blue-500 font-bold text-sm w-3.5 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>{sub}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {activeSettingTab === 'speed' && (
-                      <div className="flex flex-col gap-1 w-full text-zinc-350">
-                        {[0.5, 0.75, 1, 1.25, 1.5, 2].map((sp) => {
-                          const isActive = playbackSpeed === sp;
-                          return (
-                            <button
-                              key={sp}
-                              onClick={() => {
-                                handleSpeedChange(sp);
-                                setShowSettingsOverlay(false);
-                              }}
-                              className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
-                            >
-                              <span className={`text-blue-500 font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                              <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
-                                {sp === 1 ? "1x (Normal)" : `${sp}x`}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer bar */}
-                  <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-2">
-                    <div>
-                      {!isOnline && (
-                        <span className="flex items-center gap-1 text-red-400">
-                          <WifiOff className="w-3 h-3" />
-                          Offline
-                        </span>
-                      )}
+                      </TabsContent>
                     </div>
+                  </Tabs>
 
-                    <div className="flex items-center gap-2 sm:gap-6 shrink-0">
-                      <button
-                        onClick={() => setShowSettingsOverlay(false)}
-                        className="p-1 rounded-full bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center justify-center"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+      {/* Footer bar */}
+      <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-1.5 shrink-0">
+        <div>
+          {!isOnline && (
+            <span className="flex items-center gap-1 text-red-400">
+              <WifiOff className="w-3 h-3" />
+              Offline
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-6 shrink-0">
+          <button
+            onClick={() => setShowSettingsOverlay(false)}
+            className="p-1 rounded-full bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center justify-center"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+    </div>
               </>
             )}
 
-            {/* Feedback / Rating Overlay Modal */}
-            <FeedbackModal
-              isOpen={showFeedbackOverlay}
-              onClose={() => {
-                setShowFeedbackOverlay(false);
-                onExit();
-              }}
-              onSubmitSuccess={() => {
-                setShowFeedbackOverlay(false);
-                if (onFeedbackSubmitted) {
-                  onFeedbackSubmitted();
-                }
-                onExit();
-              }}
-              movieId={movie.id}
-              movieTitle={movie.title}
-              userId={userId}
-            />
+{/* Feedback / Rating Overlay Modal */ }
+<FeedbackModal
+  isOpen={showFeedbackOverlay}
+  onClose={() => {
+    setShowFeedbackOverlay(false);
+    onExit();
+  }}
+  onSubmitSuccess={() => {
+    setShowFeedbackOverlay(false);
+    if (onFeedbackSubmitted) {
+      onFeedbackSubmitted();
+    }
+    onExit();
+  }}
+  movieId={movie.id}
+  movieTitle={movie.title}
+  userId={userId}
+/>
           </>
         )}
-      </div>
-    </div>
+      </div >
+    </div >
   );
 });

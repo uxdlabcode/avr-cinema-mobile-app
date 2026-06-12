@@ -217,7 +217,7 @@ const VideoDetails = () => {
         const avg = total / feedbacks.length;
         setAverageRating(avg);
         setReviewCount(feedbacks.length);
-        
+
         if (userId) {
           const userHasRated = feedbacks.some((f: any) => f.userId === userId);
           setHasAlreadyRated(userHasRated);
@@ -233,7 +233,7 @@ const VideoDetails = () => {
       } else {
         setAverageRating(null);
         setReviewCount(0);
-        
+
         if (userId) {
           setHasAlreadyRated(false);
         } else {
@@ -650,21 +650,21 @@ const VideoDetails = () => {
           // Fetch related items from the same category dynamically
           try {
             const allOfCategory = await getMatchingData("media", "category", "==", dbMovie.category);
-            
+
             const currentGenres = dbMovie.genres || (dbMovie.genre ? [dbMovie.genre] : []);
             let filtered = allOfCategory.filter(m => {
               if (m.id === dbMovie.id) return false;
               if (currentGenres.length === 0) return true;
-              
+
               const itemGenres = m.genres || (m.genre ? [m.genre] : []);
-              return currentGenres.some((cg: string) => 
+              return currentGenres.some((cg: string) =>
                 itemGenres.some((ig: string) => ig.toLowerCase() === cg.toLowerCase())
               );
             });
 
             // Fallback: if we have fewer than 4 matches, fill in with items from same category
             if (filtered.length < 4) {
-              const remaining = allOfCategory.filter(m => 
+              const remaining = allOfCategory.filter(m =>
                 m.id !== dbMovie.id && !filtered.some(f => f.id === m.id)
               );
               filtered = [...filtered, ...remaining].slice(0, 4);
@@ -875,12 +875,12 @@ const VideoDetails = () => {
                 </button>
 
                 <div className="flex items-center gap-3">
-                  <button className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
+                  {/* <button className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
                     <Cast className="w-5 h-5 text-white" />
-                  </button>
-                  <button className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
+                  </button> */}
+                  {/* <button className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
                     <Share2 className="w-5 h-5 text-white" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
@@ -1176,11 +1176,11 @@ const VideoDetails = () => {
                 {isInMyList ? <Check className="w-5 h-5 text-green-500" /> : <Plus className="w-5 h-5 text-primary" />}
                 <span>{isInMyList ? "In My List" : "Add to My List"}</span>
               </button>
-
+              {/* 
               <button className="flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer select-none">
                 <Share2 className="w-4 h-4 text-white" />
                 <span>Share</span>
-              </button>
+              </button> */}
             </div>
           </div>
 
