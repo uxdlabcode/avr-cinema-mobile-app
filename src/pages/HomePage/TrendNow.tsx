@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Check } from "lucide-react";
 import { getMatchingData, getSignedUrl } from "@/Firebase";
 
 interface MovieItem {
@@ -14,7 +14,12 @@ interface MovieItem {
   [key: string]: any;
 }
 
-const TrendNow = () => {
+interface TrendNowProps {
+  watchlist?: string[];
+  toggleWatchlist?: (movieId: string, movieData: any) => void;
+}
+
+const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<MovieItem[]>([]);
   const rowRef = useRef<HTMLDivElement>(null);
@@ -145,7 +150,8 @@ const TrendNow = () => {
 
               {/* Movie Card Poster */}
               <div
-                className="relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
+                tabIndex={0}
+                className="focusable relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
                 onClick={() => navigate(`/video/${movie.id}`)}
               >
                 <img 
@@ -199,10 +205,17 @@ const TrendNow = () => {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (toggleWatchlist) {
+                          toggleWatchlist(movie.id, movie);
+                        }
                       }}
                       className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                     >
-                      <Plus className="w-3 h-3" />
+                      {watchlist.includes(movie.id.toString()) ? (
+                        <Check className="w-3 h-3 text-[#DECB94]" />
+                      ) : (
+                        <Plus className="w-3 h-3" />
+                      )}
                     </button>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
@@ -96,10 +97,14 @@ const MediaCategoryRow = ({
   genreName,
   list,
   navigate,
+  watchlist = [],
+  toggleWatchlist,
 }: {
   genreName: string;
   list: any[];
   navigate: ReturnType<typeof useNavigate>;
+  watchlist?: string[];
+  toggleWatchlist?: (movieId: string, movieData: any) => Promise<void>;
 }) => {
   const rowRef = React.useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -231,10 +236,17 @@ const MediaCategoryRow = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (toggleWatchlist) {
+                        toggleWatchlist(item.id, item);
+                      }
                     }}
                     className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
-                    <Plus className="w-3 h-3" />
+                    {watchlist.includes(item.id.toString()) ? (
+                      <Check className="w-3 h-3 text-[#DECB94]" />
+                    ) : (
+                      <Plus className="w-3 h-3" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -296,6 +308,7 @@ const TvDetails = () => {
         try {
           await deleteDocument("my_list", docId);
           setWatchlist(prev => prev.filter(id => id !== movieId.toString()));
+          toast.success("Removed from wishlist");
         } catch (err) {
           console.error("Error removing from watchlist:", err);
         }
@@ -315,6 +328,7 @@ const TvDetails = () => {
           };
           await createDocument("my_list", docId, payload);
           setWatchlist(prev => [...prev, movieId.toString()]);
+          toast.success("Added to wishlist");
         } catch (err) {
           console.error("Error adding to watchlist:", err);
         }
@@ -325,8 +339,10 @@ const TvDetails = () => {
         let updatedList;
         if (isCurrentlyIn) {
           updatedList = localList.filter((id: string) => id !== movieId.toString());
+          toast.success("Removed from wishlist");
         } else {
           updatedList = [...localList, movieId.toString()];
+          toast.success("Added to wishlist");
         }
         localStorage.setItem("avr_my_list", JSON.stringify(updatedList));
         setWatchlist(updatedList);
@@ -946,7 +962,7 @@ const TvDetails = () => {
       {/* Documentaries in FOR YOU tab */}
       {activeTab === 'For You' && (
         <div className="px-4 pb-6">
-          <DocumentaryList />
+          <DocumentaryList watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
         </div>
       )}
 
@@ -963,6 +979,8 @@ const TvDetails = () => {
                 genreName={genreName}
                 list={list}
                 navigate={navigate}
+                watchlist={watchlist}
+                toggleWatchlist={toggleWatchlist}
               />
             );
           })}
@@ -972,14 +990,14 @@ const TvDetails = () => {
       {/* TV Shows Tab */}
       {activeTab === 'TV Shows' && (
         <div className="px-4 pt-6">
-          <RecentTVShows isGrid={true} />
+          <RecentTVShows isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
         </div>
       )}
 
       {/* Documentaries Tab */}
       {activeTab === 'Documentaries' && (
         <div className="px-4 pt-6">
-          <DocumentaryList isGrid={true} />
+          <DocumentaryList isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
         </div>
       )}
 

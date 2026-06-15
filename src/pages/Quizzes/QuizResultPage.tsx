@@ -1,10 +1,14 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { RootState } from "@/store";
 import { addDocument } from "@/Firebase";
+import { db } from "@/Firebase/firebase";
+import { getDocumentData } from "@/Firebase/CloudFirestore/GetData";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Trophy, CheckCircle2, XCircle, RotateCcw, Home, Star, ArrowLeft,
 } from "lucide-react";
@@ -51,7 +55,7 @@ const AnswerCard = ({ q, sel, idx }: { q: Quiz["questions"][number]; sel: string
   const ca = q.correctAnswers ?? [];
   const isCorrect = sel.length === ca.length && ca.every((c) => sel.includes(c));
   return (
-    <div className={`rounded-xl border p-4 ${isCorrect ? "" : ""}`}>
+    <div className="rounded-xl border p-4">
       <div className="flex items-start gap-3 mb-3">
         <span className="shrink-0 w-6 h-6 rounded-md bg-foreground/10 text-foreground text-[10px] font-bold flex items-center justify-center mt-0.5">{idx + 1}</span>
         <p className="text-foreground text-sm font-semibold leading-snug">{q.text}</p>
@@ -83,6 +87,82 @@ const AnswerCard = ({ q, sel, idx }: { q: Quiz["questions"][number]; sel: string
   );
 };
 
+// ── Skeleton Loader ────────────────────────────────────────────────────────
+const QuizResultPageSkeleton = () => (
+  <div className="min-h-screen flex flex-col bg-background">
+    {/* Header Skeleton */}
+    <div className="border-b border-border py-4 px-4 md:px-10">
+      <div className="max-w-[1200px] mx-auto flex items-center gap-4">
+        <Skeleton className="w-9 h-9 md:w-10 md:h-10 rounded-full md:rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-5 md:h-6 w-40 md:w-48" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </div>
+    </div>
+
+    {/* Mobile layout */}
+    <div className="md:hidden flex-1 p-4 pt-4 pb-28 flex flex-col gap-4">
+      {/* Score Card Skeleton */}
+      <div className="border border-border rounded-2xl p-6 flex flex-col items-center gap-4">
+        <Skeleton className="w-32 h-32 rounded-full" />
+        <Skeleton className="h-5 w-24 rounded" />
+        <Skeleton className="h-4 w-48 rounded" />
+        <div className="flex gap-4 mt-2">
+          <Skeleton className="h-14 w-16 rounded-xl" />
+          <Skeleton className="h-14 w-16 rounded-xl" />
+          <Skeleton className="h-14 w-16 rounded-xl" />
+        </div>
+      </div>
+      {/* Answer list */}
+      <div className="space-y-3 mt-4">
+        <Skeleton className="h-5 w-32 rounded" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="border border-border rounded-xl p-4 space-y-3">
+            <Skeleton className="h-4 w-3/4 rounded" />
+            <Skeleton className="h-8 w-full rounded-lg" />
+            <Skeleton className="h-8 w-full rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Desktop layout */}
+    <div className="hidden md:flex flex-1 max-w-[1200px] mx-auto w-full px-6 lg:px-10 xl:px-16 py-8 gap-8">
+      {/* Left Column */}
+      <div className="w-[320px] lg:w-[360px] shrink-0 space-y-5">
+        <div className="border border-border rounded-lg p-6 flex flex-col items-center gap-5">
+          <Skeleton className="w-40 h-40 rounded-full" />
+          <Skeleton className="h-6 w-32 rounded" />
+          <Skeleton className="h-4 w-48 rounded" />
+          <div className="grid grid-cols-3 gap-3 w-full border-t border-border pt-5">
+            <Skeleton className="h-14 w-full rounded-xl" />
+            <Skeleton className="h-14 w-full rounded-xl" />
+            <Skeleton className="h-14 w-full rounded-xl" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <Skeleton className="h-10 w-full rounded-lg" />
+      </div>
+
+      {/* Right Column */}
+      <div className="flex-1 min-w-0 space-y-4">
+        <div className="flex justify-between items-center mb-5">
+          <Skeleton className="h-6 w-32 rounded" />
+          <Skeleton className="h-4 w-24 rounded" />
+        </div>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="border border-border rounded-xl p-4 space-y-3">
+            <Skeleton className="h-4 w-3/4 rounded" />
+            <Skeleton className="h-8 w-full rounded-lg" />
+            <Skeleton className="h-8 w-full rounded-lg" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 // ── Main ──────────────────────────────────────────────────────────────────
 export const QuizResultPage = () => {
   const navigate = useNavigate();
@@ -90,6 +170,9 @@ export const QuizResultPage = () => {
   const state = location.state as LocationState | null;
   const user = useSelector((s: RootState) => s.auth.user);
   const savedRef = useRef(false);
+
+  const [resultData, setResultData] = useState<LocationState | null>(state);
+  const [loading, setLoading] = useState(!state);
 
   useEffect(() => {
     if (!state || savedRef.current) return;
@@ -104,6 +187,7 @@ export const QuizResultPage = () => {
           score: state.score,
           correct: state.correct,
           total: state.total,
+          answers: state.answers, // Save user options so they can be restored on page refresh
           completedAt: Date.now(),
         });
       } catch (err) {
@@ -111,9 +195,56 @@ export const QuizResultPage = () => {
       }
     };
     saveResult();
-  }, []);
+  }, [state, user]);
 
-  if (!state) {
+  useEffect(() => {
+    if (state) return; // already loaded from state
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchLatestResult = async () => {
+      try {
+        const q = query(
+          collection(db, "quiz_result"),
+          where("userId", "==", user.id)
+        );
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+          setLoading(false);
+          return;
+        }
+
+        const docs = querySnapshot.docs.map((d) => d.data());
+        // Sort in memory to avoid index requirements
+        const latestDoc = docs.sort((a, b) => b.completedAt - a.completedAt)[0];
+        const quizDoc = await getDocumentData("quizzes", latestDoc.quizId);
+
+        if (quizDoc) {
+          setResultData({
+            quiz: quizDoc as unknown as Quiz,
+            answers: latestDoc.answers || {},
+            score: latestDoc.score,
+            correct: latestDoc.correct,
+            total: latestDoc.total,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching latest result:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestResult();
+  }, [user?.id, state]);
+
+  if (loading) {
+    return <QuizResultPageSkeleton />;
+  }
+
+  if (!resultData) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-6">
         <Trophy className="w-12 h-12 text-primary/40" />
@@ -123,11 +254,10 @@ export const QuizResultPage = () => {
     );
   }
 
-  const { quiz, answers, score, correct, total } = state;
+  const { quiz, answers, score, correct, total } = resultData;
   const resultLabel = score >= 80 ? "Excellent! 🎉" : score >= 50 ? "Good Job! 👍" : "Keep Trying! 💪";
   const resultDesc = score >= 80 ? "You're a true cinema expert!" : score >= 50 ? "You know your movies well. Practice more!" : "Don't give up — review and try again!";
   const resultColor = score >= 80 ? "text-emerald-400" : score >= 50 ? "text-primary" : "text-rose-400";
-  const ringColor = score >= 80 ? "#22c55e" : score >= 50 ? "var(--primary)" : "#ef4444";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -141,22 +271,22 @@ export const QuizResultPage = () => {
 
       {/* ═══ MOBILE Body ═══ */}
       <div className="md:hidden flex-1 pt-[64px] pb-28 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
-        <div className="mx-4 mt-4 rounded-2xl p-6 flex flex-col items-center gap-4 text-center bg-gradient-to-br from-background via-muted/30 to-background">
+        <div className="mx-4 rounded-2xl p-6 pb-2 flex flex-col items-center gap-2 text-center bg-gradient-to-br from-background via-muted/30 to-background">
           <div className="relative">
             <ScoreRing pct={score} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={`text-2xl font-black leading-none ${resultColor}`}>{score}%</span>
-              <span className="text-foreground/40 text-[10px] mt-0.5">Score</span>
+              <span className={`text-lg font-black leading-none ${resultColor}`}>{score}%</span>
+              <span className="text-foreground/40 text-sm mt-0.5">Score</span>
             </div>
           </div>
           <StarRating score={score} />
           <div>
-            <p className={`text-lg font-bold ${resultColor}`}>{resultLabel}</p>
-            <p className="text-foreground/50 text-xs mt-1">{resultDesc}</p>
+            <p className={`text-sm font-bold ${resultColor}`}>{resultLabel}</p>
+            <p className="text-foreground/50 text-xs ">{resultDesc}</p>
           </div>
           <div className="flex items-center gap-4 mt-1">
             {[{ label: "Correct", val: correct, color: "text-emerald-400" }, { label: "Wrong", val: total - correct, color: "text-rose-400" }, { label: "Total", val: total, color: "text-foreground" }].map((s) => (
-              <div key={s.label} className="flex flex-col items-center px-4 py-2 rounded-xl bg-foreground/5 border border-foreground/10">
+              <div key={s.label} className="flex flex-col items-center px-4 py-1 rounded-xl bg-foreground/5 border border-foreground/10">
                 <span className={`${s.color} font-bold text-lg leading-none`}>{s.val}</span>
                 <span className="text-foreground/40 text-[10px] mt-0.5">{s.label}</span>
               </div>
@@ -176,12 +306,12 @@ export const QuizResultPage = () => {
 
       {/* MOBILE Bottom CTAs */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 pb-safe z-40">
-        <div className="max-w-[700px] mx-auto w-full flex gap-3">
+        <div className="max-w-[700px] mx-auto w-full flex gap-3 px-2">
           <Button id="quiz-result-home-btn" variant="outline" onClick={() => navigate("/quiz")}
-            className="flex-1 h-auto py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 border-border"
+            className="flex-1 h-auto py-2.5 rounded-md font-semibold text-sm flex items-center justify-center gap-2 border-border"
           ><Home className="w-4 h-4" /> All Quizzes</Button>
           <Button id="quiz-result-retry-btn" onClick={() => navigate(`/quizzes/${quiz.id}`)}
-            className="flex-1 h-auto py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
+            className="flex-1 h-auto py-2.5 text-secondary rounded-md font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
           ><RotateCcw className="w-4 h-4" /> Try Again</Button>
         </div>
       </div>
@@ -215,19 +345,18 @@ export const QuizResultPage = () => {
         <div className="flex gap-8 lg:gap-10 items-start">
 
           {/* Left — score hero + CTAs (sticky) */}
-          <div className="w-[320px] lg:w-[360px] flex-shrink-0 sticky top-8 flex flex-col gap-5">
+          <div className="w-[320px] lg:w-[360px] flex-shrink-0 sticky top-8 flex flex-col gap-0">
 
             {/* Score card */}
             <Card className="p-8 flex flex-col items-center gap-5 relative overflow-hidden rounded-lg">
               {/* Decorative glow */}
-              <div className="absolute top-0 left-0 right-0 h-32 opacity-20 pointer-events-none"
-              />
+              <div className="absolute top-0 left-0 right-0 h-32 opacity-20 pointer-events-none" />
 
               <div className="relative z-10 flex flex-col items-center gap-3">
                 <div className="relative">
                   <ScoreRing pct={score} size={160} />
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-3xl font-semibold leading-none ${resultColor}`}>{score}%</span>
+                    <span className={`text-xl font-semibold leading-none ${resultColor}`}>{score}%</span>
                     <span className="text-primary text-xs mt-1">Score</span>
                   </div>
                 </div>
@@ -239,11 +368,11 @@ export const QuizResultPage = () => {
               </div>
 
               {/* Stats row */}
-              <div className="w-full grid grid-cols-3 gap-3 border-t border-border pt-5 relative z-10">
+              <div className="w-full grid grid-cols-3 gap-3 border-t border-border  relative z-10">
                 {[
-                  { label: "Correct", val: correct, color: "text-emerald-400", bg: "bg-emerald-500/8" },
-                  { label: "Wrong", val: total - correct, color: "text-rose-400", bg: "bg-rose-500/8" },
-                  { label: "Total", val: total, color: "text-primary", bg: "bg-muted/50" },
+                  { label: "Correct", val: correct, color: "text-emerald-400" },
+                  { label: "Wrong", val: total - correct, color: "text-rose-400" },
+                  { label: "Total", val: total, color: "text-primary" },
                 ].map((s) => (
                   <div key={s.label} className={`flex flex-col items-center py-3 rounded-xl ${s.bg}`}>
                     <span className={`${s.color} font-bold text-lg leading-none`}>{s.val}</span>

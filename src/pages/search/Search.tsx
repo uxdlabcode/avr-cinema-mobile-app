@@ -144,7 +144,7 @@ const Search = () => {
                     <button
                         key={chip}
                         onClick={() => handleFilterClick(chip)}
-                        className={`flex items-center gap-1.5 px-1 py-0.5 rounded-md border text-sm font-medium whitespace-nowrap transition-colors ${activeFilter === chip
+                        className={`focusable flex items-center gap-1.5 px-1 py-0.5 rounded-md border text-sm font-medium whitespace-nowrap transition-colors outline-none ${activeFilter === chip
                             ? 'bg-zinc-800 text-white border-zinc-700'
                             : 'bg-transparent text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
                             }`}
@@ -381,7 +381,7 @@ const Search = () => {
                                     setSearchParams(val.trim() ? { q: val.trim() } : {}, { replace: true });
                                 }}
                                 placeholder="Search for a TV Shows, Movie & Genre etc"
-                                className="pl-12 pr-12  h-10 text-base w-full text-white placeholder-zinc-500"
+                                className="focusable pl-12 pr-12  h-10 text-base w-full text-white placeholder-zinc-500 focus:bg-zinc-800"
                                 disabled={isLoadingMedia}
                             />
                             {/* <button
@@ -403,7 +403,7 @@ const Search = () => {
                                     navigate('/dashboard');
                                 }
                             }}
-                            className="p-2.5 text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center bg-zinc-900/60 hover:bg-zinc-800 rounded-full border border-zinc-800"
+                            className="focusable p-2.5 text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center bg-zinc-900/60 hover:bg-zinc-800 rounded-full border border-zinc-800 outline-none"
                             aria-label="Close search"
                         >
                             <X className="w-6 h-6" />
@@ -415,23 +415,23 @@ const Search = () => {
                         <div className="grid grid-cols-3 gap-4 w-full max-w-3xl mb-12">
                             <button
                                 onClick={() => navigate("/tv")}
-                                className="relative h-20 rounded-md overflow-hidden group cursor-pointer border border-purple-500/20 bg-gradient-to-br from-pink-650/40 to-purple-900/60 hover:from-pink-650/50 hover:to-purple-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none"
+                                className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-purple-500/20 bg-gradient-to-br from-pink-650/40 to-purple-900/60 hover:from-pink-650/50 hover:to-purple-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast1.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">TV SHOWS</span>
                             </button>
-
+ 
                             <button
                                 onClick={() => navigate("/movies")}
-                                className="relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none"
+                                className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast2.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">MOVIES</span>
                             </button>
-
+ 
                             <button
                                 onClick={() => navigate("/tv?tab=Documentaries")}
-                                className="relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none"
+                                className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast3.jpg')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">DOCUMENTARIES</span>
@@ -447,7 +447,7 @@ const Search = () => {
                                 {history.length > 0 && (
                                     <button
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                        className="text-xs font-bold text-blue-500 hover:text-blue-400 cursor-pointer"
+                                        className="focusable text-xs font-bold text-blue-500 hover:text-blue-400 cursor-pointer outline-none"
                                     >
                                         Clear All
                                     </button>
@@ -462,7 +462,8 @@ const Search = () => {
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="relative w-[180px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors"
+                                                tabIndex={0}
+                                                className="focusable relative w-[180px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors outline-none"
                                                 onClick={() => handleChipClick(item.query)}
                                             >
                                                 {displayImage ? (
@@ -534,7 +535,8 @@ const Search = () => {
                                     return (
                                         <div
                                             key={movie.id}
-                                            className="relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10"
+                                            tabIndex={0}
+                                            className="focusable relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10 outline-none"
                                             onClick={() => {
                                                 if (query.trim() && user?.id) {
                                                     dispatch(saveSearch({ uid: user.id, query: query.trim() }));

@@ -107,8 +107,9 @@ const Trailer = () => {
               return (
                 <div
                   key={item.id}
+                  tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
-                  className="flex flex-col rounded-lg overflow-hidden cursor-pointer group bg-[#181d24] border border-zinc-900 transition-all hover:scale-[1.02] hover:border-zinc-700 shadow-md text-left"
+                  className="focusable flex flex-col rounded-lg overflow-hidden cursor-pointer group bg-[#181d24] border border-zinc-900 transition-all hover:scale-[1.02] hover:border-zinc-700 shadow-md text-left outline-none"
                 >
                   {/* Thumbnail / Image container */}
                   <div className="relative w-full aspect-video bg-zinc-950 overflow-hidden">

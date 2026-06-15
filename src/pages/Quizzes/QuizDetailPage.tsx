@@ -8,6 +8,63 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getDocumentData } from "@/Firebase/CloudFirestore/GetData";
 import type { Quiz } from "./QuizzesPage";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const QuizDetailPageSkeleton = () => (
+  <div className="min-h-screen flex flex-col bg-background">
+    {/* Header Skeleton */}
+    <div className="border-b border-border py-4 px-4 md:px-10">
+      <div className="max-w-[1100px] mx-auto flex items-center gap-4">
+        <Skeleton className="w-9 h-9 md:w-10 md:h-10 rounded-full md:rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-16 hidden md:block" />
+          <Skeleton className="h-5 md:h-6 w-40 md:w-48" />
+        </div>
+      </div>
+    </div>
+
+    {/* Mobile layout */}
+    <div className="md:hidden flex-1 p-4 flex flex-col gap-4">
+      <Skeleton className="h-36 w-full rounded-2xl" />
+      <div className="grid grid-cols-2 gap-3">
+        <Skeleton className="h-16 w-full rounded-lg" />
+        <Skeleton className="h-16 w-full rounded-lg" />
+      </div>
+      <div className="border border-border rounded-lg p-4 space-y-3">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-8 w-full rounded-md" />
+        <Skeleton className="h-8 w-full rounded-md" />
+      </div>
+      <Skeleton className="h-9 w-full rounded-md mt-auto" />
+    </div>
+
+    {/* Desktop layout */}
+    <div className="hidden md:flex flex-1 max-w-[1100px] mx-auto w-full px-6 lg:px-10 py-8 gap-8">
+      <div className="flex-1 flex flex-col gap-4">
+        <Skeleton className="h-36 w-full rounded-lg" />
+        <div className="border border-border rounded-lg p-6 space-y-4">
+          <Skeleton className="h-5 w-32" />
+          <div className="grid grid-cols-2 gap-4">
+            <Skeleton className="h-12 w-full rounded-lg" />
+            <Skeleton className="h-12 w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+      <div className="w-[300px] lg:w-[340px] shrink-0">
+        <div className="border border-border rounded-lg p-6 space-y-4">
+          <Skeleton className="h-6 w-32" />
+          <div className="grid grid-cols-2 gap-2">
+            <Skeleton className="h-12 w-full rounded-lg" />
+            <Skeleton className="h-12 w-full rounded-lg" />
+            <Skeleton className="h-12 w-full rounded-lg" />
+            <Skeleton className="h-12 w-full rounded-lg" />
+          </div>
+          <Skeleton className="h-10 w-full rounded-lg" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 // ── Main Component ────────────────────────────────────────────────────────
 export const QuizDetailPage = () => {
@@ -90,12 +147,7 @@ export const QuizDetailPage = () => {
   }, [finished]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-        <p className="text-muted-foreground text-sm">Loading quiz…</p>
-      </div>
-    );
+    return <QuizDetailPageSkeleton />;
   }
 
   if (error || !quiz) {

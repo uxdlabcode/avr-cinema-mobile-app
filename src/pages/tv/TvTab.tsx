@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
@@ -238,7 +239,7 @@ const TVCategoryRow = ({
                         >
                           Play Now
                         </button>
-                        {/* <button
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleWatchlist(tv.id, tv);
@@ -250,7 +251,7 @@ const TVCategoryRow = ({
                           ) : (
                             <Plus className="w-3 h-3" />
                           )}
-                        </button> */}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -316,7 +317,7 @@ const TVCategoryRow = ({
                     >
                       Play Now
                     </button>
-                    {/* <button
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleWatchlist(tv.id, tv);
@@ -328,7 +329,7 @@ const TVCategoryRow = ({
                       ) : (
                         <Plus className="w-3 h-3" />
                       )}
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -390,6 +391,7 @@ const TvTab = () => {
         try {
           await deleteDocument("my_list", docId);
           setWatchlist(prev => prev.filter(id => id !== movieId.toString()));
+          toast.success("Removed from wishlist");
         } catch (err) {
           console.error("Error removing from watchlist:", err);
         }
@@ -409,6 +411,7 @@ const TvTab = () => {
           };
           await createDocument("my_list", docId, payload);
           setWatchlist(prev => [...prev, movieId.toString()]);
+          toast.success("Added to wishlist");
         } catch (err) {
           console.error("Error adding to watchlist:", err);
         }
@@ -419,8 +422,10 @@ const TvTab = () => {
         let updatedList;
         if (isCurrentlyIn) {
           updatedList = localList.filter((id: string) => id !== movieId.toString());
+          toast.success("Removed from wishlist");
         } else {
           updatedList = [...localList, movieId.toString()];
+          toast.success("Added to wishlist");
         }
         localStorage.setItem("avr_my_list", JSON.stringify(updatedList));
         setWatchlist(updatedList);
@@ -1023,11 +1028,11 @@ const TvTab = () => {
             )}
 
             {activeTab === "tvShows" && (
-              <RecentTVShows isGrid={true} />
+              <RecentTVShows isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
             )}
 
             {activeTab === "documentaries" && (
-              <DocumentaryList isGrid={true} />
+              <DocumentaryList isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
             )}
           </div>
         </div>

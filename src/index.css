@@ -140,3 +140,26 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Android TV platform style overrides */
+.platform-tv {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.platform-tv::-webkit-scrollbar,
+.platform-tv *::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Premium glowing gold focus ring for TV D-pad items */
+.platform-tv .focusable:focus {
+  outline: none !important;
+  box-shadow: 0 0 16px 4px rgba(222, 203, 148, 0.7), 
+              0 0 0 2px rgba(222, 203, 148, 0.9) !important;
+  border-color: #DECB94 !important;
+  transform: scale(1.04);
+  z-index: 10;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              box-shadow 0.22s ease-in-out !important;
+}

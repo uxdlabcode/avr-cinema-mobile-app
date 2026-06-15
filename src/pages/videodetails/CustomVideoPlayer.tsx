@@ -3,13 +3,15 @@ import { serverTimestamp } from 'firebase/firestore';
 import {
   Play, Pause, ChevronLeft, Cast, Volume2, VolumeX, Maximize, Minimize,
   Settings, ChevronsLeft, ChevronsRight, Heart, Sun, X, Check,
-  WifiOff, MessageSquare, ListVideo, Crown
+  WifiOff, MessageSquare, ListVideo, Crown, Subtitles
 } from 'lucide-react';
 import { createDocument, deleteDocument, getDocumentData } from '@/Firebase';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
 import { FeedbackModal } from './FeedbackModal';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { isTvPlatform } from '@/lib/tvUtils';
+import { toast } from 'sonner';
 
 interface CustomVideoPlayerProps {
   movie: any;
@@ -23,6 +25,7 @@ interface CustomVideoPlayerProps {
   onPlayStateChange?: (isPlaying: boolean) => void;
   hasAlreadyRated?: boolean;
   onFeedbackSubmitted?: () => void;
+  trailerUrl?: string;
 }
 
 export interface CustomVideoPlayerRef {
@@ -40,13 +43,29 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
   playInline = false,
   onPlayStateChange,
   hasAlreadyRated = false,
-  onFeedbackSubmitted
+  onFeedbackSubmitted,
+  trailerUrl
 }, ref) => {
   const [isCurrentlyPlaying, setIsCurrentlyPlaying] = useState(false);
   const navigate = useNavigate();
 
   // User Feedback States
   const [showFeedbackOverlay, setShowFeedbackOverlay] = useState(false);
+
+  // Trailer sequential playback states
+  const [currentSourceUrl, setCurrentSourceUrl] = useState<string>("");
+  const [isPlayingTrailer, setIsPlayingTrailer] = useState<boolean>(false);
+
+  // Sync trailer state when props change
+  useEffect(() => {
+    if (trailerUrl && trailerUrl !== videoUrlToPlay) {
+      setCurrentSourceUrl(trailerUrl);
+      setIsPlayingTrailer(true);
+    } else {
+      setCurrentSourceUrl(videoUrlToPlay);
+      setIsPlayingTrailer(false);
+    }
+  }, [videoUrlToPlay, trailerUrl]);
 
   React.useImperativeHandle(ref, () => ({
     togglePlayPause: () => togglePlayPause()
@@ -72,10 +91,12 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
   // Custom Settings overlay states
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
-  const [activeSettingTab, setActiveSettingTab] = useState<'quality' | 'audio' | 'speed'>('quality');
+  const [activeSettingTab, setActiveSettingTab] = useState<'quality' | 'audio' | 'speed' | 'subtitles'>('quality');
   const [brightness, setBrightness] = useState<number>(100);
   const [audioLanguage, setAudioLanguage] = useState<string>("English [Original]");
   const [subtitleLanguage, setSubtitleLanguage] = useState<string>("Off");
+  const [subtitleTracks, setSubtitleTracks] = useState<{ id: number; name: string; lang: string }[]>([]);
+  const [currentSubtitleTrack, setCurrentSubtitleTrack] = useState<number>(-1); // -1 = Off
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [isRated, setIsRated] = useState<boolean>(false);
   const [isMobilePortrait, setIsMobilePortrait] = useState<boolean>(false);
@@ -92,7 +113,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
   const lastSavedTimeRef = useRef<number>(0);
 
   const saveCurrentProgress = async (time: number) => {
-    if (!movie) return;
+    if (!movie || isPlayingTrailer) return;
     const currentDur = videoRef.current?.duration || duration;
     if (!currentDur) return;
 
@@ -264,7 +285,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
       setIsVideoLoading(false);
       return;
     }
-    if (!videoUrlToPlay || !videoRef.current) return;
+    if (!currentSourceUrl || !videoRef.current) return;
     setIsVideoLoading(true);
     const video = videoRef.current;
     let hlsInstance: any = null;
@@ -272,38 +293,67 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     const initPlayer = async () => {
       let startFromTime = 0;
 
-      if (userId) {
-        try {
-          const progressKey = currentEpisode ? `${movie.id}_ep_${currentEpisode.id}` : movie.id;
-          const savedDoc = await getDocumentData("watch_progress", `${userId}_${progressKey}`);
-          if (savedDoc && savedDoc.currentTime > 0) {
-            startFromTime = savedDoc.currentTime;
-          }
-        } catch (err) {
-          console.error("Error reading saved progress from DB:", err);
-        }
-      } else {
-        try {
-          const progressDataStr = localStorage.getItem('avr_watch_progress');
-          if (progressDataStr) {
-            const progressData = JSON.parse(progressDataStr);
+      if (!isPlayingTrailer) {
+        if (userId) {
+          try {
             const progressKey = currentEpisode ? `${movie.id}_ep_${currentEpisode.id}` : movie.id;
-            const saved = progressData[progressKey];
-            if (saved && saved.currentTime > 0) {
-              startFromTime = saved.currentTime;
+            const savedDoc = await getDocumentData("watch_progress", `${userId}_${progressKey}`);
+            if (savedDoc && savedDoc.currentTime > 0) {
+              startFromTime = savedDoc.currentTime;
             }
+          } catch (err) {
+            console.error("Error reading saved progress from DB:", err);
           }
-        } catch (err) {
-          console.error("Error reading saved progress:", err);
+        } else {
+          try {
+            const progressDataStr = localStorage.getItem('avr_watch_progress');
+            if (progressDataStr) {
+              const progressData = JSON.parse(progressDataStr);
+              const progressKey = currentEpisode ? `${movie.id}_ep_${currentEpisode.id}` : movie.id;
+              const saved = progressData[progressKey];
+              if (saved && saved.currentTime > 0) {
+                startFromTime = saved.currentTime;
+              }
+            }
+          } catch (err) {
+            console.error("Error reading saved progress:", err);
+          }
         }
       }
 
       const HlsClass = (window as any).Hls;
-      if (videoUrlToPlay.includes(".m3u8") && HlsClass && HlsClass.isSupported()) {
+      if (currentSourceUrl.includes(".m3u8") && HlsClass && HlsClass.isSupported()) {
         hlsInstance = new HlsClass();
-        hlsInstance.loadSource(videoUrlToPlay);
+        hlsInstance.loadSource(currentSourceUrl);
         hlsInstance.attachMedia(video);
         hlsRef.current = hlsInstance;
+
+        // Listen for Hls subtitle tracks updating
+        hlsInstance.on(HlsClass.Events.SUBTITLE_TRACKS_UPDATED, (_event: any, data: any) => {
+          const dbCaptions = movie?.caption || currentEpisode?.caption || movie?.subtitles || currentEpisode?.subtitles || [];
+          if (dbCaptions.length > 0) return;
+          if (data && data.subtitleTracks) {
+            const tracks = data.subtitleTracks.map((t: any) => ({
+              id: t.id,
+              name: t.name || t.lang || `Track ${t.id}`,
+              lang: t.lang || ""
+            }));
+            setSubtitleTracks(tracks);
+          }
+        });
+
+        // Sync local subtitle track selection state
+        hlsInstance.on(HlsClass.Events.SUBTITLE_TRACK_SWITCH, (_event: any, data: any) => {
+          if (data) {
+            setCurrentSubtitleTrack(data.id);
+            if (data.id === -1) {
+              setSubtitleLanguage("Off");
+            } else {
+              const activeTrack = hlsInstance.subtitleTracks[data.id];
+              setSubtitleLanguage(activeTrack ? (activeTrack.name || activeTrack.lang || "On") : "On");
+            }
+          }
+        });
 
         hlsInstance.on(HlsClass.Events.MANIFEST_PARSED, () => {
           const levels = hlsInstance.levels.map((level: any, idx: number) => {
@@ -337,7 +387,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             .catch(e => console.log("Play error:", e));
         });
       } else {
-        video.src = videoUrlToPlay;
+        video.src = currentSourceUrl;
         video.playbackRate = playbackSpeed;
 
         const onCanPlay = () => {
@@ -355,7 +405,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
       }
     };
 
-    if (videoUrlToPlay.includes(".m3u8") && !(window as any).Hls) {
+    if (currentSourceUrl.includes(".m3u8") && !(window as any).Hls) {
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
       script.async = true;
@@ -379,7 +429,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         }
       };
     }
-  }, [videoUrlToPlay, hasActiveMembership]);
+  }, [currentSourceUrl, hasActiveMembership, isPlayingTrailer]);
 
   // Handle controls auto-hide
   const triggerControlsShow = () => {
@@ -413,14 +463,97 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
+    // Handle video errors
+    const handleVideoError = (e: any) => {
+      const error = videoRef.current?.error;
+      if (error?.code === 4) {
+        // MEDIA_ERR_SRC_NOT_SUPPORTED - Try direct playback
+        console.warn("Retrying video playback with direct URL...", currentSourceUrl);
+      } else if (error?.code === 3) {
+        // MEDIA_ERR_DECODE
+        console.error("Video decode error. Check video format and URL.");
+      }
+    };
+
+    if (videoRef.current) {
+      videoRef.current.addEventListener("error", handleVideoError);
+    }
+
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
       }
+      if (videoRef.current) {
+        videoRef.current.removeEventListener("error", handleVideoError);
+      }
     };
   }, []);
+
+  // TV Remote controls handler (D-pad left/right for seeking, enter for play/pause, up/down to toggle controls, back/esc to exit)
+  useEffect(() => {
+    if (!isTvPlatform()) return;
+
+    const handleTVPlayerKeys = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      const isInputActive =
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA");
+
+      if (isInputActive) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          if (videoRef.current) {
+            videoRef.current.currentTime = Math.max(videoRef.current.currentTime - 10, 0);
+          }
+          triggerControlsShow();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          if (videoRef.current) {
+            videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 10, duration);
+          }
+          triggerControlsShow();
+          break;
+        case "Enter":
+          e.preventDefault();
+          if (videoRef.current) {
+            if (isCurrentlyPlaying) {
+              videoRef.current.pause();
+              setIsCurrentlyPlaying(false);
+              saveCurrentProgress(videoRef.current.currentTime);
+            } else {
+              videoRef.current.play()
+                .then(() => setIsCurrentlyPlaying(true))
+                .catch(err => console.log("TV Enter play failed:", err));
+            }
+          }
+          triggerControlsShow();
+          break;
+        case "ArrowUp":
+        case "ArrowDown":
+          e.preventDefault();
+          setShowControls((prev) => !prev);
+          break;
+        case "Escape":
+        case "Backspace":
+          e.preventDefault();
+          onExit();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleTVPlayerKeys);
+    return () => {
+      window.removeEventListener("keydown", handleTVPlayerKeys);
+    };
+  }, [isCurrentlyPlaying, duration, onExit]);
 
   const togglePlayPause = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -550,7 +683,92 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     }
   };
 
+  const handleSubtitleChange = (trackId: number) => {
+    setCurrentSubtitleTrack(trackId);
+
+    // For Hls.js
+    if (hlsRef.current && hlsRef.current.subtitleTracks && hlsRef.current.subtitleTracks.length > 0) {
+      hlsRef.current.subtitleTrack = trackId;
+    }
+
+    // For Native HTML5 TextTracks (e.g. mp4 with <track> tags)
+    if (videoRef.current) {
+      const tracks = videoRef.current.textTracks;
+      for (let i = 0; i < tracks.length; i++) {
+        if (i === trackId) {
+          tracks[i].mode = "showing";
+          setSubtitleLanguage(tracks[i].label || tracks[i].language || "On");
+        } else {
+          tracks[i].mode = "disabled";
+        }
+      }
+      if (trackId === -1) {
+        setSubtitleLanguage("Off");
+      }
+    }
+  };
+
+  const toggleCC = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (subtitleTracks.length === 0) {
+      toast.info("No captions available for this video");
+      return;
+    }
+    setShowSettingsOverlay(true);
+    setActiveSettingTab('subtitles');
+  };
+
+  // Sync Native HTML5 text tracks (if dynamically added or parsed from standard mp4 container)
+  useEffect(() => {
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+
+    const syncTextTracks = () => {
+      const dbCaptions = movie?.caption || currentEpisode?.caption || movie?.subtitles || currentEpisode?.subtitles || [];
+      if (dbCaptions.length > 0) return;
+      const tracksList = Array.from(video.textTracks);
+      if (tracksList.length > 0 && subtitleTracks.length === 0) {
+        const mapped = tracksList.map((track: any, idx: number) => ({
+          id: idx,
+          name: track.label || track.language || `Track ${idx}`,
+          lang: track.language || ""
+        }));
+        setSubtitleTracks(mapped);
+      }
+    };
+
+    video.addEventListener("loadstart", syncTextTracks);
+    if (video.textTracks) {
+      video.textTracks.addEventListener("addtrack", syncTextTracks);
+    }
+    return () => {
+      video.removeEventListener("loadstart", syncTextTracks);
+      if (video.textTracks) {
+        video.textTracks.removeEventListener("addtrack", syncTextTracks);
+      }
+    };
+  }, [subtitleTracks.length, movie, currentEpisode]);
+
+  // Hydrate subtitle tracks list dynamically from Firebase media collection database metadata
+  useEffect(() => {
+    const dbCaptions = movie?.caption || currentEpisode?.caption || movie?.subtitles || currentEpisode?.subtitles || [];
+    if (dbCaptions.length > 0) {
+      const tracks = dbCaptions.map((sub: any, idx: number) => ({
+        id: idx,
+        name: sub.language || sub.label || sub.name || `Track ${idx}`,
+        lang: sub.language || sub.lang || ""
+      }));
+      setSubtitleTracks(tracks);
+    }
+  }, [movie, currentEpisode]);
+
   const handleEnded = () => {
+    if (isPlayingTrailer) {
+      setIsPlayingTrailer(false);
+      setCurrentSourceUrl(videoUrlToPlay);
+      return;
+    }
+
     // Check if it's a show and there is a next episode
     if ((movie.category === "TV Show" || movie.category === "Documentary") && currentEpisode) {
       const currentEpNum = currentEpisode.episodeNumber;
@@ -664,14 +882,40 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               onSeeked={() => setIsVideoLoading(false)}
               onCanPlay={() => setIsVideoLoading(false)}
               onLoadedData={() => setIsVideoLoading(false)}
+              crossOrigin="anonymous"
               playsInline
-            />
+            >
+              {((movie?.caption || currentEpisode?.caption || movie?.subtitles || currentEpisode?.subtitles || []) as any[]).map((sub: any, idx: number) => (
+                <track
+                  key={idx}
+                  src={sub.caption_file || sub.src}
+                  label={sub.language || sub.label || sub.name}
+                  srcLang={sub.language?.substring(0, 2).toLowerCase() || sub.lang || "en"}
+                  kind="subtitles"
+                />
+              ))}
+            </video>
 
             {/* Loading Spinner Overlay */}
             {isVideoLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30 pointer-events-none">
                 <div className="w-12 h-12 border-4 border-zinc-800 border-t-primary rounded-full animate-spin" />
               </div>
+            )}
+
+            {/* Skip Trailer Button */}
+            {isPlayingTrailer && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPlayingTrailer(false);
+                  setCurrentSourceUrl(videoUrlToPlay);
+                }}
+                className="focusable absolute bottom-24 right-8 bg-zinc-950/90 border border-zinc-800 hover:border-zinc-750 text-white font-bold px-6 py-3 rounded-lg shadow-2xl transition-all active:scale-[0.98] z-30 cursor-pointer flex items-center gap-2 outline-none"
+              >
+                <span>Skip Trailer</span>
+                <ChevronsRight className="w-4 h-4" />
+              </button>
             )}
 
             {/* Simulated Brightness Overlay */}
@@ -732,10 +976,17 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <div className="flex flex-col text-left">
-                    <span className="font-bold text-white text-xs md:text-sm truncate max-w-[200px] md:max-w-xs text-left">
-                      {movie.title}
-                    </span>
-                    {currentPlayingEpisodeTitle && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white text-xs md:text-sm truncate max-w-[200px] md:max-w-xs text-left">
+                        {movie.title}
+                      </span>
+                      {isPlayingTrailer && (
+                        <span className="px-1.5 py-0.5 bg-yellow-500 text-black text-[9px] font-extrabold rounded uppercase tracking-wider shrink-0 select-none">
+                          Trailer
+                        </span>
+                      )}
+                    </div>
+                    {currentPlayingEpisodeTitle && !isPlayingTrailer && (
                       <span className="text-[10px] text-zinc-450 font-medium text-left">
                         {currentPlayingEpisodeTitle}
                       </span>
@@ -757,19 +1008,28 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     <MessageSquare className="w-5 h-5" />
                   </button> */}
                   <button
+                    onClick={toggleCC}
+                    className={`focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700 ${
+                      currentSubtitleTrack !== -1 ? "text-yellow-500 font-bold" : "text-white"
+                    }`}
+                    title="Toggle Captions"
+                  >
+                    <Subtitles className="w-5 h-5" />
+                  </button>
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSettingsOverlay(true);
                       setActiveSettingTab('quality');
                     }}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                    className="focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700"
                     title="Settings"
                   >
                     <Settings className="w-5 h-5" />
                   </button>
                   <button
                     onClick={toggleFullscreen}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                    className="focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700"
                     title="Fullscreen"
                   >
                     {isFullscreen ? <Minimize className="w-5 h-5" /> : <Maximize className="w-5 h-5" />}
@@ -788,7 +1048,11 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     value={brightness}
                     onChange={(e) => setBrightness(Number(e.target.value))}
                     className="w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
-                    style={{ WebkitAppearance: 'slider-vertical' } as any}
+                    style={{
+                      appearance: 'slider-vertical',
+                      WebkitAppearance: 'none',
+                      writingMode: 'bt-lr'
+                    } as any}
                     {...{ orient: "vertical" }}
                   />
                 </div>
@@ -821,7 +1085,11 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
                     className="w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
-                    style={{ WebkitAppearance: 'slider-vertical' } as any}
+                    style={{
+                      appearance: 'slider-vertical',
+                      WebkitAppearance: 'none',
+                      writingMode: 'bt-lr'
+                    } as any}
                     {...{ orient: "vertical" }}
                   />
                 </div>
@@ -974,12 +1242,15 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Tabs defaultValue="quality" value={activeSettingTab} onValueChange={(val) => setActiveSettingTab(val as any)} className="w-full flex flex-col flex-1 min-h-0">
-                    <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
-                      <TabsTrigger value="quality" className="rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center">
+                    <TabsList className="grid grid-cols-3 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
+                      <TabsTrigger value="quality" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
                         Quality
                       </TabsTrigger>
-                      <TabsTrigger value="speed" className="rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center">
+                      <TabsTrigger value="speed" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
                         Speed
+                      </TabsTrigger>
+                      <TabsTrigger value="subtitles" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
+                        Subtitles
                       </TabsTrigger>
                     </TabsList>
 
@@ -1002,7 +1273,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                     handleQualityChange(q.id);
                                     setShowSettingsOverlay(false);
                                   }}
-                                  className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
+                                  className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
                                 >
                                   <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
                                   <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-400"}>{label}</span>
@@ -1025,7 +1296,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                     setCurrentQuality(opt.id);
                                     setShowSettingsOverlay(false);
                                   }}
-                                  className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
+                                  className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
                                 >
                                   <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
                                   <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>{opt.label}</span>
@@ -1047,7 +1318,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                   handleSpeedChange(sp);
                                   setShowSettingsOverlay(false);
                                 }}
-                                className="flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left"
+                                className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
                               >
                                 <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
                                 <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
@@ -1058,51 +1329,93 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                           })}
                         </div>
                       </TabsContent>
+
+                      <TabsContent value="subtitles" className="mt-0 outline-none w-full">
+                        <div className="flex flex-col gap-1 w-full text-zinc-350">
+                          <button
+                            onClick={() => {
+                              handleSubtitleChange(-1);
+                              setShowSettingsOverlay(false);
+                            }}
+                            className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
+                          >
+                            <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${currentSubtitleTrack === -1 ? "opacity-100" : "opacity-0"}`}>✓</span>
+                            <span className={currentSubtitleTrack === -1 ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
+                              Off
+                            </span>
+                          </button>
+
+                          {subtitleTracks.map((track) => {
+                            const isActive = currentSubtitleTrack === track.id;
+                            return (
+                              <button
+                                key={track.id}
+                                onClick={() => {
+                                  handleSubtitleChange(track.id);
+                                  setShowSettingsOverlay(false);
+                                }}
+                                className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
+                              >
+                                <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
+                                  {track.name}
+                                </span>
+                              </button>
+                            );
+                          })}
+
+                          {subtitleTracks.length === 0 && (
+                            <div className="text-zinc-500 text-xs py-4 text-center font-sans">
+                              No subtitles available
+                            </div>
+                          )}
+                        </div>
+                      </TabsContent>
                     </div>
                   </Tabs>
 
-      {/* Footer bar */}
-      <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-1.5 shrink-0">
-        <div>
-          {!isOnline && (
-            <span className="flex items-center gap-1 text-red-400">
-              <WifiOff className="w-3 h-3" />
-              Offline
-            </span>
-          )}
-        </div>
+                  {/* Footer bar */}
+                  <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-1.5 shrink-0">
+                    <div>
+                      {!isOnline && (
+                        <span className="flex items-center gap-1 text-red-400">
+                          <WifiOff className="w-3 h-3" />
+                          Offline
+                        </span>
+                      )}
+                    </div>
 
-        <div className="flex items-center gap-2 sm:gap-6 shrink-0">
-          <button
-            onClick={() => setShowSettingsOverlay(false)}
-            className="p-1 rounded-full bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center justify-center"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    </div>
+                    <div className="flex items-center gap-2 sm:gap-6 shrink-0">
+                      <button
+                        onClick={() => setShowSettingsOverlay(false)}
+                        className="p-1 rounded-full bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center justify-center"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
 
-{/* Feedback / Rating Overlay Modal */ }
-<FeedbackModal
-  isOpen={showFeedbackOverlay}
-  onClose={() => {
-    setShowFeedbackOverlay(false);
-    onExit();
-  }}
-  onSubmitSuccess={() => {
-    setShowFeedbackOverlay(false);
-    if (onFeedbackSubmitted) {
-      onFeedbackSubmitted();
-    }
-    onExit();
-  }}
-  movieId={movie.id}
-  movieTitle={movie.title}
-  userId={userId}
-/>
+            {/* Feedback / Rating Overlay Modal */}
+            <FeedbackModal
+              isOpen={showFeedbackOverlay}
+              onClose={() => {
+                setShowFeedbackOverlay(false);
+                onExit();
+              }}
+              onSubmitSuccess={() => {
+                setShowFeedbackOverlay(false);
+                if (onFeedbackSubmitted) {
+                  onFeedbackSubmitted();
+                }
+                onExit();
+              }}
+              movieId={movie.id}
+              movieTitle={movie.title}
+              userId={userId}
+            />
           </>
         )}
       </div >

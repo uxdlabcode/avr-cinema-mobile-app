@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Play, Plus, ChevronRight, ChevronLeft, Volume2, VolumeX, X, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -145,7 +146,8 @@ const MediaCategoryRow = ({
           {list.map((item) => (
             <div
               key={item.id}
-              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
+              tabIndex={0}
+              className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
               onClick={() => navigate(`/video/${item.id}`)}
             >
               <img
@@ -400,6 +402,7 @@ export const HomePage = () => {
         try {
           await deleteDocument("my_list", docId);
           setWatchlist(prev => prev.filter(id => id !== movieId.toString()));
+          toast.success("Removed from wishlist");
         } catch (err) {
           console.error("Error removing from watchlist:", err);
         }
@@ -411,14 +414,15 @@ export const HomePage = () => {
             movieId: movieId.toString(),
             addedAt: new Date(),
             title: movieData.title,
-            image: movieData.image,
-            category: movieData.category,
-            year: movieData.releaseYear,
-            rating: movieData.ageRating,
+            image: movieData.image || movieData.signedThumbnailUrl || movieData.thumbnailUrl || "/assets/poster.png",
+            category: movieData.category || "Movie",
+            year: movieData.releaseYear || movieData.year || "2026",
+            rating: movieData.ageRating || movieData.rating || "U/A 13+",
             duration: movieData.duration || "N/A"
           };
           await createDocument("my_list", docId, payload);
           setWatchlist(prev => [...prev, movieId.toString()]);
+          toast.success("Added to wishlist");
         } catch (err) {
           console.error("Error adding to watchlist:", err);
         }
@@ -429,8 +433,10 @@ export const HomePage = () => {
         let updatedList;
         if (isCurrentlyIn) {
           updatedList = localList.filter((id: string) => id !== movieId.toString());
+          toast.success("Removed from wishlist");
         } else {
           updatedList = [...localList, movieId.toString()];
+          toast.success("Added to wishlist");
         }
         localStorage.setItem("avr_my_list", JSON.stringify(updatedList));
         setWatchlist(updatedList);
@@ -583,7 +589,7 @@ export const HomePage = () => {
                           e.stopPropagation();
                           navigate(`/video/${movie.id}`);
                         }}
-                        className="flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
+                        className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full outline-none"
                       >
                         <Play className="w-4 h-4 fill-current text-black" />
                         <span>Play</span>
@@ -595,9 +601,13 @@ export const HomePage = () => {
                           e.stopPropagation();
                           toggleWatchlist(movie.id, movie);
                         }}
-                        className="flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
+                        className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm outline-none"
                       >
-                        <Plus className="w-4 h-4 mr-1 text-primary  " />
+                        {watchlist.includes(movie.id.toString()) ? (
+                          <Check className="w-4 h-4 mr-1 text-[#DECB94]" />
+                        ) : (
+                          <Plus className="w-4 h-4 mr-1 text-primary" />
+                        )}
                         <span>{watchlist.includes(movie.id.toString()) ? "In My List" : "My List"}</span>
                       </Button>
                     </div>
@@ -646,7 +656,7 @@ export const HomePage = () => {
                               e.stopPropagation();
                               navigate(`/video/${movie.id}`);
                             }}
-                            className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                            className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px] outline-none"
                           >
                             <Play className="w-4 h-4 fill-current text-black" />
                             <span>Play</span>
@@ -658,7 +668,7 @@ export const HomePage = () => {
                               e.stopPropagation();
                               setExpandedMovieId(movie.id);
                             }}
-                            className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
+                            className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px] outline-none"
                           >
                             <span>More Info</span>
                           </Button>
@@ -668,10 +678,14 @@ export const HomePage = () => {
                               e.stopPropagation();
                               toggleWatchlist(movie.id, movie);
                             }}
-                            className="text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                            className="focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none rounded px-2 py-1 outline-none"
                           >
                             <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
-                              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                              {watchlist.includes(movie.id.toString()) ? (
+                                <Check className="w-3.5 h-3.5 stroke-[3] text-[#DECB94]" />
+                              ) : (
+                                <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                              )}
                             </div>
                             <span>{watchlist.includes(movie.id.toString()) ? "In My List" : "Add to My List"}</span>
                           </button>
@@ -726,7 +740,7 @@ export const HomePage = () => {
                               e.stopPropagation();
                               navigate(`/video/${movie.id}`);
                             }}
-                            className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                            className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md outline-none"
                           >
                             <Play className="w-4 h-4 fill-current text-black" />
                             <span>Resume S1 E1</span>
@@ -738,10 +752,14 @@ export const HomePage = () => {
                               e.stopPropagation();
                               toggleWatchlist(movie.id, movie);
                             }}
-                            className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
+                            className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold outline-none"
                           >
                             <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
-                              <Plus className="w-3 h-3 stroke-[2.5]" />
+                              {watchlist.includes(movie.id.toString()) ? (
+                                <Check className="w-3 h-3 stroke-[2.5] text-[#DECB94]" />
+                              ) : (
+                                <Plus className="w-3 h-3 stroke-[2.5]" />
+                              )}
                             </div>
                             <span>{watchlist.includes(movie.id.toString()) ? "In My List" : "Add to My List"}</span>
                           </Button>
@@ -756,7 +774,7 @@ export const HomePage = () => {
                               setExpandedMovieId(null);
                               setShowFullDescription(false);
                             }}
-                            className="absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                            className="focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30 outline-none"
                             title="Close info panel"
                           >
                             <X className="w-3.5 h-3.5" />
@@ -879,7 +897,7 @@ export const HomePage = () => {
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          <button
+          {/* <button
             onClick={(e) => {
               e.stopPropagation();
               setIsMuted(!isMuted);
@@ -888,7 +906,7 @@ export const HomePage = () => {
             aria-label={isMuted ? "Unmute overview theme" : "Mute overview theme"}
           >
             {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
+          </button> */}
         </div>
       </Carousel>
 
@@ -898,13 +916,13 @@ export const HomePage = () => {
         <RecentWatch />
 
         {/* Trending Now Row */}
-        <TrendNow />
+        <TrendNow watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
 
         {/* Recent TV Shows Row */}
-        <RecentTVShows />
+        <RecentTVShows watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
 
         {/* Documentaries Row */}
-        <DocumentaryList />
+        <DocumentaryList watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
 
         {/* Dynamic Genre Rows */}
         {Object.keys(groupedMedia).map((genreName) => {

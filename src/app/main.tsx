@@ -7,11 +7,15 @@ import { store } from "@/store";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 
+import { SpatialNavigationProvider } from "@/components/SpatialNavigation/SpatialNavigationProvider";
+
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <BrowserRouter>
       <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
-        <App />
+        <SpatialNavigationProvider>
+          <App />
+        </SpatialNavigationProvider>
         <Toaster position="top-right" />
       </ThemeProvider>
     </BrowserRouter>

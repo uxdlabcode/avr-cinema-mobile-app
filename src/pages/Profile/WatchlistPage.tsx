@@ -1,17 +1,105 @@
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronLeft, ArrowLeft, Bookmark, Play } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { db } from "@/Firebase/firebase";
+import { getSignedUrl } from "@/Firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const WatchlistSkeleton = () => (
+  <div className="min-h-screen flex flex-col bg-background pb-24 md:pb-16">
+    {/* MOBILE Header Skeleton */}
+    <div className="md:hidden fixed top-0 left-0 right-0 w-full z-50 bg-background border-b border-border">
+      <div className="flex items-center gap-4 p-4">
+        <Skeleton className="w-9 h-9 rounded-full" />
+        <Skeleton className="h-6 w-32" />
+      </div>
+    </div>
+
+    {/* DESKTOP Header Skeleton */}
+    <div className="hidden md:block mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
+      <div className="flex items-center gap-4 mb-2">
+        <Skeleton className="w-10 h-10 rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+      </div>
+      <div className="h-px bg-border mt-4" />
+    </div>
+
+    {/* Grid Skeleton */}
+    <div className="mx-auto w-full px-4 md:px-6 lg:px-10 xl:px-16 pt-24 md:pt-8">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 md:gap-5">
+        {Array.from({ length: 14 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-2">
+            <Skeleton className="aspect-[2/3] w-full rounded-xl" />
+            <Skeleton className="h-3 md:h-4 w-3/4 rounded mt-1 self-center" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 export const WatchlistPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as { title: string; items: any[] } | null;
+  const user = useSelector((s: RootState) => s.auth.user);
 
-  if (!state || !state.items) {
+  const [items, setItems] = useState<any[]>(state?.items ?? []);
+  const [title, setTitle] = useState(state?.title ?? "Watchlist");
+  const [loading, setLoading] = useState(!state);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (state) return; // already loaded from state
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchWatchlist = async () => {
+      try {
+        const q = query(collection(db, "my_list"), where("userId", "==", user.id));
+        const querySnapshot = await getDocs(q);
+        const fetchedItems: any[] = [];
+        for (const d of querySnapshot.docs) {
+          const itemData = d.data();
+          if (itemData.image) {
+            try {
+              itemData.image = await getSignedUrl(itemData.image);
+            } catch {
+              // fallback
+            }
+          }
+          fetchedItems.push({ id: d.id, ...itemData });
+        }
+        setItems(fetchedItems);
+      } catch (err) {
+        console.error("Error fetching watchlist:", err);
+        setError("Failed to load watchlist. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWatchlist();
+  }, [user?.id, state]);
+
+  if (loading) {
+    return <WatchlistSkeleton />;
+  }
+
+  if (error) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground mb-4">No data found.</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={() => navigate(-1)}
           className="rounded-lg font-semibold"
@@ -22,7 +110,6 @@ export const WatchlistPage = () => {
     );
   }
 
-  const { title, items } = state;
   const isContinueWatching = items.some((item) => "progress" in item);
 
   return (
@@ -44,27 +131,18 @@ export const WatchlistPage = () => {
       </div>
 
       {/* ═══ DESKTOP Header (inline) ═══ */}
-      <div className="hidden md:block  mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
+      <div className="hidden md:block mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
         <div className="flex items-center gap-4 mb-2">
           <Button
             variant="outline"
             size="icon"
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-xl border-border"
+            className="focusable w-10 h-10 rounded-xl border-border outline-none"
             id="watchlist-back-desktop"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
           </Button>
           <div className="flex items-center gap-3">
-            <div className="">
-              {isContinueWatching ? (
-                // <Play className="w-5 h-5 text-primary" />
-                ""
-              ) : (
-                // <Bookmark className="w-5 h-5 text-primary" />
-                ""
-              )}
-            </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">{title}</h1>
               <p className="text-sm text-muted-foreground">
@@ -126,13 +204,12 @@ export const WatchlistPage = () => {
       </div>
 
       {/* ═══ DESKTOP Grid ═══ */}
-      <div className="hidden md:block  mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
+      <div className="hidden md:block mx-auto w-full px-6 lg:px-10 xl:px-16 pt-8">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground gap-3">
             {isContinueWatching ? (
               <Play className="w-12 h-12 opacity-30" />
             ) : (
-              // <Bookmark className="w-12 h-12 opacity-30" />
               ""
             )}
             <p className="text-lg">{title} is empty</p>
@@ -149,7 +226,8 @@ export const WatchlistPage = () => {
               return (
                 <Card
                   key={item.id}
-                  className="relative aspect-[2/3] w-full overflow-hidden cursor-pointer group border-border shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 bg-card p-0 gap-0"
+                  tabIndex={0}
+                  className="focusable relative aspect-[2/3] w-full overflow-hidden cursor-pointer group border-border shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 bg-card p-0 gap-0 outline-none"
                   onClick={() => navigate(`/video/${movieId}`)}
                 >
                   <img

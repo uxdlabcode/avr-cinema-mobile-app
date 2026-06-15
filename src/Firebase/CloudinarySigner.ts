@@ -5,18 +5,24 @@
 export async function getSignedUrl(rawUrl: string): Promise<string> {
   if (!rawUrl) return "";
 
-  // If the URL is already signed or not authenticated, return it as-is
-  if (rawUrl.includes("/s--") || !rawUrl.includes("/authenticated/")) {
+  // Decode the URL in case it contains URL-encoded characters (like %20, %2F, etc.)
+  const decodedUrl = decodeURIComponent(rawUrl);
+
+  // If the URL is not authenticated, return it as-is
+  if (!decodedUrl.includes("/authenticated/")) {
     return rawUrl;
   }
 
   try {
-    const marker = "/authenticated/";
-    const markerIndex = rawUrl.indexOf(marker);
-    if (markerIndex === -1) return rawUrl;
+    // Decode/strip any existing Cloudinary signature segment like "s--.../" or "s--...--/" right after "authenticated/"
+    const cleanUrl = decodedUrl.replace(/\/authenticated\/s--[^/]*\//, "/authenticated/");
 
-    const basePath = rawUrl.substring(0, markerIndex + marker.length);
-    const pathParams = rawUrl.substring(markerIndex + marker.length);
+    const marker = "/authenticated/";
+    const markerIndex = cleanUrl.indexOf(marker);
+    if (markerIndex === -1) return cleanUrl;
+
+    const basePath = cleanUrl.substring(0, markerIndex + marker.length);
+    const pathParams = cleanUrl.substring(markerIndex + marker.length);
 
     // Concatenate the path part with the API secret
     const apiSecret = import.meta.env.VITE_CLOUDINARY_API_SECRET || "";

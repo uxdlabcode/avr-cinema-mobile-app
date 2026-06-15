@@ -36,16 +36,18 @@ const getCategoryColor = (category: string): string => {
   return "bg-amber-500/15 text-amber-400 border-amber-500/20";
 };
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 // ── Skeleton ──────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
-  <div className="animate-pulse bg-white/5 rounded-2xl p-4 flex gap-4 items-center border border-white/5">
-    <div className="w-12 h-12 rounded-xl bg-white/10 shrink-0" />
+  <div className="bg-card border border-border rounded-2xl p-4 flex gap-4 items-center">
+    <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
     <div className="flex-1 space-y-2">
-      <div className="h-4 bg-white/10 rounded w-3/4" />
-      <div className="h-3 bg-white/10 rounded w-full" />
+      <Skeleton className="h-4 rounded w-3/4" />
+      <Skeleton className="h-3 rounded w-full" />
       <div className="flex gap-2 mt-2">
-        <div className="h-5 w-20 bg-white/10 rounded-full" />
-        <div className="h-5 w-16 bg-white/10 rounded-full" />
+        <Skeleton className="h-5 w-20 rounded-full" />
+        <Skeleton className="h-5 w-16 rounded-full" />
       </div>
     </div>
   </div>
@@ -59,7 +61,7 @@ const QuizCard = ({ quiz, onClick }: { quiz: Quiz; onClick: () => void }) => {
     <button
       id={`quiz-card-${quiz.id}`}
       onClick={onClick}
-      className="w-full text-left flex items-center gap-4 p-4 bg-card border border-border rounded-2xl hover:border-primary/30 hover:bg-foreground/[0.03] transition-all active:scale-[0.98] group"
+      className="focusable w-full text-left flex items-center gap-4 p-4 bg-card border border-border rounded-2xl hover:border-primary/30 hover:bg-foreground/[0.03] transition-all active:scale-[0.98] group outline-none"
     >
       <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/15">
         <Trophy className="w-5 h-5 text-primary" />
@@ -210,7 +212,7 @@ export const QuizzesPage = () => {
                   navigate("/dashboard");
                 }
               }}
-              className="w-10 h-10 rounded-xl border-border"
+              className="focusable w-10 h-10 rounded-xl border-border outline-none"
             >
               <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
             </Button>
@@ -243,7 +245,7 @@ export const QuizzesPage = () => {
           <div className="relative flex-1 hap-3 max-w-sm">
             {/* <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /> */}
             <Input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search quizzes..."
-              className="w-full h-11 "
+              className="focusable w-full h-11 focus:bg-zinc-800"
             />
           </div>
           {!loading && categories.length > 1 && (
@@ -253,7 +255,7 @@ export const QuizzesPage = () => {
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   variant={selectedCategory === cat ? "default" : "outline"}
-                  className={`rounded-lg text-sm font-semibold text-secondary  h-auto py-2 px-4 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-card" : ""}`}
+                  className={`focusable rounded-lg text-sm font-semibold text-secondary  h-auto py-2 px-4 outline-none ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground hover:bg-card" : ""}`}
                 >{cat}</Button>
               ))}
             </div>

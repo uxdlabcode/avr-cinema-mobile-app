@@ -216,7 +216,7 @@ export const ProfilePage = () => {
           <Button
             variant="secondary"
             onClick={() => navigate("/update-profile")}
-            className="rounded-xl flex items-center gap-2 px-4 py-2 bg-muted text-foreground hover:bg-muted/80"
+            className="focusable rounded-xl flex items-center gap-2 px-4 py-2 bg-muted text-foreground hover:bg-muted/80 outline-none"
             id="edit-profile-btn-desktop"
           >
             <Pencil className="w-3.5 h-3.5" />
@@ -240,7 +240,7 @@ export const ProfilePage = () => {
             size="sm"
             onClick={() => navigate("/upgrade-plan")}
             id="upgrade-btn-desktop"
-            className="rounded-full border-primary text-primary-foreground hover:bg-primary-foreground h-8 px-4 text-xs"
+            className="focusable rounded-full border-primary text-primary-foreground hover:text-primary-foreground hover:bg-primary-foreground h-8 px-4 text-xs outline-none"
           >
             Upgrade
           </Button>
@@ -256,7 +256,7 @@ export const ProfilePage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/support")}
-            className="w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none"
+            className="focusable w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none outline-none"
             id="get-support-btn-desktop"
           >
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -272,7 +272,7 @@ export const ProfilePage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/notifications")}
-            className="hidden w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none"
+            className="focusable hidden w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none outline-none"
             id="notifications-btn-desktop"
           >
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
@@ -288,7 +288,7 @@ export const ProfilePage = () => {
           <Button
             variant="ghost"
             onClick={() => setShowLogoutModal(true)}
-            className="w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none hover:bg-destructive/5"
+            className="focusable w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none hover:bg-destructive/5 outline-none"
             id="logout-btn-desktop"
           >
             <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:bg-destructive/20 transition-colors">
@@ -326,7 +326,7 @@ export const ProfilePage = () => {
             <Button
               variant="link"
               onClick={() => navigate("/profile/watchlist", { state: { title: "Watchlist", items: watchlist } })}
-              className="text-primary p-0 h-auto gap-1 font-medium hover:underline"
+              className="focusable text-primary p-0 h-auto gap-1 font-medium hover:underline outline-none"
             >
               View All <ChevronRight className="w-4 h-4" />
             </Button>
@@ -340,7 +340,8 @@ export const ProfilePage = () => {
               watchlist.slice(0, 10).map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col gap-2 cursor-pointer group"
+                  tabIndex={0}
+                  className="focusable flex flex-col gap-2 cursor-pointer group outline-none"
                   onClick={() => navigate(`/video/${item.movieId}`)}
                 >
                   <div className="aspect-[2/3] rounded-xl overflow-hidden bg-muted relative">
@@ -383,7 +384,7 @@ export const ProfilePage = () => {
             <Button
               variant="link"
               onClick={() => navigate("/profile/watchlist", { state: { title: "Continue Watching", items: continueWatching } })}
-              className="text-primary p-0 h-auto gap-1 font-medium hover:underline"
+              className="focusable text-primary p-0 h-auto gap-1 font-medium hover:underline outline-none"
             >
               View All <ChevronRight className="w-4 h-4" />
             </Button>
@@ -402,7 +403,8 @@ export const ProfilePage = () => {
               continueWatching.slice(0, 10).map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col gap-2 cursor-pointer group"
+                  tabIndex={0}
+                  className="focusable flex flex-col gap-2 cursor-pointer group outline-none"
                   onClick={() => navigate(`/video/${item.movieId}`)}
                 >
                   <div className="relative aspect-video rounded-xl overflow-hidden bg-muted">
@@ -459,7 +461,8 @@ export const ProfilePage = () => {
                 return (
                   <div
                     key={quiz.id}
-                    className="flex items-center gap-4 p-4 bg-muted/30 border border-border rounded-xl cursor-pointer hover:border-primary/30 hover:bg-muted/50 transition-all group"
+                    tabIndex={0}
+                    className="focusable flex items-center gap-4 p-4 bg-muted/30 border border-border rounded-xl cursor-pointer hover:border-primary/30 hover:bg-muted/50 transition-all group outline-none"
                     onClick={() => navigate(`/quizzes/${quiz.id}`)}
                   >
                     <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/15">
@@ -504,7 +507,7 @@ export const ProfilePage = () => {
           <Button
             variant="outline"
             onClick={() => setShowDeleteModal(true)}
-            className="w-full justify-start gap-4 p-4 h-auto rounded-lg text-left group border-border hover:bg-muted/50"
+            className="focusable w-full justify-start gap-4 p-4 h-auto rounded-lg text-left group border-border hover:bg-muted/50 outline-none"
             id="delete-account-btn-desktop-content"
           >
             <div className="shrink-0 w-10 h-10 rounded-lg bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">

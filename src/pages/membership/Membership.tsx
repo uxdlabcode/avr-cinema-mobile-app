@@ -19,6 +19,7 @@ import { CheckCircle2, MonitorSmartphone, X, Crown, ShieldCheck, AlertTriangle }
 import { MembershipSkeleton } from "./MembershipSkeleton";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { isTvPlatform } from "@/lib/tvUtils";
 
 interface Plan {
     id: string;
@@ -46,6 +47,36 @@ export default function Membership() {
     const { Razorpay } = useRazorpay();
 
     const isSuccess = searchParams.get("success") === "true";
+    const isTV = isTvPlatform();
+    const [checkoutPlan, setCheckoutPlan] = useState<Plan | null>(null);
+
+    // If loaded on mobile with parameters (e.g. from scanning TV QR code), trigger payment flow automatically
+    useEffect(() => {
+        const selectPlanId = searchParams.get("selectPlan");
+        const cycle = searchParams.get("cycle") || "monthly";
+        
+        if (selectPlanId && plans.length > 0 && user) {
+            const plan = plans.find(p => p.id === selectPlanId);
+            if (plan) {
+                // Clear search params so it doesn't loop
+                setSearchParams({});
+                setBillingCycle(cycle as "monthly" | "yearly");
+                // Trigger select plan after a small timeout to let SDK render
+                setTimeout(() => {
+                    handleSelectPlan(plan);
+                }, 800);
+            }
+        }
+    }, [plans, searchParams, user]);
+
+    // On TV, watch user membership status to automatically mark success once paid on phone
+    useEffect(() => {
+        if (isTV && user?.membershipStatus === "active" && checkoutPlan) {
+            toast.success("Payment completed successfully! 🎉");
+            setSearchParams({ success: "true" });
+            setCheckoutPlan(null);
+        }
+    }, [user?.membershipStatus, isTV, checkoutPlan]);
 
     useEffect(() => {
         dispatch(setLoading(true));
@@ -75,7 +106,13 @@ export default function Membership() {
 
         if (!user) {
             toast.error("Please sign in to subscribe");
-            navigate("/login");
+            navigate("/signin"); // Modified to /signin to match router
+            return;
+        }
+
+        if (isTV) {
+            // TV mode: open QR code overlay
+            setCheckoutPlan(plan);
             return;
         }
 
@@ -227,7 +264,7 @@ export default function Membership() {
             {/* Skip Button */}
             <button
                 onClick={handleSkip}
-                className="absolute top-6 right-6 text-primary font-medium text-sm transition-colors z-10 flex items-center gap-1 "
+                className="focusable absolute top-6 right-6 text-primary font-medium text-sm transition-colors z-10 flex items-center gap-1 focus:bg-zinc-800 focus:scale-105 px-3 py-1.5 rounded-lg border border-transparent focus:border-zinc-700 outline-none"
             >
                 Skip
             </button>
@@ -261,22 +298,15 @@ export default function Membership() {
                         >
                             <ToggleGroupItem
                                 value="monthly"
-                                className="rounded-md px-5 !py-1 text-sm font-semibold cursor-pointer data-[state=on]:bg-primary data-[state=on]:text-secondary text-zinc-400 hover:text-white hover:bg-transparent data-[state=on]:hover:bg-primary transition-all"
+                                className="focusable rounded-md px-5 !py-1 text-sm font-semibold cursor-pointer data-[state=on]:bg-primary data-[state=on]:text-secondary text-zinc-400 hover:text-white hover:bg-transparent data-[state=on]:hover:bg-primary transition-all focus:bg-zinc-800"
                             >
                                 Monthly
                             </ToggleGroupItem>
                             <ToggleGroupItem
                                 value="yearly"
-                                className="rounded-md px-5 text-sm font-semibold cursor-pointer data-[state=on]:bg-primary data-[state=on]:text-secondary text-zinc-400 hover:text-white hover:bg-transparent data-[state=on]:hover:bg-primary transition-all flex items-center gap-1.5"
+                                className="focusable rounded-md px-5 text-sm font-semibold cursor-pointer data-[state=on]:bg-primary data-[state=on]:text-secondary text-zinc-400 hover:text-white hover:bg-transparent data-[state=on]:hover:bg-primary transition-all flex items-center gap-1.5 focus:bg-zinc-800"
                             >
                                 Annually
-                                {/* <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase transition-all ${
-                                    billingCycle === "yearly"
-                                        ? "bg-secondary text-primary font-black"
-                                        : "bg-green-500/20 text-green-400 border border-green-500/30"
-                                }`}>
-                                    Save up to 33%
-                                </span> */}
                             </ToggleGroupItem>
                         </ToggleGroup>
                     </div>
@@ -385,7 +415,7 @@ export default function Membership() {
 
                                     <CardFooter className="pt-6 border-t border-zinc-800/40 flex flex-col gap-3">
                                         <Button
-                                            className="w-full bg-primary-foreground text-secondary hover:bg-primary-foreground/90 font-bold h-10 cursor-pointer text-sm"
+                                            className="focusable w-full bg-primary-foreground text-secondary hover:bg-primary-foreground/90 font-bold h-10 cursor-pointer text-sm focus:bg-[#DECB94]/85 focus:scale-102 outline-none"
                                             onClick={() => handleSelectPlan(plan)}
                                             disabled={!!localLoadingPlan}
                                         >
@@ -424,7 +454,7 @@ export default function Membership() {
                                         value={plan.id}
                                         className={plan.popular ? "border-primary/50 relative" : ""}
                                     >
-                                        <AccordionTrigger className="hover:no-underline">
+                                        <AccordionTrigger className="focusable hover:no-underline focus:bg-zinc-800 rounded px-2 outline-none">
                                             <div className="flex items-center justify-between w-full text-left pr-4">
                                                 <div className="flex flex-col">
                                                     <div className="flex items-center gap-2">
@@ -491,7 +521,7 @@ export default function Membership() {
 
                                                 <div className="pt-6 border-t border-zinc-800/50">
                                                     <Button
-                                                        className="w-full bg-primary-foreground text-secondary hover:bg-primary-foreground/90 font-bold h-10 cursor-pointer"
+                                                        className="focusable w-full bg-primary-foreground text-secondary hover:bg-primary-foreground/90 font-bold h-10 cursor-pointer focus:bg-[#DECB94]/85 focus:scale-102 outline-none"
                                                         onClick={() => handleSelectPlan(plan)}
                                                         disabled={!!localLoadingPlan}
                                                     >
@@ -526,6 +556,52 @@ export default function Membership() {
                     </>
                 )}
             </div>
+
+            {/* TV Mode QR Code Checkout Overlay */}
+            {isTV && checkoutPlan && (
+                <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 animate-in fade-in duration-200">
+                    <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 flex flex-col items-center gap-6 shadow-2xl relative">
+                        {/* Close button */}
+                        <button
+                            onClick={() => setCheckoutPlan(null)}
+                            className="focusable absolute top-4 right-4 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 rounded-full border border-transparent focus:border-zinc-700 outline-none"
+                            aria-label="Close"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                        
+                        <Crown className="w-12 h-12 text-[#DECB94] animate-pulse" />
+                        
+                        <div className="text-center space-y-2">
+                            <h2 className="text-xl font-bold text-white">Subscribe on Your Phone</h2>
+                            <p className="text-sm text-zinc-400">
+                                You have selected the <span className="text-primary font-bold">{checkoutPlan.name}</span> plan ({billingCycle}).
+                            </p>
+                        </div>
+
+                        {/* QR Code Container */}
+                        <div className="bg-white p-5 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300">
+                            <img
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
+                                    window.location.origin + "/membership?selectPlan=" + checkoutPlan.id + "&cycle=" + billingCycle
+                                )}`}
+                                alt="Checkout QR Code"
+                                className="w-[180px] h-[180px]"
+                            />
+                        </div>
+
+                        <div className="text-center space-y-3">
+                            <p className="text-xs text-zinc-500 max-w-xs leading-relaxed">
+                                Scan this QR code with your mobile camera to finish the Razorpay checkout securely on your phone.
+                            </p>
+                            <div className="flex items-center justify-center gap-2 text-xs text-[#DECB94] bg-[#DECB94]/10 py-2 px-4 rounded-xl border border-[#DECB94]/20">
+                                <span className="w-2 h-2 rounded-full bg-green-500 animate-ping" />
+                                Waiting for phone payment to complete...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Plus, Tv } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Check, Tv } from 'lucide-react';
 import { getMatchingData, getSignedUrl } from '@/Firebase';
 
 interface TvShowItem {
@@ -16,9 +16,11 @@ interface TvShowItem {
 
 interface Props {
   isGrid?: boolean;
+  watchlist?: string[];
+  toggleWatchlist?: (movieId: string, movieData: any) => void;
 }
 
-const RecentTVShows: React.FC<Props> = ({ isGrid = false }) => {
+const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggleWatchlist }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<TvShowItem[]>([]);
   const [groupedItems, setGroupedItems] = useState<Record<string, TvShowItem[]>>({});
@@ -177,10 +179,19 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false }) => {
                           Play
                         </button>
                         <button
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (toggleWatchlist) {
+                              toggleWatchlist(show.id, show);
+                            }
+                          }}
                           className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                         >
-                          <Plus className="w-3 h-3" />
+                          {watchlist.includes(show.id.toString()) ? (
+                            <Check className="w-3 h-3 text-[#DECB94]" />
+                          ) : (
+                            <Plus className="w-3 h-3" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -272,10 +283,19 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false }) => {
                     Play
                   </button>
                   <button
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (toggleWatchlist) {
+                        toggleWatchlist(show.id, show);
+                      }
+                    }}
                     className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
-                    <Plus className="w-3 h-3" />
+                    {watchlist.includes(show.id.toString()) ? (
+                      <Check className="w-3 h-3 text-[#DECB94]" />
+                    ) : (
+                      <Plus className="w-3 h-3" />
+                    )}
                   </button>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Plus, Film } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Check, Film } from 'lucide-react';
 import { getMatchingData, getSignedUrl } from '@/Firebase';
 
 interface DocItem {
@@ -18,9 +18,11 @@ interface DocItem {
 
 interface Props {
   isGrid?: boolean;
+  watchlist?: string[];
+  toggleWatchlist?: (movieId: string, movieData: any) => void;
 }
 
-const DocumentaryList: React.FC<Props> = ({ isGrid = false }) => {
+const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], toggleWatchlist }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState<DocItem[]>([]);
   const [groupedItems, setGroupedItems] = useState<Record<string, DocItem[]>>({});
@@ -179,10 +181,19 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false }) => {
                           Play
                         </button>
                         <button
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (toggleWatchlist) {
+                              toggleWatchlist(doc.id, doc);
+                            }
+                          }}
                           className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                         >
-                          <Plus className="w-3 h-3" />
+                          {watchlist.includes(doc.id.toString()) ? (
+                            <Check className="w-3 h-3 text-[#DECB94]" />
+                          ) : (
+                            <Plus className="w-3 h-3" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -274,10 +285,19 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false }) => {
                     Play
                   </button>
                   <button
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (toggleWatchlist) {
+                        toggleWatchlist(doc.id, doc);
+                      }
+                    }}
                     className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
-                    <Plus className="w-3 h-3" />
+                    {watchlist.includes(doc.id.toString()) ? (
+                      <Check className="w-3 h-3 text-[#DECB94]" />
+                    ) : (
+                      <Plus className="w-3 h-3" />
+                    )}
                   </button>
                 </div>
               </div>

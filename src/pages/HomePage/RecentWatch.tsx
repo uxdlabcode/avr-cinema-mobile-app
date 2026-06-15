@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { compoundQuery, getDocumentData, getSignedUrl } from "@/Firebase";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface WatchItem {
   id: string;
@@ -104,9 +105,9 @@ const RecentWatch = () => {
         {loading
           ? // Skeleton placeholders
             Array.from({ length: 3 }).map((_, i) => (
-              <div
+              <Skeleton
                 key={i}
-                className="relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start bg-zinc-800 animate-pulse"
+                className="relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start"
               />
             ))
           : items.map((item) => {
@@ -118,7 +119,8 @@ const RecentWatch = () => {
               return (
                 <div
                   key={item.id}
-                  className="relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start cursor-pointer group"
+                  tabIndex={0}
+                  className="focusable relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start cursor-pointer group outline-none"
                   onClick={() => navigate(`/video/${item.movieId}`)}
                 >
                   <img

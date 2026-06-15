@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { toast } from 'sonner';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
@@ -445,6 +446,7 @@ const VideoDetails = () => {
           await deleteDocument("my_list", docId);
           setIsInMyList(false);
           setMyListIds(prev => prev.filter(id => id !== movieIdStr));
+          toast.success("Removed from wishlist");
         } catch (err) {
           console.error("Error removing from My List in DB:", err);
         }
@@ -465,6 +467,7 @@ const VideoDetails = () => {
           await createDocument("my_list", docId, payload);
           setIsInMyList(true);
           setMyListIds(prev => [...prev, movieIdStr]);
+          toast.success("Added to wishlist");
         } catch (err) {
           console.error("Error adding to My List in DB:", err);
         }
@@ -478,10 +481,12 @@ const VideoDetails = () => {
           myList = myList.filter((item: string) => item !== movieIdStr);
           setIsInMyList(false);
           setMyListIds(prev => prev.filter(id => id !== movieIdStr));
+          toast.success("Removed from wishlist");
         } else {
           myList.push(movieIdStr);
           setIsInMyList(true);
           setMyListIds(prev => [...prev, movieIdStr]);
+          toast.success("Added to wishlist");
         }
         localStorage.setItem('avr_my_list', JSON.stringify(myList));
       } catch (err) {
@@ -508,6 +513,7 @@ const VideoDetails = () => {
           if (itemIdStr === movie.id.toString()) {
             setIsInMyList(false);
           }
+          toast.success("Removed from wishlist");
         } catch (err) {
           console.error("Error removing related item from My List:", err);
         }
@@ -530,6 +536,7 @@ const VideoDetails = () => {
           if (itemIdStr === movie.id.toString()) {
             setIsInMyList(true);
           }
+          toast.success("Added to wishlist");
         } catch (err) {
           console.error("Error adding related item to My List:", err);
         }
@@ -545,12 +552,14 @@ const VideoDetails = () => {
           if (itemIdStr === movie.id.toString()) {
             setIsInMyList(false);
           }
+          toast.success("Removed from wishlist");
         } else {
           myList.push(itemIdStr);
           setMyListIds(prev => [...prev, itemIdStr]);
           if (itemIdStr === movie.id.toString()) {
             setIsInMyList(true);
           }
+          toast.success("Added to wishlist");
         }
         localStorage.setItem('avr_my_list', JSON.stringify(myList));
       } catch (err) {
@@ -578,6 +587,10 @@ const VideoDetails = () => {
           let signedThumb = dbMovie.thumbnailUrl || "";
           if (signedThumb) {
             signedThumb = await signUrl(dbMovie.thumbnailUrl);
+          }
+          let signedTrailerUrl = dbMovie.videoUrl || "";
+          if (signedTrailerUrl) {
+            signedTrailerUrl = await signUrl(dbMovie.videoUrl);
           }
 
           // Map Firestore document structure to UI model and SIGN ALL VIDEO URLs
@@ -634,6 +647,7 @@ const VideoDetails = () => {
             description: dbMovie.description || "",
             category: dbMovie.category,
             movieUrl: dbMovie.movieUrl || dbMovie.videoUrl || "",
+            trailerUrl: signedTrailerUrl || "",
             seasons: mappedSeasons,
             cast: dbMovie.cast ? dbMovie.cast.map((c: any) => ({
               name: c.name,
@@ -722,13 +736,28 @@ const VideoDetails = () => {
     try {
       setIsSigning(true);
       setCurrentPlayingEpisodeTitle(epInfo || "");
-      // Sign the URL if it's not already signed
-      const signed = url.startsWith('http') ? await signUrl(url) : url;
-      setVideoUrlToPlay(signed);
+
+      let finalUrl = url;
+
+      // Only sign if it contains /authenticated/ and doesn't already have a signature
+      if (url.includes("/authenticated/") && !url.includes("s--")) {
+        try {
+          finalUrl = await signUrl(url);
+          console.log("URL signed successfully");
+        } catch (signErr) {
+          console.warn("Failed to sign URL, using original:", signErr);
+          finalUrl = url;
+        }
+      } else if (url.startsWith('http') && !url.includes("/authenticated/")) {
+        // Public URL, use as-is
+        finalUrl = url;
+      }
+
+      setVideoUrlToPlay(finalUrl);
       setForceFullscreen(shouldFullscreen);
       setIsPlaying(true);
     } catch (err) {
-      console.error("Error signing video stream URL:", err);
+      console.error("Error preparing video stream URL:", err);
       setVideoUrlToPlay(url);
       setForceFullscreen(shouldFullscreen);
       setIsPlaying(true);
@@ -855,6 +884,7 @@ const VideoDetails = () => {
               playInline={!forceFullscreen}
               hasAlreadyRated={hasAlreadyRated}
               onFeedbackSubmitted={() => loadFeedbackStats(movie.id)}
+              trailerUrl={movie.trailerUrl}
             />
           ) : (
             <>
@@ -1213,7 +1243,7 @@ const VideoDetails = () => {
                 )}
                 <button
                   onClick={() => setShowFullDescription(false)}
-                  className="text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                  className="focusable text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                 >
                   See Less
                 </button>
@@ -1224,7 +1254,7 @@ const VideoDetails = () => {
                 {movie.description && movie.description.length > 150 && (
                   <button
                     onClick={() => setShowFullDescription(true)}
-                    className="text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors"
+                    className="focusable text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors outline-none"
                   >
                     See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
                   </button>
@@ -1274,7 +1304,7 @@ const VideoDetails = () => {
                   {movie.seasons.length > 1 && (
                     <button
                       onClick={handleViewAllEpisodes}
-                      className="text-xs font-bold text-blue-500 hover:text-blue-400 flex items-center gap-1 cursor-pointer"
+                      className="focusable text-xs font-bold text-blue-500 hover:text-blue-400 flex items-center gap-1 cursor-pointer outline-none"
                     >
                       View All &gt;
                     </button>
@@ -1290,8 +1320,9 @@ const VideoDetails = () => {
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
                   <div
                     key={ep.id}
+                    tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
-                    className="flex-none w-56 sm:w-64 space-y-2 cursor-pointer group"
+                    className="focusable flex-none w-56 sm:w-64 space-y-2 cursor-pointer group outline-none"
                   >
                     {/* Header above card */}
                     <div className="bg-zinc-950 border border-zinc-900 px-3 py-2 rounded-t-md text-left transition-colors group-hover:bg-zinc-900/40">
@@ -1366,12 +1397,13 @@ const VideoDetails = () => {
                 {movie.related.map((item: any) => (
                   <div
                     key={item.id}
+                    tabIndex={0}
                     onClick={() => {
                       setIsPlaying(false);
                       navigate(`/video/${item.id}`);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900"
+                    className="focusable relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 outline-none"
                   >
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300" />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
@@ -1444,6 +1476,7 @@ const VideoDetails = () => {
             playInline={!forceFullscreen}
             hasAlreadyRated={hasAlreadyRated}
             onFeedbackSubmitted={() => loadFeedbackStats(movie.id)}
+            trailerUrl={movie.trailerUrl}
           />
         ) : (
           <>
@@ -1485,7 +1518,7 @@ const VideoDetails = () => {
                     }
                   }}
                   disabled={isSigning}
-                  className="bg-white hover:bg-white/95 text-black font-medium px-8 py-6 lg:py-2 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55"
+                  className="focusable bg-white hover:bg-white/95 text-black font-medium px-8 py-2 lg:py-2 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-55 outline-none"
                 >
                   {isSigning ? (
                     <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -1511,7 +1544,7 @@ const VideoDetails = () => {
                   onClick={handleToggleMyList}
                   disabled={isListToggling}
                   variant="outline"
-                  className="bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-6 lg:py-2 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.02] disabled:opacity-55"
+                  className="focusable bg-zinc-800/40 hover:bg-zinc-700/60 border-zinc-650 text-white font-semibold px-6 py-2 lg:py-2 rounded-md cursor-pointer flex items-center justify-center gap-2 text-base transition-transform hover:scale-[1.02] disabled:opacity-55 outline-none"
                 >
                   {isInMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                   <span>{isInMyList ? "In My List" : "My List"}</span>
@@ -1541,7 +1574,7 @@ const VideoDetails = () => {
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 md:p-6 z-20">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 rounded-full bg-black/50 border border-zinc-900 text-white hover:bg-black/85 hover:border-zinc-700 transition-all cursor-pointer flex items-center justify-center"
+              className="focusable p-2 rounded-full bg-black/50 border border-zinc-900 text-white hover:bg-black/85 hover:border-zinc-700 transition-all cursor-pointer flex items-center justify-center outline-none"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
