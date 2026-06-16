@@ -159,7 +159,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
   return (
     <div className={cn("w-full flex flex-col lg:flex-row gap-10 items-center justify-between", className)}>
-      <form noValidate className="flex-1 flex flex-col gap-6 w-full" onSubmit={handleSubmit} {...props}>
+      <form noValidate className="flex-1 flex flex-col gap-6 w-full" onSubmit={handleSubmit} tabIndex={-1} {...props}>
         <FieldGroup className="gap-6">
           <div className="flex flex-col items-center gap-1 text-center mb-4">
             <img src="/assets/headerLogo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />

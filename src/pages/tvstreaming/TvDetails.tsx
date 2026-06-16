@@ -156,6 +156,7 @@ const MediaCategoryRow = ({
         {/* Left Scroll Button */}
         {showLeft && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
@@ -167,6 +168,7 @@ const MediaCategoryRow = ({
         {/* Right Scroll Button */}
         {showRight && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="absolute right-[-20px] md:right-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
@@ -183,7 +185,8 @@ const MediaCategoryRow = ({
           {list.map((item) => (
             <div
               key={item.id}
-              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
+              tabIndex={0}
+              className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
               onClick={() => navigate(`/video/${item.id}`)}
             >
               <img
@@ -229,6 +232,7 @@ const MediaCategoryRow = ({
                       e.stopPropagation();
                       navigate(`/video/${item.id}`);
                     }}
+                    tabIndex={-1}
                     className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                   >
                     Play Now
@@ -240,6 +244,7 @@ const MediaCategoryRow = ({
                         toggleWatchlist(item.id, item);
                       }
                     }}
+                    tabIndex={-1}
                     className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
                     {watchlist.includes(item.id.toString()) ? (
@@ -542,7 +547,7 @@ const TvDetails = () => {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-xs font-semibold  transition-colors relative whitespace-nowrap ${activeTab === tab
+            className={`focusable pb-2 text-xs font-semibold  transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 ${activeTab === tab
               ? 'text-primary'
               : 'text-zinc-400 hover:text-white'
               }`}
@@ -577,6 +582,7 @@ const TvDetails = () => {
               return (
                 <CarouselItem
                   key={slide.id}
+                  tabIndex={-1}
                   className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
                   onClick={() => navigate(`/video/${slide.id}`)}
                 >
@@ -624,7 +630,7 @@ const TvDetails = () => {
                             e.stopPropagation();
                             navigate(`/video/${slide.id}`);
                           }}
-                          className="flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
+                          className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
                         >
                           <Play className="w-4 h-4 fill-current text-black" />
                           <span>Play</span>
@@ -636,7 +642,7 @@ const TvDetails = () => {
                             e.stopPropagation();
                             toggleWatchlist(slide.id, slide);
                           }}
-                          className="flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
+                          className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
                         >
                           <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
                           <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "My List"}</span>
@@ -687,7 +693,7 @@ const TvDetails = () => {
                                 e.stopPropagation();
                                 navigate(`/video/${slide.id}`);
                               }}
-                              className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                              className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
@@ -699,7 +705,7 @@ const TvDetails = () => {
                                 e.stopPropagation();
                                 setExpandedShowId(slide.id);
                               }}
-                              className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
+                              className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
                             >
                               <span>More Info</span>
                             </Button>
@@ -709,7 +715,7 @@ const TvDetails = () => {
                                 e.stopPropagation();
                                 toggleWatchlist(slide.id, slide);
                               }}
-                              className="text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                              className="focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
                             >
                               <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                 {watchlist.includes(slide.id.toString()) ? (
@@ -771,7 +777,7 @@ const TvDetails = () => {
                                 e.stopPropagation();
                                 navigate(`/video/${slide.id}`);
                               }}
-                              className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                              className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
@@ -783,7 +789,7 @@ const TvDetails = () => {
                                 e.stopPropagation();
                                 toggleWatchlist(slide.id, slide);
                               }}
-                              className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
+                              className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
                             >
                               <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                 {watchlist.includes(slide.id.toString()) ? (
@@ -805,7 +811,7 @@ const TvDetails = () => {
                                 setExpandedShowId(null);
                                 setShowFullDescription(false);
                               }}
-                              className="absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                              className="focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
                               title="Close info panel"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -853,7 +859,7 @@ const TvDetails = () => {
                                       e.stopPropagation();
                                       setShowFullDescription(false);
                                     }}
-                                    className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                    className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
                                   >
                                     See Less
                                   </button>
@@ -867,7 +873,7 @@ const TvDetails = () => {
                                         e.stopPropagation();
                                         setShowFullDescription(true);
                                       }}
-                                      className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                      className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
                                     >
                                       See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
                                     </button>
@@ -893,6 +899,7 @@ const TvDetails = () => {
               {featuredShows.map((_, index) => (
                 <button
                   key={index}
+                  tabIndex={-1}
                   onClick={() => carouselApi?.scrollTo(index)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
                     ? "w-6 bg-primary"
@@ -907,6 +914,7 @@ const TvDetails = () => {
           {/* Slider Controls (Left, Right arrows) */}
           <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
             <button
+              tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();
                 carouselApi?.scrollPrev();
@@ -918,6 +926,7 @@ const TvDetails = () => {
             </button>
 
             <button
+              tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();
                 carouselApi?.scrollNext();
@@ -935,6 +944,7 @@ const TvDetails = () => {
       {activeTab === 'For You' && tvShows.length > 0 && (
         <section className="px-4 pt-6 space-y-3">
           <h2
+            tabIndex={-1}
             className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors"
             onClick={() => setActiveTab('TV Shows')}
           >
@@ -944,7 +954,8 @@ const TvDetails = () => {
             {tvShows.map((show) => (
               <div
                 key={show.id}
-                className="relative shrink-0 w-48 md:w-56 aspect-video rounded-lg overflow-hidden snap-start cursor-pointer group"
+                tabIndex={0}
+                className="focusable relative shrink-0 w-48 md:w-56 aspect-video rounded-lg overflow-hidden snap-start cursor-pointer group outline-none"
                 onClick={() => navigate(`/video/${show.id}`)}
               >
                 <img src={show.signedThumbnailUrl || "/assets/poster.png"} alt={show.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />

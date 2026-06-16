@@ -857,7 +857,7 @@ const VideoDetails = () => {
     return (
       <div className="min-h-screen bg-black text-white w-full flex flex-col items-center justify-center gap-4">
         <span className="text-zinc-550">Asset metadata could not be retrieved.</span>
-        <Button onClick={() => navigate(-1)} className="bg-primary text-secondary">Go Back</Button>
+        <Button onClick={() => navigate(-1)} className="focusable bg-primary text-secondary">Go Back</Button>
       </div>
     );
   }
@@ -899,16 +899,16 @@ const VideoDetails = () => {
               <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-20">
                 <button
                   onClick={() => navigate(-1)}
-                  className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 text-white hover:bg-black/85 transition-all cursor-pointer flex items-center justify-center"
+                  className="focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 text-white hover:bg-black/85 transition-all cursor-pointer flex items-center justify-center"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
 
                 <div className="flex items-center gap-3">
-                  {/* <button className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
+                  {/* <button tabIndex={-1} className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
                     <Cast className="w-5 h-5 text-white" />
                   </button> */}
-                  {/* <button className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
+                  {/* <button tabIndex={-1} className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
                     <Share2 className="w-5 h-5 text-white" />
                   </button> */}
                 </div>
@@ -917,7 +917,7 @@ const VideoDetails = () => {
               <div className="absolute inset-0 flex items-center justify-center z-[3]">
                 <button
                   onClick={() => handleStartPlayback(false)}
-                  className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-all border-2 border-white/20 cursor-pointer shadow-lg active:scale-95"
+                  className="focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-all border-2 border-white/20 cursor-pointer shadow-lg active:scale-95"
                 >
                   {isSigning ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -953,8 +953,9 @@ const VideoDetails = () => {
             <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
                 <span
+                  tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
-                  className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                  className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                   title="Click to rate this title"
                 >
                   ⭐ {averageRating.toFixed(1)} ({reviewCount})
@@ -1015,7 +1016,7 @@ const VideoDetails = () => {
                   <button
                     key={idx}
                     onClick={() => setSelectedSeason(idx)}
-                    className={`flex-1 min-w-[80px] max-w-[150px] py-2.5 text-xs font-bold text-center transition-all cursor-pointer whitespace-nowrap rounded-md ${selectedSeason === idx ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white border border-zinc-800"
+                    className={`focusable flex-1 min-w-[80px] max-w-[150px] py-2.5 text-xs font-bold text-center transition-all cursor-pointer whitespace-nowrap rounded-md ${selectedSeason === idx ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white border border-zinc-800"
                       }`}
                   >
                     {season.label || `Season ${idx + 1}`}
@@ -1027,8 +1028,9 @@ const VideoDetails = () => {
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
                   <div
                     key={ep.id}
+                    tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
-                    className="flex gap-4 items-center bg-zinc-900/30 border border-zinc-850 p-3 rounded-lg hover:bg-zinc-900/60 transition-colors cursor-pointer group shadow-sm relative"
+                    className="focusable flex gap-4 items-center bg-zinc-900/30 border border-zinc-850 p-3 rounded-lg hover:bg-zinc-900/60 transition-colors cursor-pointer group shadow-sm relative"
                   >
                     {/* Left: Episode Thumbnail */}
                     <div className="relative w-28 sm:w-36 aspect-video rounded-md overflow-hidden bg-zinc-950 shrink-0 shadow-sm">
@@ -1086,6 +1088,7 @@ const VideoDetails = () => {
               {isDescExpanded ? movie.description : `${(movie.description || "").slice(0, 150)}${(movie.description || "").length > 150 ? "..." : ""}`}
               {(movie.description || "").length > 150 && (
                 <button
+                  tabIndex={-1}
                   onClick={() => setIsDescExpanded(!isDescExpanded)}
                   className="text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
                 >
@@ -1132,13 +1135,14 @@ const VideoDetails = () => {
                 {movie.related.map((item: any) => (
                   <div
                     key={item.id}
+                    tabIndex={0}
                     onClick={() => {
                       // Clear any state before navigation
                       setIsPlaying(false);
                       navigate(`/video/${item.id}`);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="relative aspect-video rounded-lg overflow-hidden border border-zinc-900 cursor-pointer group shadow-sm bg-zinc-950"
+                    className="focusable relative aspect-video rounded-lg overflow-hidden border border-zinc-900 cursor-pointer group shadow-sm bg-zinc-950"
                   >
                     <img
                       src={item.image || item.signedThumbnailUrl || "/assets/poster.png"}
@@ -1164,11 +1168,11 @@ const VideoDetails = () => {
 
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold select-none">
-            <span className="hover:text-white cursor-pointer" onClick={() => navigate("/")}>Home</span>
+            <span tabIndex={-1} className="hover:text-white cursor-pointer" onClick={() => navigate("/")}>Home</span>
             <span>&gt;</span>
-            <span className="hover:text-white cursor-pointer" onClick={() => navigate("/tv")}>Shows</span>
+            <span tabIndex={-1} className="hover:text-white cursor-pointer" onClick={() => navigate("/tv")}>Shows</span>
             <span>&gt;</span>
-            <span className="hover:text-white cursor-pointer" onClick={() => navigate(`/video/${movie.id}`)}>{movie.title}</span>
+            <span tabIndex={-1} className="hover:text-white cursor-pointer" onClick={() => navigate(`/video/${movie.id}`)}>{movie.title}</span>
             {movie.seasons && movie.seasons.length > 0 && (
               <>
                 <span>&gt;</span>
@@ -1201,13 +1205,13 @@ const VideoDetails = () => {
               <button
                 onClick={handleToggleMyList}
                 disabled={isListToggling}
-                className="flex items-center gap-2 text-sm font-bold text-zinc-300 border border-2 border-primary/40 px-4 py-2 rounded-md hover:text-white transition-colors cursor-pointer select-none disabled:opacity-55"
+                className="focusable flex items-center gap-2 text-sm font-bold text-zinc-300 border border-2 border-primary/40 px-4 py-2 rounded-md hover:text-white transition-colors cursor-pointer select-none disabled:opacity-55"
               >
                 {isInMyList ? <Check className="w-5 h-5 text-green-500" /> : <Plus className="w-5 h-5 text-primary" />}
                 <span>{isInMyList ? "In My List" : "Add to My List"}</span>
               </button>
               {/* 
-              <button className="flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer select-none">
+              <button tabIndex={-1} className="flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer select-none">
                 <Share2 className="w-4 h-4 text-white" />
                 <span>Share</span>
               </button> */}
@@ -1218,8 +1222,9 @@ const VideoDetails = () => {
           <div className="flex items-center gap-4 text-xs font-bold text-zinc-450 select-none">
             {reviewCount > 0 && averageRating !== null && (
               <span
+                tabIndex={0}
                 onClick={() => setShowFeedbackModal(true)}
-                className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                 title="Click to rate this title"
               >
                 ⭐ {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
@@ -1421,6 +1426,7 @@ const VideoDetails = () => {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <button
+                          tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/video/${item.id}`);
@@ -1430,6 +1436,7 @@ const VideoDetails = () => {
                           Play
                         </button>
                         <button
+                          tabIndex={-1}
                           onClick={(e) => handleToggleRelatedMyList(e, item)}
                           disabled={isListToggling}
                           className="p-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"
@@ -1614,8 +1621,9 @@ const VideoDetails = () => {
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-400">
                 {reviewCount > 0 && averageRating !== null && (
                   <span
+                    tabIndex={0}
                     onClick={() => setShowFeedbackModal(true)}
-                    className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                    className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                     title="Click to rate this title"
                   >
                     ⭐ {averageRating.toFixed(1)} ({reviewCount})
@@ -1673,8 +1681,9 @@ const VideoDetails = () => {
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
                 <span
+                  tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
-                  className="text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                  className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                   title="Click to rate this title"
                 >
                   ⭐ {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
@@ -1696,6 +1705,7 @@ const VideoDetails = () => {
                   : `${(movie.description || "").slice(0, 150)}...`}
                 {(movie.description || "").length > 150 && (
                   <button
+                    tabIndex={-1}
                     onClick={() => setShowFullDescription(!showFullDescription)}
                     className="text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
                   >
@@ -1742,7 +1752,7 @@ const VideoDetails = () => {
             {movie.category === "TV Show" && (
               <button
                 onClick={() => setActiveTab('episodes')}
-                className={`relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
+                className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
                   }`}
               >
                 Episodes
@@ -1750,14 +1760,14 @@ const VideoDetails = () => {
             )}
             <button
               onClick={() => setActiveTab('related')}
-              className={`relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
+              className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               More Like This
             </button>
             <button
               onClick={() => setActiveTab('details')}
-              className={`relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
+              className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               Details
@@ -1772,7 +1782,7 @@ const VideoDetails = () => {
               <div className="space-y-6">
                 {/* Season select dropdown box */}
                 <div className="flex justify-start">
-                  <button className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-zinc-300 bg-zinc-900 border border-zinc-800 rounded-md hover:text-white transition-all cursor-pointer">
+                  <button className="focusable flex items-center gap-2 px-4 py-2 text-sm font-semibold text-zinc-300 bg-zinc-900 border border-zinc-800 rounded-md hover:text-white transition-all cursor-pointer">
                     <span>{movie.seasons[0].label}</span>
                     <ChevronDown className="w-4 h-4" />
                   </button>
@@ -1783,8 +1793,9 @@ const VideoDetails = () => {
                   {movie.seasons[0].episodes.map((ep: any, index: number) => (
                     <div
                       key={ep.id}
+                      tabIndex={0}
                       onClick={() => playEpisode(ep)}
-                      className="grid grid-cols-12 gap-4 border-b border-zinc-900/60 pb-4 pt-2 hover:bg-zinc-900/40 rounded-lg p-2 transition-all cursor-pointer group"
+                      className="focusable grid grid-cols-12 gap-4 border-b border-zinc-900/60 pb-4 pt-2 hover:bg-zinc-900/40 rounded-lg p-2 transition-all cursor-pointer group"
                     >
                       {/* Left: Thumbnail aspect card */}
                       <div className="col-span-4 md:col-span-3 aspect-video relative rounded-md overflow-hidden bg-zinc-900 shadow-md">
@@ -1838,11 +1849,12 @@ const VideoDetails = () => {
                 {movie.related.map((item: any) => (
                   <div
                     key={item.id}
+                    tabIndex={0}
                     onClick={() => {
                       setIsPlaying(false);
                       navigate(`/video/${item.id}`);
                     }}
-                    className="relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900"
+                    className="focusable relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900"
                   >
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300" />
 
@@ -1873,6 +1885,7 @@ const VideoDetails = () => {
                       {/* Actions row */}
                       <div className="flex items-center gap-1.5 md:gap-2">
                         <button
+                          tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/video/${item.id}`);
@@ -1882,6 +1895,7 @@ const VideoDetails = () => {
                           Play Now
                         </button>
                         <button
+                          tabIndex={-1}
                           onClick={(e) => handleToggleRelatedMyList(e, item)}
                           disabled={isListToggling}
                           className="p-1.5 md:p-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"

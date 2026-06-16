@@ -88,7 +88,7 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
             variant="outline"
             size="icon"
             onClick={onCancel}
-            className="w-10 h-10 rounded-xl border-border"
+            className="focusable w-10 h-10 rounded-xl border-border focus:bg-zinc-850"
           >
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </Button>
@@ -109,13 +109,13 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
           value={ticketSubject}
           onChange={(e) => setTicketSubject(e.target.value)}
           placeholder="Brief summary of your issue..."
-          className="w-full h-9"
+          className="focusable w-full h-9 focus:bg-zinc-800"
         />
       </div>
       <div className="flex flex-col gap-2">
         <Label className="text-sm font-semibold text-foreground">Topic</Label>
         <Select value={ticketTopic} onValueChange={(val) => setTicketTopic(val)}>
-          <SelectTrigger className="w-full text-foreground  h-9">
+          <SelectTrigger className="focusable w-full text-foreground h-9 focus:bg-zinc-800">
             <SelectValue placeholder="Select a topic" />
           </SelectTrigger>
           <SelectContent side="bottom">
@@ -135,14 +135,14 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
           value={ticketDesc}
           onChange={(e) => setTicketDesc(e.target.value)}
           placeholder="Describe your problem in detail so we can help you faster..."
-          className="w-full text-md "
+          className="focusable w-full text-md focus:bg-zinc-800"
         />
       </div>
       <div className="flex items-center gap-3 mt-auto pt-3">
         <Button
           onClick={handleSubmitTicket}
           disabled={submitting}
-          className="flex-1 h-10 rounded-md bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 flex items-center justify-center gap-2"
+          className="focusable flex-1 h-10 rounded-md bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 flex items-center justify-center gap-2 focus:scale-102"
         >
           {submitting ? (
             <>
@@ -157,7 +157,7 @@ export const NewTicketForm = ({ onCancel, onSuccess, isDesktop = false, initialT
         <Button
           variant="outline"
           onClick={onCancel}
-          className="flex-1 h-10 rounded-md bg-card border border-border text-foreground font-semibold text-sm hover:bg-muted/50"
+          className="focusable flex-1 h-10 rounded-md bg-card border border-border text-foreground font-semibold text-sm hover:bg-muted/50 focus:bg-zinc-800"
         >
           Cancel
         </Button>

@@ -119,6 +119,7 @@ const MediaCategoryRow = ({
         {/* Left Scroll Button */}
         {showLeft && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
@@ -130,6 +131,7 @@ const MediaCategoryRow = ({
         {/* Right Scroll Button */}
         {showRight && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
@@ -189,6 +191,7 @@ const MediaCategoryRow = ({
                 {/* Actions Row */}
                 <div className="flex items-center gap-1 md:gap-1.5">
                   <button
+                    tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/video/${item.id}`);
@@ -198,6 +201,7 @@ const MediaCategoryRow = ({
                     Play Now
                   </button>
                   <button
+                    tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleWatchlist(item.id, item);
@@ -542,7 +546,8 @@ export const HomePage = () => {
             return (
               <CarouselItem
                 key={movie.id}
-                className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
+                tabIndex={0}
+                className="focusable pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
                 onClick={() => navigate(`/video/${movie.id}`)}
               >
                 {/* Age Rating Badge */}
@@ -818,6 +823,7 @@ export const HomePage = () => {
                                   <p>No description available.</p>
                                 )}
                                 <button
+                                  tabIndex={-1}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setShowFullDescription(false);
@@ -832,6 +838,7 @@ export const HomePage = () => {
                                 <p className="line-clamp-3 select-all">{movie.description || "No description available."}</p>
                                 {movie.description && movie.description.length > 150 && (
                                   <button
+                                    tabIndex={-1}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setShowFullDescription(true);
@@ -862,6 +869,7 @@ export const HomePage = () => {
             {featuredMovies.map((_, index) => (
               <button
                 key={index}
+                tabIndex={-1}
                 onClick={() => api?.scrollTo(index)}
                 className={`h-1.5 text-primary/40 rounded-full transition-all duration-300 ${current === index
                   ? "w-6 bg-primary "
@@ -876,6 +884,7 @@ export const HomePage = () => {
         {/* Carousel Slide Controls (Left, Right arrows, Mute button) - Desktop Right Bottom Corner */}
         <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
           <button
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               api?.scrollPrev();
@@ -887,6 +896,7 @@ export const HomePage = () => {
           </button>
 
           <button
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               api?.scrollNext();
@@ -898,6 +908,7 @@ export const HomePage = () => {
           </button>
 
           {/* <button
+            tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
               setIsMuted(!isMuted);

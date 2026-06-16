@@ -91,7 +91,7 @@ export const NotificationsPage = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate("/profile")}
-            className="w-9 h-9 rounded-full border-border"
+            className="focusable w-9 h-9 rounded-full border-border"
           >
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </Button>
@@ -104,7 +104,7 @@ export const NotificationsPage = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate("/profile")}
-            className="w-10 h-10 rounded-xl border-border"
+            className="focusable w-10 h-10 rounded-xl border-border"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
           </Button>
@@ -115,7 +115,7 @@ export const NotificationsPage = () => {
           <Button
             variant="ghost"
             onClick={() => setActiveTab("general")}
-            className={`pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 hover:bg-transparent ${activeTab === "general"
+            className={`focusable pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 hover:bg-transparent ${activeTab === "general"
                 ? "text-foreground border-foreground"
                 : "text-muted-foreground border-transparent hover:text-foreground"
               }`}
@@ -125,7 +125,7 @@ export const NotificationsPage = () => {
           <Button
             variant="ghost"
             onClick={() => setActiveTab("recommended")}
-            className={`pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 flex items-center gap-2 hover:bg-transparent ${activeTab === "recommended"
+            className={`focusable pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 flex items-center gap-2 hover:bg-transparent ${activeTab === "recommended"
                 ? "text-foreground border-foreground"
                 : "text-muted-foreground border-transparent hover:text-foreground"
               }`}

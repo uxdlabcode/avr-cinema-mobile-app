@@ -143,8 +143,9 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                 {genreItems.map((doc) => (
                   <div
                     key={doc.id}
+                    tabIndex={0}
                     onClick={() => navigate(`/video/${doc.id}`)}
-                    className="relative w-full h-full lg:h-[90%] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
+                    className="focusable relative w-full h-full lg:h-[90%] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
                   >
                     <img
                       src={doc.signedThumbnailUrl || '/assets/poster.png'}
@@ -176,6 +177,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                       <div className="flex items-center gap-1">
                         <button
                           onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }}
+                          tabIndex={-1}
                           className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play
@@ -187,6 +189,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                               toggleWatchlist(doc.id, doc);
                             }
                           }}
+                          tabIndex={-1}
                           className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                         >
                           {watchlist.includes(doc.id.toString()) ? (
@@ -220,6 +223,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
         {/* Left Scroll */}
         {showLeft && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll('left')}
             className="absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
@@ -231,6 +235,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
         {/* Right Scroll */}
         {showRight && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll('right')}
             className="absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
@@ -247,8 +252,9 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
           {items.map((doc) => (
             <div
               key={doc.id}
+              tabIndex={0}
               onClick={() => navigate(`/video/${doc.id}`)}
-              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
+              className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
             >
               <img
                 src={doc.signedThumbnailUrl || '/assets/poster.png'}
@@ -280,6 +286,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                 <div className="flex items-center gap-1">
                   <button
                     onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }}
+                    tabIndex={-1}
                     className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                   >
                     Play
@@ -291,6 +298,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                         toggleWatchlist(doc.id, doc);
                       }
                     }}
+                    tabIndex={-1}
                     className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
                     {watchlist.includes(doc.id.toString()) ? (

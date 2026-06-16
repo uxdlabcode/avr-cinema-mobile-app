@@ -1013,7 +1013,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 }`}>
                 <button
                   onClick={() => navigate('/membership')}
-                  className={`bg-yellow-500 hover:bg-yellow-450 text-black font-bold rounded-lg transition-all shadow-lg shadow-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
+                  className={`focusable bg-yellow-500 hover:bg-yellow-450 text-black font-bold rounded-lg transition-all shadow-lg shadow-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
                     }`}
                 >
                   <Crown className="w-3.5 h-3.5 fill-current shrink-0" />
@@ -1027,7 +1027,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     }
                     onExit();
                   }}
-                  className={`bg-zinc-800 hover:bg-zinc-750 text-white font-semibold rounded-lg transition-all active:scale-[0.98] cursor-pointer text-center ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
+                  className={`focusable bg-zinc-800 hover:bg-zinc-750 text-white font-semibold rounded-lg transition-all active:scale-[0.98] cursor-pointer text-center ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
                     }`}
                 >
                   Go Back
@@ -1039,6 +1039,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
           <>
             <video
               ref={videoRef}
+              tabIndex={-1}
               className="w-full h-full object-contain cursor-pointer"
               onClick={togglePlayPause}
               onTimeUpdate={handleTimeUpdate}
@@ -1106,7 +1107,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   </div>
                   <button
                     onClick={() => setNextEpisodeCountdown(null)}
-                    className="text-zinc-500 hover:text-white text-xs font-bold cursor-pointer"
+                    className="focusable text-zinc-500 hover:text-white text-xs font-bold cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1116,7 +1117,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     playNextEpisode();
                     setNextEpisodeCountdown(null);
                   }}
-                  className="w-full py-2 bg-white text-black text-xs font-bold rounded hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="focusable w-full py-2 bg-white text-black text-xs font-bold rounded hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
                   Play Now ({nextEpisodeCountdown}s)
@@ -1141,7 +1142,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                       }
                       onExit();
                     }}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white"
+                    className="focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
@@ -1167,6 +1168,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 <div className="flex items-center gap-0 text-white">
 
                   {/* <button
+                    tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSettingsOverlay(true);
@@ -1211,6 +1213,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 <Sun className="w-5 h-5 text-zinc-350" />
                 <div className="h-24 w-6 flex items-center justify-center relative">
                   <input
+                    tabIndex={-1}
                     type="range"
                     min="10"
                     max="100"
@@ -1243,12 +1246,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     }
                     triggerControlsShow();
                   }}
-                  className="text-zinc-350 hover:text-white transition-colors cursor-pointer"
+                  className="focusable text-zinc-350 hover:text-white transition-colors cursor-pointer"
                 >
                   {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
                 <div className="h-24 w-6 flex items-center justify-center relative">
                   <input
+                    tabIndex={-1}
                     type="range"
                     min="0"
                     max="1"
@@ -1268,11 +1272,10 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 </div>
               </div>
 
-              {/* Middle Play/Pause/Skip Overlay Controls */}
               <div className="flex items-center justify-center gap-12 md:gap-20">
                 <button
                   onClick={skipBackward}
-                  className="p-3 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white flex items-center justify-center"
+                  className="focusable p-3 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white flex items-center justify-center"
                   title="Rewind 10s"
                 >
                   <ChevronsLeft className="w-8 h-8 md:w-10 md:h-10" />
@@ -1280,7 +1283,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                 <button
                   onClick={togglePlayPause}
-                  className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg cursor-pointer animate-in fade-in"
+                  className="focusable w-16 h-16 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform shadow-lg cursor-pointer animate-in fade-in"
                   title={isCurrentlyPlaying ? "Pause" : "Play"}
                 >
                   {isCurrentlyPlaying ? (
@@ -1292,7 +1295,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                 <button
                   onClick={skipForward}
-                  className="p-3 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white flex items-center justify-center"
+                  className="focusable p-3 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white flex items-center justify-center"
                   title="Fast Forward 10s"
                 >
                   <ChevronsRight className="w-8 h-8 md:w-10 md:h-10" />
@@ -1304,6 +1307,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 {/* Progress Bar/Scrubber */}
                 <div className="flex items-center gap-3">
                   <input
+                    tabIndex={-1}
                     type="range"
                     min={0}
                     max={duration || 100}
@@ -1324,7 +1328,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     {/* Episodes button for shows */}
                     {(movie.category === "TV Show" || movie.category === "Documentary") && movie.seasons && movie.seasons.length > 0 && (
                       <button
-                        className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
+                        className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
                         onClick={(e) => {
                           e.stopPropagation();
                           const el = document.getElementById("episodes-section");
@@ -1343,7 +1347,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         setShowSettingsOverlay(true);
                         setActiveSettingTab('speed');
                       }}
-                      className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
+                      className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
                     >
                       <span className="px-1.5 py-0.5 border border-zinc-700 rounded text-[9px] uppercase font-bold text-zinc-400">Speed</span>
                       <span>{playbackSpeed === 1 ? "1x" : `${playbackSpeed}x`}</span>
@@ -1355,7 +1359,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         e.stopPropagation();
                         setIsRated(!isRated);
                       }}
-                      className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
+                      className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
                       title="Rate"
                     >
                       <Heart className={`w-4 h-4 transition-colors ${isRated ? "fill-red-500 text-red-500" : ""}`} />
@@ -1376,7 +1380,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                 e.stopPropagation();
                                 playNextEpisode();
                               }}
-                              className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300 animate-pulse"
+                              className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300 animate-pulse"
                             >
                               <Play className="w-3.5 h-3.5 fill-current" />
                               <span>Next Episode</span>
@@ -1403,6 +1407,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               <>
                 {/* Backdrop to close the dropdown when clicking outside */}
                 <div
+                  tabIndex={-1}
                   className="absolute inset-0 z-30 cursor-default"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -1411,6 +1416,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 />
 
                 <div
+                  tabIndex={-1}
                   className="absolute top-3 right-3 sm:top-16 sm:right-4 w-49 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -1612,26 +1618,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     </div>
                   </Tabs>
 
-                  {/* Footer bar */}
-                  {/* <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-1.5 shrink-0">
-                    <div>
-                      {!isOnline && (
-                        <span className="flex items-center gap-1 text-red-400">
-                          <WifiOff className="w-3 h-3" />
-                          Offline
-                        </span>
-                      )}
-                    </div>
 
-                    <div className="flex items-center gap-2 sm:gap-6 shrink-0">
-                      <button
-                        onClick={() => setShowSettingsOverlay(false)}
-                        className="p-1 rounded-full bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 transition-colors cursor-pointer flex items-center justify-center"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div> */}
                 </div>
               </>
             )}

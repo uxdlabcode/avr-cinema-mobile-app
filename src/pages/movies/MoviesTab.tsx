@@ -121,6 +121,7 @@ const MovieCategoryRow = ({
         {/* Left Scroll Button */}
         {showLeft && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll('left')}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
@@ -132,6 +133,7 @@ const MovieCategoryRow = ({
         {/* Right Scroll Button */}
         {showRight && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll('right')}
             className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
@@ -150,7 +152,8 @@ const MovieCategoryRow = ({
             return (
               <div
                 key={movie.id}
-                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
+                tabIndex={0}
+                className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
                 onClick={() => navigate(`/video/${movie.id}`)}
               >
                 <img
@@ -193,6 +196,7 @@ const MovieCategoryRow = ({
                   {/* Actions row */}
                   <div className="flex items-center gap-1 md:gap-1.5">
                     <button
+                      tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/video/${movie.id}`);
@@ -202,6 +206,7 @@ const MovieCategoryRow = ({
                       Play Now
                     </button>
                     <button
+                      tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (toggleWatchlist) {
@@ -482,7 +487,8 @@ const MoviesTab = () => {
                   return (
                     <CarouselItem
                       key={slide.id}
-                      className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
+                      tabIndex={0}
+                      className="focusable pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
                       onClick={() => navigate(`/video/${slide.id}`)}
                     >
                       {/* Age Rating Badge */}
@@ -529,7 +535,7 @@ const MoviesTab = () => {
                                 e.stopPropagation();
                                 navigate(`/video/${slide.id}`);
                               }}
-                              className="flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
+                              className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full outline-none"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
@@ -541,7 +547,7 @@ const MoviesTab = () => {
                                 e.stopPropagation();
                                 toggleWatchlist(slide.id, slide);
                               }}
-                              className="flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
+                              className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm outline-none"
                             >
                               <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
                               <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "My List"}</span>
@@ -592,7 +598,7 @@ const MoviesTab = () => {
                                     e.stopPropagation();
                                     navigate(`/video/${slide.id}`);
                                   }}
-                                  className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                                  className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px] outline-none"
                                 >
                                   <Play className="w-4 h-4 fill-current text-black" />
                                   <span>Play</span>
@@ -604,7 +610,7 @@ const MoviesTab = () => {
                                     e.stopPropagation();
                                     setExpandedMovieId(slide.id);
                                   }}
-                                  className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
+                                  className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px] outline-none"
                                 >
                                   <span>More Info</span>
                                 </Button>
@@ -614,11 +620,11 @@ const MoviesTab = () => {
                                     e.stopPropagation();
                                     toggleWatchlist(slide.id, slide);
                                   }}
-                                  className="text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                                  className="focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none outline-none"
                                 >
                                   <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                     {watchlist.includes(slide.id.toString()) ? (
-                                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                      <Check className="w-3.5 h-3.5 stroke-[3] text-[#DECB94]" />
                                     ) : (
                                       <Plus className="w-3.5 h-3.5 stroke-[3]" />
                                     )}
@@ -655,7 +661,7 @@ const MoviesTab = () => {
                               </div>
 
                               {/* Metadata Details Row */}
-                              <div className="flex items-center gap-3 text-xs font-bold text-zinc-300 mb-6 select-none">
+                              <div className="flex items-center gap-3 text-xs font-bold text-zinc-350 mb-6 select-none">
                                 <span>{slide.duration || "N/A"}</span>
                                 <span className="text-zinc-650">|</span>
                                 <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-200">{slide.ageRating || "U/A 13+"}</span>
@@ -672,7 +678,7 @@ const MoviesTab = () => {
                                     e.stopPropagation();
                                     navigate(`/video/${slide.id}`);
                                   }}
-                                  className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                                  className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md outline-none"
                                 >
                                   <Play className="w-4 h-4 fill-current text-black" />
                                   <span>Play</span>
@@ -684,11 +690,11 @@ const MoviesTab = () => {
                                     e.stopPropagation();
                                     toggleWatchlist(slide.id, slide);
                                   }}
-                                  className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
+                                  className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold outline-none"
                                 >
                                   <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                     {watchlist.includes(slide.id.toString()) ? (
-                                      <Check className="w-3 h-3 stroke-[2.5]" />
+                                      <Check className="w-3 h-3 stroke-[2.5] text-[#DECB94]" />
                                     ) : (
                                       <Plus className="w-3 h-3 stroke-[2.5]" />
                                     )}
@@ -706,7 +712,7 @@ const MoviesTab = () => {
                                     setExpandedMovieId(null);
                                     setShowFullDescription(false);
                                   }}
-                                  className="absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                                  className="focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30 outline-none"
                                   title="Close info panel"
                                 >
                                   <X className="w-3.5 h-3.5" />
@@ -754,7 +760,7 @@ const MoviesTab = () => {
                                           e.stopPropagation();
                                           setShowFullDescription(false);
                                         }}
-                                        className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                        className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                                       >
                                         See Less
                                       </button>
@@ -768,7 +774,7 @@ const MoviesTab = () => {
                                             e.stopPropagation();
                                             setShowFullDescription(true);
                                           }}
-                                          className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                          className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                                         >
                                           See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
                                         </button>
@@ -794,6 +800,7 @@ const MoviesTab = () => {
                   {featuredList.map((_, index) => (
                     <button
                       key={index}
+                      tabIndex={-1}
                       onClick={() => carouselApi?.scrollTo(index)}
                       className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
                         ? "w-6 bg-primary"

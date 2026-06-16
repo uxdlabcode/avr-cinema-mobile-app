@@ -105,13 +105,13 @@ export const DesktopChatPanel = ({
                 placeholder="Message support..."
                 rows={1}
                 style={{ lineHeight: "1.4", minHeight: "24px", maxHeight: "80px" }}
-                className="flex-1 py-2"
+                className="focusable flex-1 py-2 focus:bg-zinc-800"
               />
               <Button
                 size="icon"
                 onClick={onSendMessage}
                 disabled={sending || !chatInput.trim()}
-                className={`w-9 h-9 rounded-full shrink-0 transition-all ${chatInput.trim() && !sending ? "bg-gradient-to-br from-primary p-1 to-primary/80 shadow-md shadow-primary/20" : "bg-foreground/10 hover:bg-foreground/10 text-foreground/40"}`}
+                className={`focusable w-9 h-9 rounded-full shrink-0 transition-all ${chatInput.trim() && !sending ? "bg-gradient-to-br from-primary p-1 to-primary/80 shadow-md shadow-primary/20" : "bg-foreground/10 hover:bg-foreground/10 text-foreground/40"}`}
               >
                 {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className={`w-4 h-4 ml-0.5 ${chatInput.trim() ? "text-background" : ""}`} />}
               </Button>
@@ -204,13 +204,13 @@ export const DesktopChatPanel = ({
               placeholder="Type your message… (Enter to send, Shift+Enter for new line)"
               rows={1}
               style={{ lineHeight: "1.5", minHeight: "28px", maxHeight: "120px" }}
-              className="flex-1 "
+              className="focusable flex-1 focus:bg-zinc-800"
             />
             <Button
               onClick={onSendMessage}
               disabled={sending || !chatInput.trim()}
               size="icon"
-              className={`h-9 w-9 rounded-xl transition-all ${chatInput.trim() && !sending ? "bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20" : "bg-foreground/5 hover:bg-foreground/5"}`}
+              className={`focusable h-9 w-9 rounded-xl transition-all ${chatInput.trim() && !sending ? "bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20" : "bg-foreground/5 hover:bg-foreground/5"}`}
             >
               {sending ? <Loader2 className="w-4 h-4 animate-spin text-foreground" /> : <Send className={`w-4 h-4 ml-0.5 ${chatInput.trim() ? "text-background" : "text-muted-foreground"}`} />}
             </Button>

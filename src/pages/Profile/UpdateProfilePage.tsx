@@ -124,7 +124,7 @@ export const UpdateProfilePage = () => {
           <Button
             size="icon"
             onClick={() => fileInputRef.current?.click()}
-            className={`absolute -bottom-1 -right-1 ${editBtnSize} rounded-full shadow-lg`}
+            className={`focusable absolute -bottom-1 -right-1 ${editBtnSize} rounded-full shadow-lg`}
             title="Change photo"
           >
             <Camera className={`${editIconSize}`} />
@@ -147,7 +147,7 @@ export const UpdateProfilePage = () => {
             <Button
               variant="link"
               onClick={handleRemoveAvatar}
-              className="text-xs font-medium text-destructive hover:text-destructive hover:underline mt-2 p-0 h-auto block mx-auto"
+              className="focusable text-xs font-medium text-destructive hover:text-destructive hover:underline mt-2 p-0 h-auto block mx-auto focus:bg-zinc-800 rounded px-2"
             >
               Remove photo
             </Button>
@@ -159,7 +159,7 @@ export const UpdateProfilePage = () => {
 
   // Shared form section
   const FormSection = ({ isDesktop = false }: { isDesktop?: boolean }) => (
-    <Card className={`rounded-2xl ${isDesktop ? "p-8" : "p-5"} flex flex-col gap-5 shadow-sm`}>
+    <Card tabIndex={-1} className={`rounded-2xl ${isDesktop ? "p-8" : "p-5"} flex flex-col gap-5 shadow-sm`}>
 
       {/* Full Name */}
       <div className="flex flex-col gap-2">
@@ -175,7 +175,7 @@ export const UpdateProfilePage = () => {
           value={profile.name}
           onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
           placeholder="Enter your full name"
-          className={`${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground`}
+          className={`focusable ${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground focus:bg-zinc-800`}
         />
       </div>
 
@@ -212,7 +212,7 @@ export const UpdateProfilePage = () => {
           onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
           placeholder="Enter your phone number"
           type="tel"
-          className={`${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground`}
+          className={`focusable ${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground focus:bg-zinc-800`}
         />
       </div>
 
@@ -221,7 +221,7 @@ export const UpdateProfilePage = () => {
         id="update-profile-btn"
         onClick={handleUpdateProfile}
         disabled={isUpdating || saved}
-        className={`w-full ${isDesktop ? "h-12" : "h-10"} rounded-xl bg-primary hover:bg-primary/90 text-secondary font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2`}
+        className={`focusable w-full ${isDesktop ? "h-12" : "h-10"} rounded-xl bg-primary hover:bg-primary/90 text-secondary font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2 focus:scale-102 outline-none`}
       >
         {isUpdating ? "Saving…" : saved ? "Saved" : "Update Profile"}
       </Button>
@@ -238,7 +238,7 @@ export const UpdateProfilePage = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate("/profile")}
-            className="absolute left-4 w-9 h-9 rounded-full z-10 border-border"
+            className="focusable w-9 h-9 rounded-full z-10 border-border focus:bg-zinc-850"
             id="edit-profile-back-btn"
           >
             <ArrowLeft className="w-4 h-4 text-foreground" />
@@ -255,7 +255,7 @@ export const UpdateProfilePage = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate("/profile")}
-            className="w-10 h-10 rounded-xl border-border"
+            className="focusable w-10 h-10 rounded-xl border-border focus:bg-zinc-850"
             id="edit-profile-back-btn-desktop"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
@@ -269,7 +269,7 @@ export const UpdateProfilePage = () => {
         <div className="flex gap-8 lg:gap-10">
           {/* Left: Avatar Card */}
           <div className="w-[340px] lg:w-[380px] shrink-0 sticky top-[90px] self-start">
-            <Card className="rounded-2xl p-8 flex flex-col items-center gap-5 relative overflow-hidden">
+            <Card tabIndex={-1} className="rounded-2xl p-8 flex flex-col items-center gap-5 relative overflow-hidden">
               {/* Decorative top gradient */}
               <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-primary/10 to-transparent" />
               <div className="relative z-10 pt-4">

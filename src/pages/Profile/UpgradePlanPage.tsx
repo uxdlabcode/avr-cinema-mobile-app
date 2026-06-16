@@ -208,7 +208,7 @@ export const UpgradePlanPage = () => {
             size="icon"
             onClick={() => navigate(-1)}
             id="back-btn"
-            className="w-9 h-9 rounded-full bg-foreground/5 border-foreground/10 hover:bg-foreground/10"
+            className="focusable w-9 h-9 rounded-full bg-foreground/5 border-foreground/10 hover:bg-foreground/10 focus:bg-zinc-850 outline-none"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </Button>
@@ -225,7 +225,7 @@ export const UpgradePlanPage = () => {
             variant="outline"
             size="icon"
             onClick={() => navigate("/profile")}
-            className="w-7 h-7 rounded-lg border-foreground/10 bg-foreground/5 hover:bg-foreground/10"
+            className="focusable w-7 h-7 rounded-lg border-foreground/10 bg-foreground/5 hover:bg-foreground/10 focus:bg-zinc-850 outline-none"
             id="upgrade-plan-back-btn-desktop"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
@@ -326,9 +326,10 @@ export const UpgradePlanPage = () => {
                 return (
                   <div
                     key={plan.id}
+                    tabIndex={0}
                     onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
                     id={`plan-card-${plan.id}`}
-                    className={`relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
+                    className={`focusable relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border outline-none ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
                   >
                     {/* Popular Badge */}
                     {plan.popular && (
@@ -432,6 +433,7 @@ export const UpgradePlanPage = () => {
                             if (selectedPlan !== plan.id) setSelectedPlan(plan.id);
                             handleSubscribe(plan.id);
                           }}
+                          tabIndex={-1}
                           disabled={!!processingPlan}
                           className={`w-full py-3.5 h-auto rounded-xl font-semibold text-sm transition-all duration-300 gap-2 ${isSelected && !processingPlan
                             ? "bg-gradient-to-br from-primary-foreground to-primary-foreground/80 text-background hover:opacity-90"

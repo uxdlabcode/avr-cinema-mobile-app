@@ -135,6 +135,7 @@ const TVCategoryRow = ({
         {/* Left Scroll Button */}
         {showLeft && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
@@ -146,6 +147,7 @@ const TVCategoryRow = ({
         {/* Right Scroll Button */}
         {showRight && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
@@ -157,9 +159,9 @@ const TVCategoryRow = ({
         {/* Horizontal Scrollable Row */}
         <div
           ref={rowRef}
-          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth ${isTrending
-            ? "gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20"
-            : "gap-4 pb-1"
+          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4 ${isTrending
+            ? "pl-8 sm:pl-12 md:pl-16 lg:pl-20"
+            : "pb-1"
             }`}
         >
           {displayList.map((tv, index) => {
@@ -185,7 +187,8 @@ const TVCategoryRow = ({
 
                   {/* TV Card Poster */}
                   <div
-                    className="relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950"
+                    tabIndex={0}
+                    className="focusable relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
                     onClick={() => navigate(`/video/${tv.id}`)}
                   >
                     <img
@@ -231,6 +234,7 @@ const TVCategoryRow = ({
                       {/* Actions row */}
                       <div className="flex items-center gap-1 md:gap-1.5">
                         <button
+                          tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/video/${tv.id}`);
@@ -240,6 +244,7 @@ const TVCategoryRow = ({
                           Play Now
                         </button>
                         <button
+                          tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleWatchlist(tv.id, tv);
@@ -263,7 +268,8 @@ const TVCategoryRow = ({
             return (
               <div
                 key={tv.id}
-                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start"
+                tabIndex={0}
+                className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
                 onClick={() => navigate(`/video/${tv.id}`)}
               >
                 <img
@@ -309,6 +315,7 @@ const TVCategoryRow = ({
                   {/* Actions row */}
                   <div className="flex items-center gap-1 md:gap-1.5">
                     <button
+                      tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/video/${tv.id}`);
@@ -318,6 +325,7 @@ const TVCategoryRow = ({
                       Play Now
                     </button>
                     <button
+                      tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleWatchlist(tv.id, tv);
@@ -580,7 +588,7 @@ const TvTab = () => {
           variant="ghost"
           size="icon"
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full bg-black/60 border border-zinc-900/60 hover:bg-zinc-800 text-white"
+          className="focusable w-10 h-10 rounded-full bg-black/60 border border-zinc-900/60 hover:bg-zinc-800 text-white outline-none"
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
@@ -621,7 +629,8 @@ const TvTab = () => {
                   return (
                     <CarouselItem
                       key={featuredShow.id}
-                      className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
+                      tabIndex={0}
+                      className="focusable pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
                       onClick={() => navigate(`/video/${featuredShow.id}`)}
                     >
                       {/* Age Rating Badge */}
@@ -668,7 +677,7 @@ const TvTab = () => {
                                 e.stopPropagation();
                                 navigate(`/video/${featuredShow.id}`);
                               }}
-                              className="flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
+                              className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full outline-none"
                             >
                               <Play className="w-4 h-4 fill-current text-black" />
                               <span>Play</span>
@@ -680,7 +689,7 @@ const TvTab = () => {
                                 e.stopPropagation();
                                 toggleWatchlist(featuredShow.id, featuredShow);
                               }}
-                              className="flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
+                              className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm outline-none"
                             >
                               <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
                               <span>{watchlist.includes(featuredShow.id.toString()) ? "In My List" : "My List"}</span>
@@ -731,7 +740,7 @@ const TvTab = () => {
                                     e.stopPropagation();
                                     navigate(`/video/${featuredShow.id}`);
                                   }}
-                                  className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                                  className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px] outline-none"
                                 >
                                   <Play className="w-4 h-4 fill-current text-black" />
                                   <span>Play</span>
@@ -743,7 +752,7 @@ const TvTab = () => {
                                     e.stopPropagation();
                                     setExpandedShowId(featuredShow.id);
                                   }}
-                                  className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
+                                  className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px] outline-none"
                                 >
                                   <span>More Info</span>
                                 </Button>
@@ -753,11 +762,11 @@ const TvTab = () => {
                                     e.stopPropagation();
                                     toggleWatchlist(featuredShow.id, featuredShow);
                                   }}
-                                  className="text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                                  className="focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none outline-none"
                                 >
                                   <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                     {watchlist.includes(featuredShow.id.toString()) ? (
-                                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                      <Check className="w-3.5 h-3.5 stroke-[3] text-[#DECB94]" />
                                     ) : (
                                       <Plus className="w-3.5 h-3.5 stroke-[3]" />
                                     )}
@@ -794,7 +803,7 @@ const TvTab = () => {
                               </div>
 
                               {/* Metadata Details Row */}
-                              <div className="flex items-center gap-3 text-xs font-bold text-zinc-300 mb-6 select-none">
+                              <div className="flex items-center gap-3 text-xs font-bold text-zinc-350 mb-6 select-none">
                                 <span>
                                   {featuredShow.seasons?.length > 0
                                     ? `${featuredShow.seasons.length} Season${featuredShow.seasons.length > 1 ? "s" : ""} ${featuredShow.seasons.reduce((acc: number, s: any) => acc + (s.episodes?.length || 0), 0) || 6} Episodes`
@@ -815,7 +824,7 @@ const TvTab = () => {
                                     e.stopPropagation();
                                     navigate(`/video/${featuredShow.id}`);
                                   }}
-                                  className="bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                                  className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md outline-none"
                                 >
                                   <Play className="w-4 h-4 fill-current text-black" />
                                   <span>Resume S1 E1</span>
@@ -827,11 +836,11 @@ const TvTab = () => {
                                     e.stopPropagation();
                                     toggleWatchlist(featuredShow.id, featuredShow);
                                   }}
-                                  className="bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
+                                  className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold outline-none"
                                 >
                                   <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                     {watchlist.includes(featuredShow.id.toString()) ? (
-                                      <Check className="w-3 h-3 stroke-[2.5]" />
+                                      <Check className="w-3 h-3 stroke-[2.5] text-[#DECB94]" />
                                     ) : (
                                       <Plus className="w-3 h-3 stroke-[2.5]" />
                                     )}
@@ -849,7 +858,7 @@ const TvTab = () => {
                                     setExpandedShowId(null);
                                     setShowFullDescription(false);
                                   }}
-                                  className="absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                                  className="focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30 outline-none"
                                   title="Close info panel"
                                 >
                                   <X className="w-3.5 h-3.5" />
@@ -897,7 +906,7 @@ const TvTab = () => {
                                           e.stopPropagation();
                                           setShowFullDescription(false);
                                         }}
-                                        className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                        className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                                       >
                                         See Less
                                       </button>
@@ -911,7 +920,7 @@ const TvTab = () => {
                                             e.stopPropagation();
                                             setShowFullDescription(true);
                                           }}
-                                          className="text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                          className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                                         >
                                           See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
                                         </button>
@@ -937,6 +946,7 @@ const TvTab = () => {
                   {featuredList.map((_, index) => (
                     <button
                       key={index}
+                      tabIndex={-1}
                       onClick={() => carouselApi?.scrollTo(index)}
                       className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
                         ? "w-6 bg-primary"
@@ -951,6 +961,7 @@ const TvTab = () => {
               {/* Slider Controls (Left, Right arrows) */}
               <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
                 <button
+                  tabIndex={-1}
                   onClick={(e) => {
                     e.stopPropagation();
                     carouselApi?.scrollPrev();
@@ -962,6 +973,7 @@ const TvTab = () => {
                 </button>
 
                 <button
+                  tabIndex={-1}
                   onClick={(e) => {
                     e.stopPropagation();
                     carouselApi?.scrollNext();
@@ -979,21 +991,21 @@ const TvTab = () => {
           <div className="flex items-center gap-6 px-4 md:px-12 lg:px-16 pt-6 pb-0 border-b border-zinc-900 w-full max-w-7xl mx-auto">
             <button
               onClick={() => setActiveTab("forYou")}
-              className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "forYou" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
+              className={`focusable pb-3 text-sm md:text-base font-semibold transition-colors relative outline-none ${activeTab === "forYou" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
             >
               For You
               {activeTab === "forYou" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
             </button>
             <button
               onClick={() => setActiveTab("tvShows")}
-              className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "tvShows" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
+              className={`focusable pb-3 text-sm md:text-base font-semibold transition-colors relative outline-none ${activeTab === "tvShows" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
             >
               TV Shows
               {activeTab === "tvShows" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}
             </button>
             <button
               onClick={() => setActiveTab("documentaries")}
-              className={`pb-3 text-sm md:text-base font-semibold transition-colors relative ${activeTab === "documentaries" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
+              className={`focusable pb-3 text-sm md:text-base font-semibold transition-colors relative outline-none ${activeTab === "documentaries" ? "text-primary" : "text-zinc-400 hover:text-white"}`}
             >
               Documentaries
               {activeTab === "documentaries" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />}

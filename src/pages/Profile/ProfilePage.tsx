@@ -198,7 +198,7 @@ export const ProfilePage = () => {
     <div className="hidden md:flex flex-col gap-5 w-[320px] lg:w-[360px] shrink-0 sticky top-[90px] self-start">
 
       {/* User Profile Card */}
-      <Card className="p-6 flex flex-col items-center gap-4 relative overflow-hidden rounded-lg">
+      <Card tabIndex={-1} className="p-6 flex flex-col items-center gap-4 relative overflow-hidden rounded-lg">
         {/* Decorative top gradient */}
         <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-primary/10 to-transparent" />
 
@@ -248,7 +248,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Quick Actions */}
-      <Card className="rounded-lg overflow-hidden p-0 gap-0">
+      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="px-5 py-3 border-b border-border">
           <p className="text-foreground font-semibold text-sm">Quick Actions</p>
         </div>
@@ -309,7 +309,7 @@ export const ProfilePage = () => {
     <div className="hidden md:flex flex-col gap-6 flex-1 min-w-0">
 
       {/* Watchlist Card */}
-      <Card className="rounded-lg overflow-hidden p-0 gap-0">
+      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -367,7 +367,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Continue Watching Card */}
-      <Card className="rounded-lg overflow-hidden p-0 gap-0">
+      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -432,7 +432,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Quizzes Card */}
-      <Card className="rounded-lg overflow-hidden p-0 gap-0">
+      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -494,7 +494,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Account Section - Desktop */}
-      <Card className="rounded-lg overflow-hidden p-0 gap-0">
+      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center">
@@ -542,7 +542,7 @@ export const ProfilePage = () => {
             <Button
               variant="ghost"
               onClick={() => setShowLogoutModal(true)}
-              className="text-destructive hover:text-destructive hover:bg-transparent hover:opacity-80 p-0 h-auto gap-1.5 font-semibold text-sm"
+              className="focusable text-destructive hover:text-destructive hover:bg-transparent hover:opacity-80 p-0 h-auto gap-1.5 font-semibold text-sm focus:scale-102 outline-none"
               id="logout-btn"
             >
               <LogOut className="w-4 h-4" />
@@ -551,7 +551,7 @@ export const ProfilePage = () => {
           </div>
 
           {/* User Info Card */}
-          <Card className="flex items-center gap-4 p-4 rounded-2xl p-4 gap-4 flex-row">
+          <Card tabIndex={-1} className="flex items-center gap-4 p-4 rounded-2xl p-4 gap-4 flex-row">
             <Avatar className="w-14 h-14 ring-2 ring-border shadow-lg">
               <AvatarImage src={user?.avatar || ""} className="object-cover" />
               <AvatarFallback className="bg-muted text-foreground text-lg font-bold">
@@ -568,7 +568,7 @@ export const ProfilePage = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate("/update-profile")}
-              className="w-8 h-8 rounded-full hover:bg-muted"
+              className="focusable w-8 h-8 rounded-full hover:bg-muted focus:bg-zinc-800 outline-none"
               id="edit-profile-btn"
             >
               <Pencil className="w-4 h-4 text-muted-foreground" />
@@ -578,7 +578,7 @@ export const ProfilePage = () => {
           {/* Tier + Upgrade Row */}
           <div className="flex items-center justify-between">
             <div>
-              <Button variant="ghost" className="text-primary text-left !p-0 flex justify-start h-auto hover:bg-transparent gap-1 font-semibold text-sm">
+              <Button tabIndex={-1} variant="ghost" className="text-primary text-left !p-0 flex justify-start h-auto hover:bg-transparent gap-1 font-semibold text-sm">
                 {currentPlanName} <ChevronDown className="w-3.5 h-3.5" />
               </Button>
               <p className="text-muted-foreground text-xs mt-0.5">
@@ -591,7 +591,7 @@ export const ProfilePage = () => {
                 size="sm"
                 onClick={() => navigate("/upgrade-plan")}
                 id="upgrade-btn"
-                className="rounded-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-5 h-8 text-xs font-semibold"
+                className="focusable rounded-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-5 h-8 text-xs font-semibold focus:scale-102 outline-none"
               >
                 Upgrade
               </Button>
@@ -605,7 +605,7 @@ export const ProfilePage = () => {
           <Button
             variant="outline"
             onClick={() => navigate("/support")}
-            className="w-full justify-between py-3 px-4 h-auto rounded-lg border-primary/30 text-primary hover:text-primary hover:bg-primary/10 tracking-wider font-semibold text-sm"
+            className="focusable w-full justify-between py-3 px-4 h-auto rounded-lg border-primary/30 text-primary hover:text-primary hover:bg-primary/10 tracking-wider font-semibold text-sm focus:scale-102 outline-none"
             id="get-support-btn"
           >
             <span>Get Support</span>
@@ -616,7 +616,7 @@ export const ProfilePage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/notifications")}
-            className="hidden w-full justify-between py-3 h-auto rounded-none border-t border-border hover:bg-transparent text-left"
+            className="focusable hidden w-full justify-between py-3 h-auto rounded-none border-t border-border hover:bg-transparent text-left outline-none"
             id="notifications-btn"
           >
             <div>
@@ -635,7 +635,7 @@ export const ProfilePage = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => navigate("/profile/watchlist", { state: { title: "Watchlist", items: watchlist } })}
-                  className="w-8 h-8 rounded-full"
+                  className="focusable w-8 h-8 rounded-full focus:bg-zinc-800 outline-none"
                 >
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </Button>
@@ -648,7 +648,8 @@ export const ProfilePage = () => {
                 watchlist.slice(0, 5).map((item) => (
                   <div
                     key={item.id}
-                    className="flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity"
+                    tabIndex={0}
+                    className="focusable flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer hover:opacity-90 transition-opacity outline-none"
                     onClick={() => navigate(`/video/${item.movieId}`)}
                   >
                     <div className="w-[130px] h-[175px] rounded-xl overflow-hidden bg-muted">
@@ -677,7 +678,7 @@ export const ProfilePage = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => navigate("/profile/watchlist", { state: { title: "Continue Watching", items: continueWatching } })}
-                  className="w-8 h-8 rounded-full"
+                  className="focusable w-8 h-8 rounded-full focus:bg-zinc-800 outline-none"
                 >
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </Button>
@@ -692,7 +693,8 @@ export const ProfilePage = () => {
                 continueWatching.slice(0, 5).map((item) => (
                   <div
                     key={item.id}
-                    className="flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer"
+                    tabIndex={0}
+                    className="focusable flex-shrink-0 w-[130px] flex flex-col gap-2 cursor-pointer outline-none"
                     onClick={() => navigate(`/video/${item.movieId}`)}
                   >
                     <div className="relative w-[130px] h-[100px] rounded-xl overflow-hidden bg-muted">
@@ -733,7 +735,8 @@ export const ProfilePage = () => {
                   return (
                     <Card
                       key={quiz.id}
-                      className="flex-shrink-0 w-[240px] flex flex-col gap-2 p-3 rounded-2xl cursor-pointer hover:border-primary/30 hover:bg-white/[0.03] transition-all group"
+                      tabIndex={0}
+                      className="focusable flex-shrink-0 w-[240px] flex flex-col gap-2 p-3 rounded-2xl cursor-pointer hover:border-primary/30 hover:bg-white/[0.03] transition-all group outline-none"
                       onClick={() => navigate(`/quizzes/${quiz.id}`)}
                     >
                       <div className="flex items-center gap-3">
@@ -773,7 +776,7 @@ export const ProfilePage = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowDeleteModal(true)}
-                className="w-full justify-start gap-3 p-3 h-auto rounded-lg border-border hover:bg-muted/50 text-left group"
+                className="focusable w-full justify-start gap-3 p-3 h-auto rounded-lg border-border hover:bg-muted/50 text-left group focus:bg-zinc-800 outline-none"
                 id="delete-account-btn"
               >
                 <div className="shrink-0 w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center border border-border group-hover:bg-foreground/10 transition-colors">
@@ -793,7 +796,7 @@ export const ProfilePage = () => {
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <Card className="w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+          <Card tabIndex={-1} className="w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col gap-2 text-center items-center">
               <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
                 <LogOut className="w-6 h-6 text-destructive" />
@@ -807,7 +810,7 @@ export const ProfilePage = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 h-auto py-3 rounded-xl border-border hover:bg-muted font-semibold"
+                className="focusable flex-1 h-auto py-3 rounded-xl border-border hover:bg-muted font-semibold focus:bg-zinc-800 outline-none"
               >
                 Cancel
               </Button>
@@ -817,7 +820,7 @@ export const ProfilePage = () => {
                   setShowLogoutModal(false);
                   logout();
                 }}
-                className="flex-1 h-auto py-3 rounded-xl shadow-sm hover:bg-destructive/90 font-semibold"
+                className="focusable flex-1 h-auto py-3 rounded-xl shadow-sm hover:bg-destructive/90 font-semibold focus:bg-destructive/80 focus:scale-102 outline-none"
               >
                 Yes, Log Out
               </Button>
@@ -829,7 +832,7 @@ export const ProfilePage = () => {
       {/* Delete Account Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <Card className="border-destructive/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+          <Card tabIndex={-1} className="border-destructive/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col gap-2 text-center items-center">
               <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
                 <Trash2 className="w-6 h-6 text-destructive" />

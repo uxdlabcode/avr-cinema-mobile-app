@@ -105,6 +105,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
         {/* Left Scroll Button */}
         {showLeft && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
             aria-label="Scroll left"
@@ -116,6 +117,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
         {/* Right Scroll Button */}
         {showRight && (
           <button
+            tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
             aria-label="Scroll right"
@@ -194,6 +196,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                   {/* Actions row */}
                   <div className="flex items-center gap-1 md:gap-1.5">
                     <button 
+                      tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/video/${movie.id}`);
@@ -203,6 +206,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                       Play Now
                     </button>
                     <button 
+                      tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (toggleWatchlist) {

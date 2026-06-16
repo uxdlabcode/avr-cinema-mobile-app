@@ -320,12 +320,12 @@ export default function Membership() {
                             <p className="text-red-300 text-sm">{paymentError}</p>
                             <button
                                 onClick={() => setPaymentError(null)}
-                                className="text-red-400 hover:text-red-300 text-xs mt-2 underline"
+                                className="focusable text-red-400 hover:text-red-300 text-xs mt-2 underline focus:bg-zinc-800 rounded px-1"
                             >
                                 Dismiss
                             </button>
                         </div>
-                        <button onClick={() => setPaymentError(null)} className="text-red-400 hover:text-red-300">
+                        <button onClick={() => setPaymentError(null)} className="focusable text-red-400 hover:text-red-300 p-1 focus:bg-zinc-800 rounded-full">
                             <X className="w-4 h-4" />
                         </button>
                     </div>
@@ -340,6 +340,7 @@ export default function Membership() {
                             {plans.map((plan) => (
                                 <Card
                                     key={plan.id}
+                                    tabIndex={-1}
                                     className={`bg-zinc-900/40 border-zinc-800 hover:border-zinc-700 transition-all flex flex-col justify-between relative overflow-hidden ${plan.popular ? "border-primary/60 ring-1 ring-primary/30" : ""
                                         }`}
                                 >

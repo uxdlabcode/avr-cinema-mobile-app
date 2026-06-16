@@ -249,7 +249,7 @@ export const QuizResultPage = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 px-6">
         <Trophy className="w-12 h-12 text-primary/40" />
         <p className="text-muted-foreground text-sm text-center">No result data found. Please take a quiz first.</p>
-        <Button onClick={() => navigate("/quiz")} className="rounded-xl px-5 h-auto py-2.5 text-sm font-bold">Browse Quizzes</Button>
+        <Button onClick={() => navigate("/quiz")} className="focusable rounded-xl px-5 h-auto py-2.5 text-sm font-bold">Browse Quizzes</Button>
       </div>
     );
   }
@@ -308,10 +308,10 @@ export const QuizResultPage = () => {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 py-3 pb-safe z-40">
         <div className="max-w-[700px] mx-auto w-full flex gap-3 px-2">
           <Button id="quiz-result-home-btn" variant="outline" onClick={() => navigate("/quiz")}
-            className="flex-1 h-auto py-2.5 rounded-md font-semibold text-sm flex items-center justify-center gap-2 border-border"
+            className="focusable flex-1 h-auto py-2.5 rounded-md font-semibold text-sm flex items-center justify-center gap-2 border-border"
           ><Home className="w-4 h-4" /> All Quizzes</Button>
           <Button id="quiz-result-retry-btn" onClick={() => navigate(`/quizzes/${quiz.id}`)}
-            className="flex-1 h-auto py-2.5 text-secondary rounded-md font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
+            className="focusable flex-1 h-auto py-2.5 text-secondary rounded-md font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
           ><RotateCcw className="w-4 h-4" /> Try Again</Button>
         </div>
       </div>
@@ -331,7 +331,7 @@ export const QuizResultPage = () => {
                 navigate("/quiz");
               }
             }}
-            className="w-10 h-10 rounded-xl border-border"
+            className="focusable w-10 h-10 rounded-xl border-border"
           >
             <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
           </Button>
@@ -348,7 +348,7 @@ export const QuizResultPage = () => {
           <div className="w-[320px] lg:w-[360px] flex-shrink-0 sticky top-8 flex flex-col gap-0">
 
             {/* Score card */}
-            <Card className="p-8 flex flex-col items-center gap-5 relative overflow-hidden rounded-lg">
+            <Card tabIndex={-1} className="p-8 flex flex-col items-center gap-5 relative overflow-hidden rounded-lg">
               {/* Decorative glow */}
               <div className="absolute top-0 left-0 right-0 h-32 opacity-20 pointer-events-none" />
 
@@ -385,10 +385,10 @@ export const QuizResultPage = () => {
             {/* CTAs */}
             <div className="flex flex-col gap-3">
               <Button id="quiz-result-retry-btn" onClick={() => navigate(`/quizzes/${quiz.id}`)}
-                className="w-full h-10 py-3 rounded-lg font-semibold text-secondary flex items-center justify-center gap-2"
+                className="focusable w-full h-10 py-3 rounded-lg font-semibold text-secondary flex items-center justify-center gap-2"
               ><RotateCcw className="w-4 h-4" /> Try Again</Button>
               <Button id="quiz-result-home-btn" variant="outline" onClick={() => navigate("/quiz")}
-                className="w-full h-10 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 border-border"
+                className="focusable w-full h-10 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 border-border"
               ><Home className="w-4 h-10 rounded-lg" /> All Quizzes</Button>
             </div>
           </div>

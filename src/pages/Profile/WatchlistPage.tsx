@@ -102,7 +102,7 @@ export const WatchlistPage = () => {
         <p className="text-muted-foreground mb-4">{error}</p>
         <Button
           onClick={() => navigate(-1)}
-          className="rounded-lg font-semibold"
+          className="focusable rounded-lg font-semibold focus:scale-102 outline-none"
         >
           Go Back
         </Button>
@@ -122,7 +122,7 @@ export const WatchlistPage = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate(-1)}
-            className="-ml-2 rounded-full"
+            className="focusable -ml-2 rounded-full focus:bg-zinc-800 outline-none"
           >
             <ChevronLeft className="w-6 h-6 text-foreground" />
           </Button>
@@ -171,7 +171,8 @@ export const WatchlistPage = () => {
               return (
                 <Card
                   key={item.id}
-                  className="relative aspect-[2/3] w-full overflow-hidden cursor-pointer group border-border shadow-sm bg-card p-0 gap-0"
+                  tabIndex={0}
+                  className="focusable relative aspect-[2/3] w-full overflow-hidden cursor-pointer group border-border shadow-sm bg-card p-0 gap-0 outline-none"
                   onClick={() => navigate(`/video/${movieId}`)}
                 >
                   <img

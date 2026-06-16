@@ -288,7 +288,7 @@ export const GetSupportPage = () => {
             variant="outline"
             size="icon"
             onClick={handleBack}
-            className="absolute left-4 w-9 h-9 rounded-full z-10 border-border"
+            className="focusable w-9 h-9 rounded-full z-10 border-border focus:bg-zinc-850"
             id="support-back-btn"
           >
             {viewState.view === "list"
@@ -308,7 +308,7 @@ export const GetSupportPage = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => setViewState({ view: "list" })}
-                  className="w-10 h-10 rounded-lg border-border"
+                  className="focusable w-10 h-10 rounded-lg border-border focus:bg-zinc-850"
                 >
                   <ArrowLeft className="w-4 h-4 text-foreground" />
                 </Button>
@@ -321,7 +321,7 @@ export const GetSupportPage = () => {
               </div>
               <Button
                 onClick={() => { setInitialTopic(""); setIsNewTicketSheetOpen(true); }}
-                className="flex items-center gap-2 text-sm font-semibold rounded-lg bg-primary text-secondary hover:bg-primary/90 transition-colors shadow-lg"
+                className="focusable flex items-center gap-2 text-sm font-semibold rounded-lg bg-primary text-secondary hover:bg-primary/90 transition-colors shadow-lg focus:scale-102"
               >
                 <Plus className="w-4 h-4" />
                 New Ticket
@@ -343,7 +343,7 @@ export const GetSupportPage = () => {
                     </div>
                     <Button
                       onClick={() => setIsNewTicketSheetOpen(true)}
-                      className="mt-1 rounded-lg bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 transition-colors"
+                      className="focusable mt-1 rounded-lg bg-primary text-secondary font-semibold text-sm hover:bg-primary/90 transition-colors focus:scale-102"
                     >
                       Create a Ticket
                     </Button>
@@ -359,7 +359,7 @@ export const GetSupportPage = () => {
                             setSelectedTicketId(ticket.id);
                             setActiveTicket(null);
                           }}
-                          className={`flex flex-col gap-1.5 px-4 py-4 text-left transition-colors border-l-2 ${isSelected
+                          className={`focusable flex flex-col gap-1.5 px-4 py-4 text-left transition-colors border-l-2 focus:bg-zinc-800 ${isSelected
                             ? "bg-primary/8 border-l-primary"
                             : "hover:bg-muted/40 border-l-transparent"
                             }`}
@@ -411,7 +411,7 @@ export const GetSupportPage = () => {
                   variant="outline"
                   size="icon"
                   onClick={handleBack}
-                  className="w-10 h-10 rounded-lg border-border"
+                  className="focusable w-10 h-10 rounded-lg border-border focus:bg-zinc-850"
                 >
                   <ArrowLeft className="w-4 h-4 text-foreground" />
                 </Button>
@@ -420,7 +420,7 @@ export const GetSupportPage = () => {
               <Button
                 variant="outline"
                 onClick={() => setViewState({ view: "my-tickets" })}
-                className="flex items-center gap-2 text-sm font-semibold rounded-lg !bg-primary !text-secondary "
+                className="focusable flex items-center gap-2 text-sm font-semibold rounded-lg !bg-primary !text-secondary focus:scale-102"
               >
                 <MessageSquare className="w-4 h-4" />
                 My Tickets
@@ -434,7 +434,7 @@ export const GetSupportPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for help or topics..."
-                className="w-full h-9 md:h-11 "
+                className="focusable w-full h-9 md:h-11 focus:bg-zinc-800"
               />
             </div>
             <h3 className="text-sm font-semibold text-foreground">Top Categories</h3>
@@ -447,6 +447,7 @@ export const GetSupportPage = () => {
                   return (
                     <Card
                       key={cat.id || cat.title}
+                      tabIndex={0}
                       onClick={() => {
                         if (cat.content && cat.content.length > 0) {
                           setViewState({ view: "detail", categoryIndex: idx });
@@ -455,7 +456,7 @@ export const GetSupportPage = () => {
                           setIsNewTicketSheetOpen(true);
                         }
                       }}
-                      className="flex flex-row items-center justify-between gap-4 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors group cursor-pointer border border-border shadow-sm bg-card/60"
+                      className="focusable flex flex-row items-center justify-between gap-4 px-4 py-2 rounded-lg hover:bg-muted/50 transition-colors group cursor-pointer border border-border shadow-sm bg-card/60 outline-none"
                     >
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                         <MessageSquare className="w-5 h-5 text-primary" />
@@ -482,7 +483,7 @@ export const GetSupportPage = () => {
                 variant="outline"
                 size="icon"
                 onClick={handleBack}
-                className="w-10 h-10 rounded-lg border-border"
+                className="focusable w-10 h-10 rounded-lg border-border focus:bg-zinc-850"
               >
                 <ArrowLeft className="w-4 h-4 text-foreground" />
               </Button>
@@ -519,7 +520,7 @@ export const GetSupportPage = () => {
                 </div>
                 <Button
                   onClick={() => setIsNewTicketSheetOpen(true)}
-                  className="mt-2 rounded-lg text-secondary bg-primary px-6"
+                  className="focusable mt-2 rounded-lg text-secondary bg-primary px-6 focus:scale-102"
                 >
                   Create a Ticket
                 </Button>
@@ -529,8 +530,9 @@ export const GetSupportPage = () => {
                 {myTickets.map((ticket) => (
                   <Card
                     key={ticket.id}
+                    tabIndex={0}
                     onClick={() => navigate(`/support/ticket/${ticket.id}`)}
-                    className="flex flex-col gap-2 p-4 rounded-lg hover:bg-muted/40 transition-colors text-left cursor-pointer border-border shadow-sm"
+                    className="focusable flex flex-col gap-2 p-4 rounded-lg hover:bg-muted/40 transition-colors text-left cursor-pointer border-border shadow-sm outline-none"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-semibold text-foreground leading-snug flex-1">{ticket.subject}</p>
@@ -591,7 +593,7 @@ export const GetSupportPage = () => {
           variant="outline"
           size="sm"
           onClick={() => setViewState({ view: "my-tickets" })}
-          className="md:hidden fixed bottom-24 right-4 z-40 flex items-center gap-1.5 h-8 text-xs font-semibold px-3 rounded-lg !bg-primary !text-secondary "
+          className="focusable md:hidden fixed bottom-24 right-4 z-40 flex items-center gap-1.5 h-8 text-xs font-semibold px-3 rounded-lg !bg-primary !text-secondary focus:scale-102"
           id="mobile-floating-my-tickets-btn"
         >
           <MessageSquare className="w-3.5 h-3.5" />
@@ -603,7 +605,7 @@ export const GetSupportPage = () => {
         <Button
           size="sm"
           onClick={() => { setInitialTopic(""); setIsNewTicketSheetOpen(true); }}
-          className="md:hidden fixed bottom-24 right-4 z-40 flex items-center gap-1.5 rounded-lg h-8 px-3 text-secondary bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+          className="focusable md:hidden fixed bottom-24 right-4 z-40 flex items-center gap-1.5 rounded-lg h-8 px-3 text-secondary bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 focus:scale-102"
           id="mobile-floating-new-ticket-btn"
         >
           <Plus className="w-3.5 h-3.5" />

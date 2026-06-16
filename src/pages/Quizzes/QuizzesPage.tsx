@@ -54,13 +54,14 @@ const SkeletonCard = () => (
 );
 
 // ── Quiz Card ─────────────────────────────────────────────────────────────
-const QuizCard = ({ quiz, onClick }: { quiz: Quiz; onClick: () => void }) => {
+const QuizCard = ({ quiz, onClick, tabIndex }: { quiz: Quiz; onClick: () => void; tabIndex?: number }) => {
   const qCount = quiz.questions?.length ?? 0;
   const catColor = getCategoryColor(quiz.category);
   return (
     <button
       id={`quiz-card-${quiz.id}`}
       onClick={onClick}
+      tabIndex={tabIndex}
       className="focusable w-full text-left flex items-center gap-4 p-4 bg-card border border-border rounded-2xl hover:border-primary/30 hover:bg-foreground/[0.03] transition-all active:scale-[0.98] group outline-none"
     >
       <div className="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/15">
@@ -139,7 +140,7 @@ export const QuizzesPage = () => {
                 navigate("/dashboard");
               }
             }}
-            className="absolute left-4 w-9 h-9 rounded-full z-10 border-border"
+            className="focusable w-9 h-9 rounded-full z-10 border-border focus:bg-zinc-850"
           >
             <ArrowLeft className="w-4 h-4 text-foreground" />
           </Button>
@@ -183,7 +184,7 @@ export const QuizzesPage = () => {
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
                 variant={selectedCategory === cat ? "default" : "outline"}
-                className={`shrink-0 rounded-lg text-secondary text-xs font-semibold h-8 px-4 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:bg-card" : ""}`}
+                className={`focusable shrink-0 rounded-lg text-secondary text-xs font-semibold h-8 px-4 focus:scale-102 ${selectedCategory !== cat ? "border-border text-muted-foreground hover:border-primary/40 hover:bg-card" : ""}`}
               >{cat}</Button>
             ))}
           </div>
@@ -192,7 +193,7 @@ export const QuizzesPage = () => {
           {loading && <><SkeletonCard /><SkeletonCard /><SkeletonCard /></>}
           {error && !loading && <div className="flex flex-col items-center py-16 gap-3"><HelpCircle className="w-7 h-7 text-rose-400" /><p className="text-muted-foreground text-sm">{error}</p></div>}
           {!loading && !error && filtered.length === 0 && <div className="flex flex-col items-center py-16 gap-3"><Trophy className="w-7 h-7 text-primary/40" /><p className="text-muted-foreground text-sm text-center">{searchQuery || selectedCategory !== "All" ? "No quizzes match your filters." : "No quizzes available yet."}</p></div>}
-          {!loading && !error && filtered.map((quiz) => <QuizCard key={quiz.id} quiz={quiz} onClick={() => navigate(`/quizzes/${quiz.id}`)} />)}
+          {!loading && !error && filtered.map((quiz) => <QuizCard key={quiz.id} quiz={quiz} tabIndex={-1} onClick={() => navigate(`/quizzes/${quiz.id}`)} />)}
         </div>
       </div>
 
@@ -230,6 +231,7 @@ export const QuizzesPage = () => {
             ].map((s) => (
               <Card
                 key={s.label}
+                tabIndex={-1}
                 className="flex flex-col p-2.5 !gap-1 rounded-md items-center justify-center min-w-[80px]"
               >
                 <div className="flex items-center justify-center gap-1.5 !pb-0 !mb-0">
@@ -279,7 +281,7 @@ export const QuizzesPage = () => {
           <div className="flex flex-col items-center justify-center flex-1 gap-4">
             <HelpCircle className="w-10 h-10 text-rose-400/50" />
             <p className="text-muted-foreground">{error}</p>
-            <Button onClick={() => window.location.reload()} className="rounded-md px-5 py-2.5 h-auto text-sm font-semibold">Retry</Button>
+            <Button onClick={() => window.location.reload()} className="focusable rounded-md px-5 py-2.5 h-auto text-sm font-semibold focus:scale-102">Retry</Button>
           </div>
         )}
         {!loading && !error && filtered.length === 0 && (
@@ -290,7 +292,7 @@ export const QuizzesPage = () => {
         )}
         {!loading && !error && filtered.length > 0 && (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((quiz) => <QuizCard key={quiz.id} quiz={quiz} onClick={() => navigate(`/quizzes/${quiz.id}`)} />)}
+            {filtered.map((quiz) => <QuizCard key={quiz.id} quiz={quiz} tabIndex={-1} onClick={() => navigate(`/quizzes/${quiz.id}`)} />)}
           </div>
         )}
       </div>

@@ -161,7 +161,7 @@ export const QuizDetailPage = () => {
           } else {
             navigate("/quiz");
           }
-        }} className="mt-2 rounded-xl px-5 h-auto py-2.5 text-sm font-semibold">Go Back</Button>
+        }} className="focusable mt-2 rounded-xl px-5 h-auto py-2.5 text-sm font-semibold focus:scale-102">Go Back</Button>
       </div>
     );
   }
@@ -187,7 +187,7 @@ export const QuizDetailPage = () => {
                   navigate("/quiz");
                 }
               }}
-              className="absolute left-4 w-9 h-9 rounded-full border-border"
+              className="focusable absolute left-4 w-9 h-9 rounded-full border-border focus:bg-zinc-850"
             >
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </Button>
@@ -207,13 +207,13 @@ export const QuizDetailPage = () => {
               { icon: <HelpCircle className="w-5 h-5 text-primary" />, value: qCount, label: "Questions" },
               { icon: <Trophy className="w-5 h-5 text-primary" />, value: quiz.category, label: "Category" },
             ].map(({ icon, value, label }) => (
-              <Card key={label} className="flex flex-col items-center gap-1.5 p-3 rounded-lg">
+              <Card key={label} tabIndex={-1} className="flex flex-col items-center gap-1.5 p-3 rounded-lg">
                 {icon}<span className="text-foreground font-bold text-sm text-center">{value}</span>
                 <span className="text-muted-foreground text-[10px]">{label}</span>
               </Card>
             ))}
           </div>
-          <Card className="rounded-lg p-2 space-y-1">
+          <Card tabIndex={-1} className="rounded-lg p-2 space-y-1">
             <h3 className="text-foreground font-semibold text-sm">How to Play</h3>
             {["Read each question carefully.", "Select the correct answer(s) and tap Confirm.", `Answer all ${qCount} questions to complete the quiz.`, "Your final score will be shown at the end."].map((tip, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -223,7 +223,7 @@ export const QuizDetailPage = () => {
             ))}
           </Card>
           <Button id="quiz-start-btn" onClick={() => setStarted(true)}
-            className="w-full h-9 py-2 rounded-md font-semibold !text-secondary bg-primary active:scale-[0.98]"
+            className="focusable w-full h-9 py-2 rounded-md font-semibold !text-secondary bg-primary active:scale-[0.98] focus:scale-102"
           >Start Quiz</Button>
         </div>
 
@@ -243,7 +243,7 @@ export const QuizDetailPage = () => {
                     navigate("/quiz");
                   }
                 }}
-                className="w-10 h-10 rounded-xl border-border flex-shrink-0"
+                className="focusable w-10 h-10 rounded-xl border-border flex-shrink-0 focus:bg-zinc-850"
               >
                 <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
               </Button>
@@ -279,7 +279,7 @@ export const QuizDetailPage = () => {
             </div>
 
             {/* How to play */}
-            <Card className="rounded-md p-4">
+            <Card tabIndex={-1} className="rounded-md p-4">
               <h3 className="text-foreground font-semibold text-base ">How to Play</h3>
               <div className="grid grid-cols-2 gap-3">
                 {["Read each question carefully.", "Select correct answer(s) and click Confirm.", `Answer all ${qCount} questions to complete.`, "Your score is shown at the end."].map((tip, i) => (
@@ -294,7 +294,7 @@ export const QuizDetailPage = () => {
 
           {/* Right column — start card */}
           <div className="w-[300px] lg:w-[340px] flex-shrink-0 self-start sticky top-27">
-            <Card className="rounded-xl p-4 flex flex-col gap-5">
+            <Card tabIndex={-1} className="rounded-xl p-4 flex flex-col gap-5">
               <h3 className="text-foreground font-bold text-lg">Ready to start?</h3>
 
               {/* Stats */}
@@ -316,7 +316,7 @@ export const QuizDetailPage = () => {
               </div>
 
               <Button id="quiz-start-btn" onClick={() => setStarted(true)}
-                className="w-full h-9 py-3 rounded-md font-semibold !text-secondary flex items-center justify-center gap-2"
+                className="focusable w-full h-9 py-3 rounded-md font-semibold !text-secondary flex items-center justify-center gap-2 focus:scale-102"
               >
                 <Trophy className="w-4 h-4" /> Start Quiz
               </Button>
@@ -355,7 +355,7 @@ export const QuizDetailPage = () => {
                   navigate("/quiz");
                 }
               }}
-              className="shrink-0 w-9 h-9 rounded-full border-border"
+              className="focusable w-9 h-9 rounded-full border-border focus:bg-zinc-850"
             >
               <ArrowLeft className="w-4 h-4 text-foreground" />
             </Button>
@@ -370,7 +370,7 @@ export const QuizDetailPage = () => {
 
       {/* MOBILE Scrollable body */}
       <div className="md:hidden flex-1 pt-[88px] pb-28 px-4 overflow-y-auto scrollbar-hide max-w-[700px] mx-auto w-full">
-        <Card className="mt-4 rounded-2xl p-5">
+        <Card tabIndex={-1} className="mt-4 rounded-2xl p-5">
           <div className="flex items-start gap-3 mb-2">
             <span className="shrink-0 w-7 h-7 rounded-md bg-primary/15 border border-primary/20 text-primary text-xs font-bold flex items-center justify-center mt-0.5">{currentIdx + 1}</span>
             <p className="text-foreground font-semibold text-base leading-snug">{currentQ.text}</p>
@@ -390,7 +390,7 @@ export const QuizDetailPage = () => {
               base += sel ? "bg-primary/10 border-primary/50 text-primary" : "bg-card border-border text-foreground hover:border-primary/30 hover:bg-foreground/[0.02]";
             }
             return (
-              <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={base} disabled={showFeedback}>
+              <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={`focusable ${base}`} disabled={showFeedback}>
                 <span className={`shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${showFeedback ? correct ? "border-emerald-400" : sel ? "border-rose-400" : "border-border" : sel ? "border-primary bg-primary" : "border-border"}`}>
                   {showFeedback && correct && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
                   {showFeedback && sel && !correct && <XCircle className="w-3.5 h-3.5 text-rose-400" />}
@@ -408,11 +408,11 @@ export const QuizDetailPage = () => {
         <div className="max-w-[700px] mx-auto w-full">
           {!showFeedback ? (
             <Button id="quiz-confirm-btn" onClick={handleConfirmAnswer} disabled={!hasSelected}
-              className="w-full h-10 py-3 rounded-md font-semibold text-secondary active:scale-[0.98]"
+              className="focusable w-full h-10 py-3 rounded-md font-semibold text-secondary active:scale-[0.98] focus:scale-102"
             >Confirm Answer</Button>
           ) : (
             <Button id="quiz-next-btn" onClick={handleNext}
-              className="w-full h-auto py-3.5 rounded-xl font-bold text-base active:scale-[0.98] flex items-center justify-center gap-2"
+              className="focusable w-full h-auto py-3.5 rounded-xl font-bold text-base active:scale-[0.98] flex items-center justify-center gap-2 focus:scale-102"
             >{currentIdx + 1 >= quiz.questions.length ? "See Results" : "Next Question"}<ChevronRight className="w-4 h-4" /></Button>
           )}
         </div>
@@ -435,7 +435,7 @@ export const QuizDetailPage = () => {
                   navigate("/quiz");
                 }
               }}
-              className="w-10 h-10 rounded-lg border-border flex-shrink-0"
+              className="focusable w-10 h-10 rounded-lg border-border flex-shrink-0 focus:bg-zinc-850"
             >
               <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
             </Button>
@@ -451,7 +451,7 @@ export const QuizDetailPage = () => {
           </div>
 
           {/* Question card */}
-          <Card className="rounded-lg p-4">
+          <Card tabIndex={-1} className="rounded-lg p-4">
             <div className="flex items-start gap-4">
               <span className="shrink-0 w-7 h-7 rounded-lg bg-primary/15 border border-primary/20 text-primary text-sm font-bold flex items-center justify-center mt-0.5">{currentIdx + 1}</span>
               <div>
@@ -475,7 +475,7 @@ export const QuizDetailPage = () => {
                 base += sel ? "bg-primary/8 border-primary/50 text-primary" : "bg-card border-border text-foreground hover:border-primary/30 hover:bg-foreground/[0.02]";
               }
               return (
-                <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={base} disabled={showFeedback}>
+                <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={`focusable ${base}`} disabled={showFeedback}>
                   <span className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${showFeedback ? correct ? "border-emerald-400" : sel ? "border-rose-400" : "border-border" : sel ? "border-primary bg-primary" : "border-border"}`}>
                     {showFeedback && correct && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
                     {showFeedback && sel && !correct && <XCircle className="w-4 h-4 text-rose-400" />}
@@ -490,7 +490,7 @@ export const QuizDetailPage = () => {
 
         {/* Right — confirm panel */}
         <div className="w-[280px] lg:w-[300px] flex-shrink-0 self-start sticky top-25">
-          <Card className="rounded-lg p-4 flex flex-col gap-4">
+          <Card tabIndex={-1} className="rounded-lg p-4 flex flex-col gap-4">
             <h3 className="text-foreground font-bold text-base">Question {currentIdx + 1} of {quiz.questions.length}</h3>
             <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
               <div className="h-full rounded-full transition-all duration-500 bg-primary" style={{ width: `${progress}%` }} />
@@ -500,11 +500,11 @@ export const QuizDetailPage = () => {
             </div>
             {!showFeedback ? (
               <Button id="quiz-confirm-btn" onClick={handleConfirmAnswer} disabled={!hasSelected}
-                className="w-full h-auto py-3 text-secondary rounded-lg font-semibold text-sm flex items-center justify-center gap-2"
+                className="focusable w-full h-auto py-3 text-secondary rounded-lg font-semibold text-sm flex items-center justify-center gap-2 focus:scale-102"
               >Confirm Answer</Button>
             ) : (
               <Button id="quiz-next-btn" onClick={handleNext}
-                className="w-full h-auto py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
+                className="focusable w-full h-auto py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 focus:scale-102"
               >{currentIdx + 1 >= quiz.questions.length ? "See Results" : "Next Question"}<ChevronRight className="w-4 h-4" /></Button>
             )}
           </Card>

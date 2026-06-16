@@ -200,7 +200,7 @@ const Search = () => {
                         </div>
 
                         {/* Search Input Bar */}
-                        <form onSubmit={handleSearchSubmit} className="relative w-full group">
+                        <form tabIndex={-1} onSubmit={handleSearchSubmit} className="relative w-full group">
                             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-white transition-colors" />
                             <Input
                                 type="text"
@@ -220,6 +220,7 @@ const Search = () => {
                                 </div>
                             ) : query.length > 0 ? (
                                 <button
+                                    tabIndex={-1}
                                     type="button"
                                     onClick={clearSearchState}
                                     className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
@@ -244,7 +245,7 @@ const Search = () => {
                                 {history.length > 0 && (
                                     <button
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                        className="text-xs font-bold text-blue-500 hover:text-blue-400"
+                                        className="focusable text-xs font-bold text-blue-500 hover:text-blue-400"
                                     >
                                         Clear All
                                     </button>
@@ -259,7 +260,8 @@ const Search = () => {
                                         return (
                                             <div
                                                 key={item.id}
-                                                className="relative w-[140px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors"
+                                                tabIndex={0}
+                                                className="focusable relative w-[140px] aspect-video rounded-md overflow-hidden flex-shrink-0 cursor-pointer group bg-zinc-900 border border-zinc-800/50 hover:border-zinc-600 transition-colors"
                                                 onClick={() => handleChipClick(item.query)}
                                             >
                                                 {displayImage ? (
@@ -272,6 +274,7 @@ const Search = () => {
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-2">
                                                     <div className="flex justify-end">
                                                         <button
+                                                            tabIndex={-1}
                                                             className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
@@ -332,7 +335,8 @@ const Search = () => {
                                 return (
                                     <div
                                         key={movie.id}
-                                        className={`relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10 ${isLarge ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}`}
+                                        tabIndex={0}
+                                        className={`focusable relative rounded-md overflow-hidden group cursor-pointer bg-zinc-900 transition-transform duration-300 hover:scale-[1.02] hover:z-10 ${isLarge ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}`}
                                         onClick={() => {
                                             if (query.trim() && user?.id) {
                                                 dispatch(saveSearch({ uid: user.id, query: query.trim() }));
@@ -370,7 +374,7 @@ const Search = () => {
                 <div className="max-w-6xl mx-auto px-6 pt-16 flex flex-col items-center">
                     {/* Search Input Bar & Close Button */}
                     <div className="flex items-center gap-6 w-full max-w-3xl mb-8">
-                        <form onSubmit={handleSearchSubmit} className="relative flex-1 group">
+                        <form tabIndex={-1} onSubmit={handleSearchSubmit} className="relative flex-1 group">
                             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-white transition-colors" />
                             <Input
                                 type="text"
@@ -385,6 +389,7 @@ const Search = () => {
                                 disabled={isLoadingMedia}
                             />
                             {/* <button
+                                tabIndex={-1}
                                 type="button"
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
                                 title="Voice Search"
@@ -476,6 +481,7 @@ const Search = () => {
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-2">
                                                     <div className="flex justify-end">
                                                         <button
+                                                            tabIndex={-1}
                                                             className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();

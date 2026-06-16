@@ -72,7 +72,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   return (
     <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 animate-fade-in p-2">
-      <Card className="max-w-[280px] xs:max-w-xs sm:max-w-sm w-full bg-zinc-900/95 border-zinc-800 p-3.5 sm:p-5 flex flex-col items-center justify-center animate-in zoom-in-95 duration-300 border gap-3 sm:gap-4">
+      <Card tabIndex={-1} className="max-w-[280px] xs:max-w-xs sm:max-w-sm w-full bg-zinc-900/95 border-zinc-800 p-3.5 sm:p-5 flex flex-col items-center justify-center animate-in zoom-in-95 duration-300 border gap-3 sm:gap-4">
         <CardHeader className="flex flex-col items-center justify-center text-center p-0 gap-2.5 sm:gap-4 w-full">
           <div className="flex justify-center">
             <div className="rounded-full bg-yellow-500/10 w-8 h-8 sm:w-12 sm:h-12 flex items-center justify-center border border-yellow-500/25">
@@ -109,7 +109,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
                   onMouseEnter={() => setHoveredStar(starValue)}
                   onMouseLeave={() => setHoveredStar(0)}
                   onClick={() => setUserRatingSelection(starValue)}
-                  className="p-0.5  cursor-pointer transition-transform duration-150 active:scale-90 focus:outline-none"
+                  className="focusable p-0.5  cursor-pointer transition-transform duration-150 active:scale-90 focus:outline-none"
                 >
                   <svg
                     className={`w-7 h-7 sm:w-10 sm:h-10 transition-colors duration-150 ${isHighlighted ? "text-primary-foreground fill-primary-foreground" : "text-zinc-600 hover:text-primary-foreground"
@@ -130,7 +130,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
           <button
             onClick={handleSubmitFeedback}
             disabled={userRatingSelection === 0 || isSubmitting}
-            className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm bg-primary-foreground hover:bg-primary-foreground/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-secondary font-bold rounded-md transition-all shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
+            className="focusable flex-1 py-1.5 sm:py-2 text-xs sm:text-sm bg-primary-foreground hover:bg-primary-foreground/90 disabled:bg-zinc-800 disabled:text-zinc-500 text-secondary font-bold rounded-md transition-all shadow-lg active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5"
           >
             {isSubmitting ? (
               <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -141,7 +141,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
           <button
             onClick={onClose}
-            className="flex-1 py-1.5 sm:py-2 text-xs sm:text-sm bg-zinc-950 border border-zinc-800/80 hover:bg-zinc-900 text-white font-semibold rounded-md transition-all active:scale-[0.98] cursor-pointer text-center"
+            className="focusable flex-1 py-1.5 sm:py-2 text-xs sm:text-sm bg-zinc-950 border border-zinc-800/80 hover:bg-zinc-900 text-white font-semibold rounded-md transition-all active:scale-[0.98] cursor-pointer text-center"
           >
             Skip
           </button>
