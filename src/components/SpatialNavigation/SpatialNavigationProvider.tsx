@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { isTvPlatform, TV_KEYS } from "@/lib/tvUtils";
 import { useNavigate } from "react-router-dom";
 
@@ -18,7 +18,27 @@ interface SpatialNavigationProviderProps {
 
 export const SpatialNavigationProvider: React.FC<SpatialNavigationProviderProps> = ({ children }) => {
   const navigate = useNavigate();
-  const isTV = isTvPlatform();
+  const [isTV, setIsTV] = useState(() => isTvPlatform());
+
+  useEffect(() => {
+    // Add dynamic keypress detection for D-pad/Arrow keys to auto-enable TV mode if it wasn't detected by User Agent
+    const handleInitialTVDetection = (e: KeyboardEvent) => {
+      if (!isTV && (
+        e.key === TV_KEYS.UP ||
+        e.key === TV_KEYS.DOWN ||
+        e.key === TV_KEYS.LEFT ||
+        e.key === TV_KEYS.RIGHT
+      )) {
+        setIsTV(true);
+        localStorage.setItem("force_tv_mode", "true");
+      }
+    };
+
+    window.addEventListener("keydown", handleInitialTVDetection);
+    return () => {
+      window.removeEventListener("keydown", handleInitialTVDetection);
+    };
+  }, [isTV]);
 
   useEffect(() => {
     if (!isTV) return;
@@ -52,8 +72,7 @@ export const SpatialNavigationProvider: React.FC<SpatialNavigationProviderProps>
       if (
         e.key === TV_KEYS.UP ||
         e.key === TV_KEYS.DOWN ||
-        e.key === TV_KEYS.LEFT ||
-        e.key === TV_KEYS.RIGHT
+        ((e.key === TV_KEYS.LEFT || e.key === TV_KEYS.RIGHT) && !isInputActive)
       ) {
         // Prevent default scrolling behaviour of browser
         e.preventDefault();

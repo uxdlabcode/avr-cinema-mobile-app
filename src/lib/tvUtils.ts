@@ -20,7 +20,23 @@ export const isTvPlatform = (): boolean => {
     ua.includes("appletv") ||
     ua.includes("xbox") ||
     ua.includes("playstation") ||
-    ua.includes("tv");
+    ua.includes("tv") ||
+    ua.includes("chromecast") ||
+    ua.includes("crkey") ||
+    ua.includes("aft") || // aftb, afts, etc (Fire TV)
+    ua.includes("mibox") ||
+    ua.includes("mitv") ||
+    ua.includes("sony") || // Sony Bravia
+    ua.includes("bravia") ||
+    ua.includes("philips") ||
+    ua.includes("panasonic") ||
+    ua.includes("viera") ||
+    ua.includes("sharp") ||
+    ua.includes("aquos") ||
+    ua.includes("hisense") ||
+    ua.includes("toshiba") ||
+    ua.includes("vizio") ||
+    (ua.includes("android") && !ua.includes("mobile")); // Android TV standard webview
   
   // Developer override for easy testing on desktop browsers
   const isForceTv = localStorage.getItem("force_tv_mode") === "true";
