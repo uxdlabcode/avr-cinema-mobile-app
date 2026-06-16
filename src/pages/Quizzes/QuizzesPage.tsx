@@ -223,18 +223,26 @@ export const QuizzesPage = () => {
           </div>
 
           {/* Stats row */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center !gap-2">
             {[
               { label: "Total Quizzes", value: loading ? "—" : quizzes.length, icon: <Trophy className="w-4 h-4 text-primary" /> },
               { label: "Questions", value: loading ? "—" : totalQuestions, icon: <HelpCircle className="w-4 h-4 text-primary" /> },
               { label: "Categories", value: loading ? "—" : categories.length - 1, icon: <BookOpen className="w-4 h-4 text-primary" /> },
             ].map((s) => (
-              <Card key={s.label} className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl">
-                {s.icon}
-                <div>
-                  <p className="text-foreground font-bold text-base leading-none">{s.value}</p>
-                  <p className="text-muted-foreground text-[11px] mt-0.5">{s.label}</p>
+              <Card
+                key={s.label}
+                className="flex flex-col px-4 pt-2   rounded-md"
+              >
+                <div className="flex items-center justify-center  gap-2 !pb-0 !mb-0">
+                  {s.icon}
+                  <p className="text-foreground  text-base leading-none">
+                    {s.value}
+                  </p>
                 </div>
+
+                <p className="text-muted-foreground text-xs mt-0 pt-0 ">
+                  {s.label}
+                </p>
               </Card>
             ))}
           </div>

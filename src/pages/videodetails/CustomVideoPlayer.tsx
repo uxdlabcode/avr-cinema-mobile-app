@@ -1047,11 +1047,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     max="100"
                     value={brightness}
                     onChange={(e) => setBrightness(Number(e.target.value))}
+                    onClick={(e) => e.stopPropagation()}
                     className="w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
                     style={{
                       appearance: 'slider-vertical',
-                      WebkitAppearance: 'none',
-                      writingMode: 'bt-lr'
+                      WebkitAppearance: 'slider-vertical',
+                      writingMode: 'vertical-lr',
+                      direction: 'rtl'
                     } as any}
                     {...{ orient: "vertical" }}
                   />
@@ -1084,11 +1086,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     step="0.05"
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
+                    onClick={(e) => e.stopPropagation()}
                     className="w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
                     style={{
                       appearance: 'slider-vertical',
-                      WebkitAppearance: 'none',
-                      writingMode: 'bt-lr'
+                      WebkitAppearance: 'slider-vertical',
+                      writingMode: 'vertical-lr',
+                      direction: 'rtl'
                     } as any}
                     {...{ orient: "vertical" }}
                   />
