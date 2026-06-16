@@ -370,9 +370,9 @@ export const QuizResultPage = () => {
               {/* Stats row */}
               <div className="w-full grid grid-cols-3 gap-3 border-t border-border  relative z-10">
                 {[
-                  { label: "Correct", val: correct, color: "text-emerald-400" },
-                  { label: "Wrong", val: total - correct, color: "text-rose-400" },
-                  { label: "Total", val: total, color: "text-primary" },
+                  { label: "Correct", val: correct, color: "text-emerald-400", bg: "bg-foreground/5" },
+                  { label: "Wrong", val: total - correct, color: "text-rose-400", bg: "bg-foreground/5" },
+                  { label: "Total", val: total, color: "text-primary", bg: "bg-foreground/5" },
                 ].map((s) => (
                   <div key={s.label} className={`flex flex-col items-center py-3 rounded-xl ${s.bg}`}>
                     <span className={`${s.color} font-bold text-lg leading-none`}>{s.val}</span>
