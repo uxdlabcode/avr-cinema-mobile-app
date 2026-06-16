@@ -12,6 +12,7 @@ import { FeedbackModal } from './FeedbackModal';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { isTvPlatform } from '@/lib/tvUtils';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
 interface CustomVideoPlayerProps {
   movie: any;
@@ -27,6 +28,17 @@ interface CustomVideoPlayerProps {
   onFeedbackSubmitted?: () => void;
   trailerUrl?: string;
 }
+
+const parseResolutionToHeight = (res: string): number => {
+  if (!res) return 1080;
+  const cleaned = res.toLowerCase().replace(/\s+/g, "");
+  if (cleaned.includes("4k") || cleaned.includes("2160p")) return 2160;
+  if (cleaned.includes("1080p")) return 1080;
+  if (cleaned.includes("720p")) return 720;
+  if (cleaned.includes("480p")) return 480;
+  if (cleaned.includes("360p")) return 360;
+  return 1080;
+};
 
 export interface CustomVideoPlayerRef {
   togglePlayPause: () => void;
@@ -86,8 +98,27 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
   const [showControls, setShowControls] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
-  const [qualities, setQualities] = useState<{ id: number; name: string }[]>([]);
+  const [qualities, setQualities] = useState<{ id: number; name: string; height: number }[]>([]);
   const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
+  const [maxResolutionHeight, setMaxResolutionHeight] = useState<number>(2160);
+
+  useEffect(() => {
+    if (!user?.membershipPlanId) {
+      setMaxResolutionHeight(2160);
+      return;
+    }
+    const fetchPlanResolution = async () => {
+      try {
+        const plan = await getDocumentData("plans", user.membershipPlanId as string);
+        if (plan && plan.resolution) {
+          setMaxResolutionHeight(parseResolutionToHeight(plan.resolution));
+        }
+      } catch (err) {
+        console.error("Error fetching plan resolution:", err);
+      }
+    };
+    fetchPlanResolution();
+  }, [user?.membershipPlanId]);
 
   // Custom Settings overlay states
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
@@ -111,6 +142,9 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
   const hlsRef = useRef<any>(null);
   const controlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSavedTimeRef = useRef<number>(0);
+  // Persists the height (e.g. 720) the user last manually selected so it can be
+  // re-applied when switching from trailer → main content.
+  const preferredQualityHeight = useRef<number | null>(null);
 
   const saveCurrentProgress = async (time: number) => {
     if (!movie || isPlayingTrailer) return;
@@ -356,23 +390,81 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         });
 
         hlsInstance.on(HlsClass.Events.MANIFEST_PARSED, () => {
-          const levels = hlsInstance.levels.map((level: any, idx: number) => {
-            const height = level.height;
-            let name = `${height}p`;
-            if (height === 1080) name = "1080p";
-            else if (height === 720) name = "720p";
-            else if (height === 480) name = "480p";
-            else if (height === 360) name = "360p";
-            return {
-              id: idx,
-              name: name
-            };
-          });
+          // Standard quality series — only show options the stream can actually provide
+          const STANDARD_HEIGHTS = [1080, 720, 480, 360, 240, 144];
+          const actualLevels: { idx: number; height: number }[] = hlsInstance.levels.map((level: any, idx: number) => ({ idx, height: level.height }));
 
-          const uniqueLevels = Array.from(new Map(levels.map((item: any) => [item.name, item])).values()) as any[];
-          uniqueLevels.sort((a, b) => parseInt(b.name) - parseInt(a.name));
-          setQualities([{ id: -1, name: "Auto" }, ...uniqueLevels]);
+          // The highest resolution the stream actually has
+          const actualMaxHeight = actualLevels.reduce((max, l) => Math.max(max, l.height), 0);
+
+          // Map each standard height to the closest real HLS level index
+          const findClosestLevel = (targetHeight: number) => {
+            if (actualLevels.length === 0) return -1;
+            return actualLevels.reduce((best, cur) => {
+              return Math.abs(cur.height - targetHeight) < Math.abs(best.height - targetHeight) ? cur : best;
+            }, actualLevels[0]).idx;
+          };
+
+          // Only keep standard heights that the stream can actually serve (cap at actualMaxHeight)
+          const filteredHeights = STANDARD_HEIGHTS.filter((h) => h <= actualMaxHeight);
+
+          const standardQualities = filteredHeights.map((h) => ({
+            id: findClosestLevel(h),
+            height: h,
+            name: `${h}p`
+          }));
+
+          setQualities([{ id: -1, name: "Auto", height: 0 }, ...standardQualities]);
           setCurrentQuality(hlsInstance.currentLevel);
+
+
+          // Cap the auto selection level of Hls.js to user's plan limit
+          // Trailers are always free — skip the cap when playing trailer
+          const effectiveMaxHeight = isPlayingTrailer ? 2160 : maxResolutionHeight;
+          let maxAllowedIdx = -1;
+          let maxAllowedHeight = 0;
+          hlsInstance.levels.forEach((level: any, idx: number) => {
+            if (level.height <= effectiveMaxHeight && level.height > maxAllowedHeight) {
+              maxAllowedHeight = level.height;
+              maxAllowedIdx = idx;
+            }
+          });
+          if (maxAllowedIdx === -1 && hlsInstance.levels.length > 0) {
+            let minHeight = Infinity;
+            hlsInstance.levels.forEach((level: any, idx: number) => {
+              if (level.height < minHeight) {
+                minHeight = level.height;
+                maxAllowedIdx = idx;
+              }
+            });
+          }
+          if (maxAllowedIdx !== -1) {
+            hlsInstance.maxAutoLevel = maxAllowedIdx;
+          }
+
+          // If user chose a quality during trailer playback, restore it now for main content
+          if (!isPlayingTrailer && preferredQualityHeight.current !== null) {
+            const prefHeight = preferredQualityHeight.current;
+            // Only restore if it's within the plan limit
+            if (prefHeight <= effectiveMaxHeight) {
+              // Find the best matching HLS level for the preferred height
+              let bestIdx = -1;
+              let bestDiff = Infinity;
+              hlsInstance.levels.forEach((level: any, idx: number) => {
+                const diff = Math.abs(level.height - prefHeight);
+                if (diff < bestDiff) {
+                  bestDiff = diff;
+                  bestIdx = idx;
+                }
+              });
+              if (bestIdx !== -1) {
+                hlsInstance.currentLevel = bestIdx;
+                setCurrentQuality(bestIdx);
+              }
+            }
+            // Clear so it doesn't persist beyond first apply
+            preferredQualityHeight.current = null;
+          }
 
           // Apply current playback speed
           video.playbackRate = playbackSpeed;
@@ -555,6 +647,49 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     };
   }, [isCurrentlyPlaying, duration, onExit]);
 
+  // Global keyboard shortcuts for volume and brightness (non-TV platforms)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          setVolume(prev => {
+            const newVol = Math.min(prev + 0.05, 1);
+            if (videoRef.current) videoRef.current.volume = newVol;
+            setIsMuted(newVol === 0);
+            return newVol;
+          });
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          setVolume(prev => {
+            const newVol = Math.max(prev - 0.05, 0);
+            if (videoRef.current) videoRef.current.volume = newVol;
+            setIsMuted(newVol === 0);
+            return newVol;
+          });
+          break;
+        case '+':
+        case '=':
+          e.preventDefault();
+          setBrightness(prev => Math.min(prev + 5, 100));
+          break;
+        case '-':
+          e.preventDefault();
+          setBrightness(prev => Math.max(prev - 5, 10));
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+
   const togglePlayPause = (e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (videoRef.current) {
@@ -673,8 +808,41 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     if (hlsRef.current) {
       hlsRef.current.currentLevel = qualityId;
       setCurrentQuality(qualityId);
+
+      if (qualityId === -1) {
+        // Auto selected — clear preference and re-enforce the plan's resolution cap
+        preferredQualityHeight.current = null;
+
+        // Re-compute maxAutoLevel so Auto never exceeds the plan limit
+        const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
+        let maxAllowedIdx = -1;
+        let maxAllowedHeight = 0;
+        (hlsRef.current.levels as any[]).forEach((level: any, idx: number) => {
+          if (level.height <= effectiveMax && level.height > maxAllowedHeight) {
+            maxAllowedHeight = level.height;
+            maxAllowedIdx = idx;
+          }
+        });
+        // Fallback to lowest level if none fit
+        if (maxAllowedIdx === -1 && hlsRef.current.levels.length > 0) {
+          let minH = Infinity;
+          (hlsRef.current.levels as any[]).forEach((level: any, idx: number) => {
+            if (level.height < minH) { minH = level.height; maxAllowedIdx = idx; }
+          });
+        }
+        if (maxAllowedIdx !== -1) {
+          hlsRef.current.maxAutoLevel = maxAllowedIdx;
+        }
+      } else {
+        // Manual level — persist height for trailer→main content carry-over
+        const chosenLevel = hlsRef.current.levels?.[qualityId];
+        if (chosenLevel && chosenLevel.height) {
+          preferredQualityHeight.current = chosenLevel.height;
+        }
+      }
     }
   };
+
 
   const handleSpeedChange = (speedVal: number) => {
     setPlaybackSpeed(speedVal);
@@ -905,18 +1073,20 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
             {/* Skip Trailer Button */}
             {isPlayingTrailer && (
-              <button
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsPlayingTrailer(false);
                   setCurrentSourceUrl(videoUrlToPlay);
                 }}
-                className="focusable absolute bottom-24 right-8 bg-zinc-950/90 border border-zinc-800 hover:border-zinc-750 text-white font-bold px-6 py-3 rounded-lg shadow-2xl transition-all active:scale-[0.98] z-30 cursor-pointer flex items-center gap-2 outline-none"
+                className="focusable absolute bottom-12 right-6 md:bottom-24 md:right-8 z-30 bg-transparent hover:bg-transparent border-none p-0 text-white font-semibold shadow-none text-sm md:bg-zinc-950/90 md:hover:bg-zinc-950/90 md:border md:border-zinc-700 md:hover:border-zinc-500 md:px-3 md:py-3 md:rounded-lg md:shadow-2xl transition-all active:scale-[0.98] cursor-pointer flex items-center md:gap-2 outline-none"
               >
-                <span>Skip Trailer</span>
-                <ChevronsRight className="w-4 h-4" />
-              </button>
+                <span>Skip</span>
+                {/* <ChevronsRight className="w-4 h-4" /> */}
+              </Button>
             )}
+
+
 
             {/* Simulated Brightness Overlay */}
             <div
@@ -994,7 +1164,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-white">
+                <div className="flex items-center gap-0 text-white">
 
                   {/* <button
                     onClick={(e) => {
@@ -1009,9 +1179,8 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   </button> */}
                   <button
                     onClick={toggleCC}
-                    className={`focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700 ${
-                      currentSubtitleTrack !== -1 ? "text-yellow-500 font-bold" : "text-white"
-                    }`}
+                    className={`focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700 ${currentSubtitleTrack !== -1 ? "text-yellow-500 font-bold" : "text-white"
+                      }`}
                     title="Toggle Captions"
                   >
                     <Subtitles className="w-5 h-5" />
@@ -1242,20 +1411,20 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 />
 
                 <div
-                  className="absolute top-3 right-3 sm:top-16 sm:right-4 w-72 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3.5 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
+                  className="absolute top-3 right-3 sm:top-16 sm:right-4 w-49 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Tabs defaultValue="quality" value={activeSettingTab} onValueChange={(val) => setActiveSettingTab(val as any)} className="w-full flex flex-col flex-1 min-h-0">
-                    <TabsList className="grid grid-cols-3 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
+                    <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
                       <TabsTrigger value="quality" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
                         Quality
                       </TabsTrigger>
                       <TabsTrigger value="speed" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
                         Speed
                       </TabsTrigger>
-                      <TabsTrigger value="subtitles" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
+                      {/* <TabsTrigger value="subtitles" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
                         Subtitles
-                      </TabsTrigger>
+                      </TabsTrigger> */}
                     </TabsList>
 
                     {/* Content Options */}
@@ -1265,48 +1434,113 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                           {qualities.length > 0 ? (
                             qualities.map((q) => {
                               const isActive = currentQuality === q.id;
-                              let label = q.name;
-                              if (q.id === -1) label = "Auto (Recommended)";
-                              else if (q.name === "1080p") label = "Full HD (1080p)";
-                              else if (q.name === "720p") label = "HD (720p)";
-                              else if (q.name === "480p") label = "Data Saver (480p)";
+                              const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
+                              const isLocked = q.id !== -1 && q.height > effectiveMax;
+                              const label = q.id === -1 ? "Auto (Recommended)" : q.name;
+
                               return (
-                                <button
-                                  key={q.id}
-                                  onClick={() => {
-                                    handleQualityChange(q.id);
-                                    setShowSettingsOverlay(false);
-                                  }}
-                                  className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
+                                <div
+                                  key={`${q.height}_${q.id}`}
+                                  className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
                                 >
-                                  <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                  <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-400"}>{label}</span>
-                                </button>
+                                  <button
+                                    onClick={() => {
+                                      if (isLocked) {
+                                        if (document.fullscreenElement) {
+                                          document.exitFullscreen().catch(() => { });
+                                        }
+                                        navigate("/upgrade-plan");
+                                      } else {
+                                        handleQualityChange(q.id);
+                                      }
+                                      setShowSettingsOverlay(false);
+                                    }}
+                                    className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
+                                  >
+                                    <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                    <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
+                                      {label}
+                                    </span>
+                                  </button>
+
+                                  {isLocked && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (document.fullscreenElement) {
+                                          document.exitFullscreen().catch(() => { });
+                                        }
+                                        navigate("/upgrade-plan");
+                                        setShowSettingsOverlay(false);
+                                      }}
+                                      className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                    >
+                                      Upgrade
+                                    </button>
+                                  )}
+                                </div>
                               );
                             })
                           ) : (
-                            // Simulated Quality Options for static MP4
-                            [
-                              { id: -1, label: "Auto (Recommended)" },
-                              { id: 1080, label: "Full HD (1080p)" },
-                              { id: 720, label: "HD (720p)" },
-                              { id: 480, label: "Data Saver (480p)" }
-                            ].map((opt) => {
-                              const isActive = currentQuality === opt.id;
-                              return (
-                                <button
-                                  key={opt.id}
-                                  onClick={() => {
-                                    setCurrentQuality(opt.id);
-                                    setShowSettingsOverlay(false);
-                                  }}
-                                  className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
-                                >
-                                  <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                  <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>{opt.label}</span>
-                                </button>
-                              );
-                            })
+                            // Standard quality series for static MP4 / no HLS levels
+                            (() => {
+                              const staticOpts = [
+                                { id: -1, label: "Auto (Recommended)", height: 0 },
+                                { id: 1080, label: "1080p", height: 1080 },
+                                { id: 720, label: "720p", height: 720 },
+                                { id: 480, label: "480p", height: 480 },
+                                { id: 360, label: "360p", height: 360 },
+                                { id: 240, label: "240p", height: 240 },
+                                { id: 144, label: "144p", height: 144 },
+                              ];
+                              return staticOpts.map((opt) => {
+                                const isActive = currentQuality === opt.id;
+                                const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
+                                const isLocked = opt.id !== -1 && opt.height > effectiveMax;
+                                return (
+                                  <div
+                                    key={opt.id}
+                                    className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
+                                  >
+                                    <button
+                                      onClick={() => {
+                                        if (isLocked) {
+                                          if (document.fullscreenElement) {
+                                            document.exitFullscreen().catch(() => { });
+                                          }
+                                          navigate("/upgrade-plan");
+                                        } else {
+                                          setCurrentQuality(opt.id);
+                                        }
+                                        setShowSettingsOverlay(false);
+                                      }}
+                                      className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
+                                    >
+                                      <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                      <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
+                                        {opt.label}
+                                      </span>
+                                    </button>
+
+                                    {isLocked && (
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (document.fullscreenElement) {
+                                            document.exitFullscreen().catch(() => { });
+                                          }
+                                          navigate("/upgrade-plan");
+                                          setShowSettingsOverlay(false);
+                                        }}
+                                        className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                      >
+                                        Upgrade
+                                      </button>
+                                    )}
+                                  </div>
+                                );
+                              });
+                            })()
                           )}
                         </div>
                       </TabsContent>
@@ -1379,7 +1613,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   </Tabs>
 
                   {/* Footer bar */}
-                  <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-1.5 shrink-0">
+                  {/* <div className="flex items-center justify-between w-full text-[10px] text-zinc-500 border-t border-zinc-900 pt-2 mt-1.5 shrink-0">
                     <div>
                       {!isOnline && (
                         <span className="flex items-center gap-1 text-red-400">
@@ -1397,7 +1631,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </>
             )}

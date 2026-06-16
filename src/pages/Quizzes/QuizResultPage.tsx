@@ -368,7 +368,7 @@ export const QuizResultPage = () => {
               </div>
 
               {/* Stats row */}
-              <div className="w-full grid grid-cols-3 gap-3 border-t border-border  relative z-10">
+              <div className="w-full grid grid-cols-3 gap-2 border-t border-border  relative z-10">
                 {[
                   { label: "Correct", val: correct, color: "text-emerald-400", bg: "bg-foreground/5" },
                   { label: "Wrong", val: total - correct, color: "text-rose-400", bg: "bg-foreground/5" },

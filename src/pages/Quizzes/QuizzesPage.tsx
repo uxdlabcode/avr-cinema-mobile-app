@@ -222,8 +222,7 @@ export const QuizzesPage = () => {
             </div>
           </div>
 
-          {/* Stats row */}
-          <div className="flex items-center !gap-2">
+          <div className="flex items-center !gap-1.5">
             {[
               { label: "Total Quizzes", value: loading ? "—" : quizzes.length, icon: <Trophy className="w-4 h-4 text-primary" /> },
               { label: "Questions", value: loading ? "—" : totalQuestions, icon: <HelpCircle className="w-4 h-4 text-primary" /> },
@@ -231,16 +230,16 @@ export const QuizzesPage = () => {
             ].map((s) => (
               <Card
                 key={s.label}
-                className="flex flex-col px-4 pt-2   rounded-md"
+                className="flex flex-col p-2.5 !gap-1 rounded-md items-center justify-center min-w-[80px]"
               >
-                <div className="flex items-center justify-center  gap-2 !pb-0 !mb-0">
+                <div className="flex items-center justify-center gap-1.5 !pb-0 !mb-0">
                   {s.icon}
-                  <p className="text-foreground  text-base leading-none">
+                  <p className="text-foreground text-sm font-bold leading-none">
                     {s.value}
                   </p>
                 </div>
 
-                <p className="text-muted-foreground text-xs mt-0 pt-0 ">
+                <p className="text-muted-foreground text-[10px] leading-none text-center">
                   {s.label}
                 </p>
               </Card>
