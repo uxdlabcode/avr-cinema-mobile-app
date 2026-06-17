@@ -2,22 +2,9 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
-  Activity,
-  CheckCircle,
-  Command,
-  DollarSign,
-  FileText,
   Folder,
-  GalleryVerticalEnd,
-  Heart,
   LayoutDashboard,
-  MapPin,
-  Receipt,
-  Star,
   User,
-  Users,
-  Wrench,
   Film,
   Settings,
   LogIn,
@@ -44,57 +31,31 @@ import {
   SidebarGroup,
 } from "@/components/ui/sidebar"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+const superadminNav = [
+  {
+    title: "Admin Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
+    isActive: true,
   },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  superadminNav: [
-    {
-      title: "Admin Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboard,
-      isActive: true,
-    },
-    {
-      title: "Manage Projects",
-      url: "/projects",
-      icon: Folder,
-      isActive: false,
-    },
-    {
-      title: "System Settings",
-      url: "/home",
-      icon: Settings,
-    },
-  ],
-}
+  {
+    title: "Manage Projects",
+    url: "/projects",
+    icon: Folder,
+    isActive: false,
+  },
+  {
+    title: "System Settings",
+    url: "/home",
+    icon: Settings,
+  },
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { state } = useSidebar()
   const location = useLocation()
   const user = useSelector((state: RootState) => state.auth.user)
-
-  const navItems = data.superadminNav
+  const navItems = superadminNav
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -168,7 +129,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={{
           name: user?.name || 'User',
           email: user?.email || '',
-          avatar: data.user.avatar
+          avatar: user?.avatar || ''
         }} />
       </SidebarFooter>
       <SidebarRail />

@@ -1463,7 +1463,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         </button>
                         <span className="text-xs font-bold text-white">Report an Issue</span>
                       </div>
-                      
+
                       <div className="flex flex-col gap-1.5 overflow-y-auto pr-1 flex-1 min-h-0 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
                         {[
                           { key: 'quality_issue', label: 'Quality Issue' },
@@ -1698,7 +1698,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </>
             )}
 
-            {/* Feedback / Rating Overlay Modal */}
+            {/* Feedback / Review Overlay Modal */}
             <FeedbackModal
               isOpen={showFeedbackOverlay}
               onClose={() => {

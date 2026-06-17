@@ -98,7 +98,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         </CardHeader>
 
         <CardContent className="p-0 flex flex-col items-center justify-center w-full">
-          {/* 5-Star Interactive Rating Picker */}
+          {/* 5-Star Interactive Review  Picker */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             {[1, 2, 3, 4, 5].map((starValue) => {
               const isHighlighted = (hoveredStar || userRatingSelection) >= starValue;

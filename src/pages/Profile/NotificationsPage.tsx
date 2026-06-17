@@ -3,74 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-const notifications = [
-  {
-    id: 1,
-    title: "Sale is Live",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit dolor sit amet, consectetur adipiscing elit.",
-    time: "1m ago",
-    image: "/assets/episode1.webp",
-    badge: 1,
-    read: false,
-  },
-  {
-    id: 2,
-    title: "Sale is Live",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit dolor sit amet, consectetur adipiscing elit.",
-    time: "1m ago",
-    image: "/assets/episode2.webp",
-    badge: 2,
-    read: false,
-  },
-  {
-    id: 3,
-    title: "Sale is Live",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit dolor sit amet, consectetur adipiscing elit.",
-    time: "1m ago",
-    image: "/assets/poster.png",
-    badge: null,
-    read: true,
-  },
-  {
-    id: 4,
-    title: "Sale is Live",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit dolor sit amet, consectetur adipiscing elit.",
-    time: "10 Hrs ago",
-    image: "/assets/episode1.webp",
-    badge: null,
-    read: true,
-  },
-  {
-    id: 5,
-    title: "Sale is Live",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit dolor sit amet, consectetur adipiscing elit.",
-    time: "15 Hrs ago",
-    image: "/assets/episode2.webp",
-    badge: null,
-    read: true,
-  },
-];
 
-const recommended = [
-  {
-    id: 6,
-    title: "New Release",
-    description: "Lord of the Rings is now available on AVR Cinema. Watch it now!",
-    time: "2m ago",
-    image: "/assets/episode2.webp",
-    badge: null,
-    read: false,
-  },
-  {
-    id: 7,
-    title: "Top Pick for You",
-    description: "Based on your watchlist, you might enjoy Anweshippin Kandethum.",
-    time: "5 Hrs ago",
-    image: "/assets/poster.png",
-    badge: null,
-    read: true,
-  },
-];
 
 export const NotificationsPage = () => {
   const navigate = useNavigate();
@@ -85,59 +18,59 @@ export const NotificationsPage = () => {
       {/* ── Header & Tabs (Fixed on mobile) ── */}
       <div className="fixed md:static top-0 left-0 right-0 z-50 bg-background border-b border-border md:border-none">
         <div className="max-w-[700px] md:max-w-[1000px] mx-auto w-full">
-        {/* Mobile top bar */}
-        <div className="md:hidden flex items-center gap-3 px-4 pt-5 pb-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate("/profile")}
-            className="focusable w-9 h-9 rounded-full border-border"
-          >
-            <ArrowLeft className="w-4 h-4 text-foreground" />
-          </Button>
-          <h1 className="text-foreground font-bold text-lg">Notifications</h1>
-        </div>
+          {/* Mobile top bar */}
+          <div className="md:hidden flex items-center gap-3 px-4 pt-5 pb-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate("/profile")}
+              className="focusable w-9 h-9 rounded-full border-border"
+            >
+              <ArrowLeft className="w-4 h-4 text-foreground" />
+            </Button>
+            <h1 className="text-foreground font-bold text-lg">Notifications</h1>
+          </div>
 
-        {/* Desktop inline header */}
-        <div className="hidden md:flex items-center gap-3 px-4 pt-8 pb-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => navigate("/profile")}
-            className="focusable w-10 h-10 rounded-xl border-border"
-          >
-            <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
-          </Button>
-          <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
-        </div>
+          {/* Desktop inline header */}
+          <div className="hidden md:flex items-center gap-3 px-4 pt-8 pb-4">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => navigate("/profile")}
+              className="focusable w-10 h-10 rounded-xl border-border"
+            >
+              <ArrowLeft className="w-4.5 h-4.5 text-foreground" />
+            </Button>
+            <h1 className="text-2xl font-bold text-foreground">Notifications</h1>
+          </div>
 
-        <div className="flex items-center gap-6 px-4 pb-3 border-b border-border md:border-b-2">
-          <Button
-            variant="ghost"
-            onClick={() => setActiveTab("general")}
-            className={`focusable pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 hover:bg-transparent ${activeTab === "general"
+          <div className="flex items-center gap-6 px-4 pb-3 border-b border-border md:border-b-2">
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab("general")}
+              className={`focusable pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 hover:bg-transparent ${activeTab === "general"
                 ? "text-foreground border-foreground"
                 : "text-muted-foreground border-transparent hover:text-foreground"
-              }`}
-          >
-            General
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => setActiveTab("recommended")}
-            className={`focusable pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 flex items-center gap-2 hover:bg-transparent ${activeTab === "recommended"
+                }`}
+            >
+              General
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab("recommended")}
+              className={`focusable pb-2 h-auto rounded-none text-sm font-semibold transition-colors border-b-2 flex items-center gap-2 hover:bg-transparent ${activeTab === "recommended"
                 ? "text-foreground border-foreground"
                 : "text-muted-foreground border-transparent hover:text-foreground"
-              }`}
-          >
-            Recommended
-            {unreadCount > 0 && (
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-foreground text-background text-[10px] font-bold">
-                {unreadCount}
-              </span>
-            )}
-          </Button>
-        </div>
+                }`}
+            >
+              Recommended
+              {unreadCount > 0 && (
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-foreground text-background text-[10px] font-bold">
+                  {unreadCount}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
