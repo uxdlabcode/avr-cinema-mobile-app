@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Home,
@@ -12,11 +12,34 @@ import {
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "@/Firebase/firebase";
 
 export function TVSidebar() {
   const user = useSelector((state: RootState) => state.auth.user);
   const location = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [currentPlanName, setCurrentPlanName] = useState("Free Plan");
+
+  useEffect(() => {
+    if (!user?.membershipPlanId) {
+      setCurrentPlanName("Free Plan");
+      return;
+    }
+    const fetchPlan = async () => {
+      try {
+        const planDoc = await getDoc(doc(db, "plans", user.membershipPlanId as string));
+        if (planDoc.exists()) {
+          setCurrentPlanName(planDoc.data().name || "Premium Plan");
+        } else {
+          setCurrentPlanName("Premium Plan");
+        }
+      } catch (err) {
+        console.error("Error fetching plan:", err);
+      }
+    };
+    fetchPlan();
+  }, [user?.membershipPlanId]);
 
   const tvNavItems = [
     { label: "Home", path: "/dashboard", icon: Home },
@@ -30,91 +53,106 @@ export function TVSidebar() {
 
   return (
     <aside
-      className={`fixed left-0 top-0 bottom-0 h-screen bg-zinc-950/95 border-r border-zinc-800/60 z-50 transition-all duration-300 flex flex-col items-start pt-6 pb-8 ${
-        isExpanded ? "w-[240px] px-4" : "w-[80px] px-2"
-      }`}
-      onFocus={() => setIsExpanded(true)}
-      onBlur={(e) => {
-        // Only collapse if the new focus target is not inside the sidebar
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-          setIsExpanded(false);
-        }
-      }}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      className={`fixed left-0 top-0 bottom-0 h-screen z-50 transition-all duration-300 flex flex-col items-start pt-8 pb-8 backdrop-blur-md border-r-0 pointer-events-none ${isExpanded
+        ? "w-60 bg-gradient-to-r from-black via-black/95 to-transparent"
+        : "w-[80px] bg-gradient-to-r from-black via-black/90 to-transparent"
+        }`}
     >
-      {/* App Logo */}
-      <div className="w-full flex items-center justify-center mb-10 overflow-hidden h-14">
-        {isExpanded ? (
+      <div
+        className={`h-full flex flex-col items-start pointer-events-auto transition-all duration-300 ${
+          isExpanded ? "w-[210px]" : "w-[80px]"
+        }`}
+        onFocus={() => setIsExpanded(true)}
+        onBlur={(e) => {
+          // Only collapse if the new focus target is not inside the sidebar
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setIsExpanded(false);
+          }
+        }}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
+      >
+        {/* App Logo */}
+        <div className="w-full flex items-center mb-10 overflow-hidden h-14 pl-[18px]">
           <img
-            src="/assets/headerLogo.png"
+            src="/assets/logo.jpg"
             alt="AVR Logo"
-            className="h-12 object-contain transition-all duration-300"
+            className="h-10 w-10 rounded-full object-cover shadow-md transition-all duration-300"
           />
-        ) : (
-          <div className="w-10 h-10 bg-[#DECB94] rounded-full flex items-center justify-center font-bold text-black text-lg shadow-md">
-            AVR
-          </div>
-        )}
-      </div>
+        </div>
 
-      {/* Nav Items */}
-      <nav className="flex-1 w-full space-y-3 flex flex-col">
-        {tvNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+        {/* Nav Items */}
+        <nav className="focusable flex-1 w-full flex flex-col space-y-4">
+          {tvNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
 
-          return (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`focusable flex items-center gap-4 py-3.5 px-3 rounded-lg transition-all duration-200 w-full outline-none border border-transparent
-                ${
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`focusable flex items-center gap-5 py-3 w-full outline-none transition-all duration-200 group pl-[28px] ${
                   isActive
-                    ? "bg-[#DECB94]/10 text-[#DECB94]"
-                    : "text-zinc-400 hover:text-zinc-200"
-                }
-                focus:bg-zinc-800 focus:text-white focus:border-zinc-700 focus:scale-105
-              `}
-            >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#DECB94]" : ""}`} />
-              <span
-                className={`text-sm font-medium transition-opacity duration-200 whitespace-nowrap ${
-                  isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
+                    ? "text-primary font-bold"
+                    : "text-zinc-400 hover:text-white"
                 }`}
               >
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
+                <Icon
+                  className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${isActive ? "text-primary scale-110" : "text-zinc-400 group-hover:text-white group-hover:scale-105"
+                    }`}
+                />
+                <span
+                  className={`text-[15px] font-semibold transition-all duration-200 whitespace-nowrap ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 w-0 overflow-hidden"
+                    } ${isActive ? "text-primary" : "text-zinc-400 group-hover:text-white"
+                    }`}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
 
-      {/* Profile/Subscription status at the bottom */}
-      <div className="w-full border-t border-zinc-800/50 pt-4 flex flex-col items-center">
-        {user?.membershipStatus === "active" && (
-          <Link
-            to="/membership"
-            className="focusable mb-4 p-2 rounded-full focus:bg-zinc-800 focus:scale-105 border border-transparent focus:border-zinc-700 outline-none text-[#DECB94]"
-            title="Premium Active"
-          >
-            <Crown className="w-5 h-5" />
-          </Link>
-        )}
-        <div className="flex items-center gap-3 w-full px-3 py-2 rounded-lg">
-          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-white shadow">
-            {user?.name?.[0]?.toUpperCase() || "U"}
-          </div>
-          {isExpanded && (
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-xs font-medium text-zinc-300 truncate">
-                {user?.name || "Guest User"}
-              </span>
-              <span className="text-[10px] text-zinc-500 truncate">
-                {user?.membershipStatus === "active" ? "Premium Subscriber" : "Free Plan"}
-              </span>
-            </div>
+        {/* Profile/Subscription status at the bottom */}
+        <div className="w-full border-t border-zinc-800/40 pt-6 flex flex-col items-center">
+          {user?.membershipStatus === "active" ? (
+            <Link
+              to="/membership"
+              className="focusable mb-4 py-2 flex items-center gap-4 transition-all duration-200 text-primary w-full pl-[28px]"
+              title="Premium Active"
+            >
+              <Crown className="w-5 h-5 text-amber-400 shrink-0" />
+              {isExpanded && (
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider truncate animate-in fade-in duration-300">
+                  {currentPlanName}
+                </span>
+              )}
+            </Link>
+          ) : (
+            isExpanded && (
+              <div className="mb-4 text-[10px] text-zinc-500 font-bold uppercase tracking-wider text-left w-full pl-8">
+                {currentPlanName}
+              </div>
+            )
           )}
+          <Link
+            to="/profile"
+            className="focusable flex items-center w-full py-2 rounded-lg gap-4 transition-all duration-200 outline-none border border-transparent focus:border-zinc-700 hover:bg-zinc-800/35 cursor-pointer pl-[22px]"
+          >
+            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-white shadow shrink-0">
+              {user?.name?.[0]?.toUpperCase() || "U"}
+            </div>
+            {isExpanded && (
+              <div className="flex flex-col overflow-hidden text-left animate-in fade-in duration-300">
+                <span className="text-xs font-semibold text-zinc-300 truncate">
+                  {user?.name || "Guest User"}
+                </span>
+                <span className="text-[10px] text-zinc-500 truncate">
+                  {user?.membershipStatus === "active" ? "Premium" : "Free Plan"}
+                </span>
+              </div>
+            )}
+          </Link>
         </div>
       </div>
     </aside>

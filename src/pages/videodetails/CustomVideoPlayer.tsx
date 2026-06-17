@@ -3,9 +3,9 @@ import { serverTimestamp } from 'firebase/firestore';
 import {
   Play, Pause, ChevronLeft, Cast, Volume2, VolumeX, Maximize, Minimize,
   Settings, ChevronsLeft, ChevronsRight, Heart, Sun, X, Check,
-  WifiOff, MessageSquare, ListVideo, Crown, Subtitles
+  WifiOff, MessageSquare, ListVideo, Crown, Subtitles, AlertCircle
 } from 'lucide-react';
-import { createDocument, deleteDocument, getDocumentData } from '@/Firebase';
+import { createDocument, deleteDocument, getDocumentData, addDocument } from '@/Firebase';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
 import { FeedbackModal } from './FeedbackModal';
@@ -122,6 +122,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
   // Custom Settings overlay states
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
+  const [showReportSection, setShowReportSection] = useState(false);
   const [activeSettingTab, setActiveSettingTab] = useState<'quality' | 'audio' | 'speed' | 'subtitles'>('quality');
   const [brightness, setBrightness] = useState<number>(100);
   const [audioLanguage, setAudioLanguage] = useState<string>("English [Original]");
@@ -550,6 +551,12 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
   }, [showSettingsOverlay]);
 
   useEffect(() => {
+    if (!showSettingsOverlay) {
+      setShowReportSection(false);
+    }
+  }, [showSettingsOverlay]);
+
+  useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     window.addEventListener("online", handleOnline);
@@ -873,6 +880,31 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
       if (trackId === -1) {
         setSubtitleLanguage("Off");
       }
+    }
+  };
+
+  const handleReportIssue = async (issueType: string) => {
+    if (!userId) {
+      toast.error("You must be logged in to report an issue.");
+      return;
+    }
+    try {
+      const payload = {
+        userId,
+        movieId: movie?.id || "",
+        movieTitle: movie?.title || "",
+        episodeId: currentEpisode?.id || null,
+        episodeTitle: currentPlayingEpisodeTitle || null,
+        issueType,
+        timestamp: serverTimestamp(),
+      };
+      await addDocument("reports", payload);
+      toast.success("Thank you! Your report has been submitted.");
+      setShowSettingsOverlay(false);
+      setShowReportSection(false);
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error("Failed to submit report. Please try again.");
     }
   };
 
@@ -1420,203 +1452,246 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   className="absolute top-3 right-3 sm:top-16 sm:right-4 w-49 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Tabs defaultValue="quality" value={activeSettingTab} onValueChange={(val) => setActiveSettingTab(val as any)} className="w-full flex flex-col flex-1 min-h-0">
-                    <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
-                      <TabsTrigger value="quality" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
-                        Quality
-                      </TabsTrigger>
-                      <TabsTrigger value="speed" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
-                        Speed
-                      </TabsTrigger>
-                      {/* <TabsTrigger value="subtitles" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
-                        Subtitles
-                      </TabsTrigger> */}
-                    </TabsList>
+                  {showReportSection ? (
+                    <div className="flex flex-col flex-1 min-h-0">
+                      <div className="flex items-center gap-2 mb-3 shrink-0">
+                        <button
+                          onClick={() => setShowReportSection(false)}
+                          className="focusable p-1 hover:bg-zinc-900 rounded-md text-zinc-400 hover:text-white transition-colors outline-none cursor-pointer"
+                        >
+                          <ChevronLeft className="w-4 h-4 text-white" />
+                        </button>
+                        <span className="text-xs font-bold text-white">Report an Issue</span>
+                      </div>
+                      
+                      <div className="flex flex-col gap-1.5 overflow-y-auto pr-1 flex-1 min-h-0 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+                        {[
+                          { key: 'quality_issue', label: 'Quality Issue' },
+                          { key: 'audio_issue', label: 'Audio Issue' },
+                          { key: 'buffering_connection_issue', label: 'Buffering and Connection Issue' },
+                          { key: 'caption_issue', label: 'Caption Issue' }
+                        ].map((item) => (
+                          <button
+                            key={item.key}
+                            onClick={() => handleReportIssue(item.label)}
+                            className="focusable text-xs font-semibold cursor-pointer py-2 px-3 rounded hover:bg-white/5 border border-zinc-900 hover:border-zinc-800 text-zinc-300 hover:text-white text-left outline-none transition-all duration-150"
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-zinc-900 shrink-0">
+                        <button
+                          onClick={() => setShowReportSection(true)}
+                          className="focusable text-[10px] md:text-xs font-semibold text-zinc-450 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 outline-none"
+                        >
+                          <AlertCircle className="w-4 h-4 text-yellow-500" />
+                          <span>Report an Issue</span>
+                        </button>
+                      </div>
 
-                    {/* Content Options */}
-                    <div className="overflow-y-auto w-full my-0.5 pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent flex-1 min-h-0">
-                      <TabsContent value="quality" className="mt-0 outline-none w-full">
-                        <div className="flex flex-col gap-1 w-full text-zinc-300">
-                          {qualities.length > 0 ? (
-                            qualities.map((q) => {
-                              const isActive = currentQuality === q.id;
-                              const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
-                              const isLocked = q.id !== -1 && q.height > effectiveMax;
-                              const label = q.id === -1 ? "Auto (Recommended)" : q.name;
+                      <Tabs defaultValue="quality" value={activeSettingTab} onValueChange={(val) => setActiveSettingTab(val as any)} className="w-full flex flex-col flex-1 min-h-0">
+                        <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
+                          <TabsTrigger value="quality" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
+                            Quality
+                          </TabsTrigger>
+                          <TabsTrigger value="speed" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
+                            Speed
+                          </TabsTrigger>
+                          {/* <TabsTrigger value="subtitles" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
+                            Subtitles
+                          </TabsTrigger> */}
+                        </TabsList>
 
-                              return (
-                                <div
-                                  key={`${q.height}_${q.id}`}
-                                  className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
-                                >
-                                  <button
-                                    onClick={() => {
-                                      if (isLocked) {
-                                        if (document.fullscreenElement) {
-                                          document.exitFullscreen().catch(() => { });
-                                        }
-                                        navigate("/upgrade-plan");
-                                      } else {
-                                        handleQualityChange(q.id);
-                                      }
-                                      setShowSettingsOverlay(false);
-                                    }}
-                                    className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
-                                  >
-                                    <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                    <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
-                                      {label}
-                                    </span>
-                                  </button>
+                        {/* Content Options */}
+                        <div className="overflow-y-auto w-full my-0.5 pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent flex-1 min-h-0">
+                          <TabsContent value="quality" className="mt-0 outline-none w-full">
+                            <div className="flex flex-col gap-1 w-full text-zinc-300">
+                              {qualities.length > 0 ? (
+                                qualities.map((q) => {
+                                  const isActive = currentQuality === q.id;
+                                  const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
+                                  const isLocked = q.id !== -1 && q.height > effectiveMax;
+                                  const label = q.id === -1 ? "Auto (Recommended)" : q.name;
 
-                                  {isLocked && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (document.fullscreenElement) {
-                                          document.exitFullscreen().catch(() => { });
-                                        }
-                                        navigate("/upgrade-plan");
-                                        setShowSettingsOverlay(false);
-                                      }}
-                                      className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                  return (
+                                    <div
+                                      key={`${q.height}_${q.id}`}
+                                      className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
                                     >
-                                      Upgrade
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            })
-                          ) : (
-                            // Standard quality series for static MP4 / no HLS levels
-                            (() => {
-                              const staticOpts = [
-                                { id: -1, label: "Auto (Recommended)", height: 0 },
-                                { id: 1080, label: "1080p", height: 1080 },
-                                { id: 720, label: "720p", height: 720 },
-                                { id: 480, label: "480p", height: 480 },
-                                { id: 360, label: "360p", height: 360 },
-                                { id: 240, label: "240p", height: 240 },
-                                { id: 144, label: "144p", height: 144 },
-                              ];
-                              return staticOpts.map((opt) => {
-                                const isActive = currentQuality === opt.id;
-                                const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
-                                const isLocked = opt.id !== -1 && opt.height > effectiveMax;
-                                return (
-                                  <div
-                                    key={opt.id}
-                                    className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
-                                  >
-                                    <button
-                                      onClick={() => {
-                                        if (isLocked) {
-                                          if (document.fullscreenElement) {
-                                            document.exitFullscreen().catch(() => { });
-                                          }
-                                          navigate("/upgrade-plan");
-                                        } else {
-                                          setCurrentQuality(opt.id);
-                                        }
-                                        setShowSettingsOverlay(false);
-                                      }}
-                                      className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
-                                    >
-                                      <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                      <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
-                                        {opt.label}
-                                      </span>
-                                    </button>
-
-                                    {isLocked && (
                                       <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          if (document.fullscreenElement) {
-                                            document.exitFullscreen().catch(() => { });
+                                        onClick={() => {
+                                          if (isLocked) {
+                                            if (document.fullscreenElement) {
+                                              document.exitFullscreen().catch(() => { });
+                                            }
+                                            navigate("/upgrade-plan");
+                                          } else {
+                                            handleQualityChange(q.id);
                                           }
-                                          navigate("/upgrade-plan");
                                           setShowSettingsOverlay(false);
                                         }}
-                                        className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                        className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
                                       >
-                                        Upgrade
+                                        <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                        <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
+                                          {label}
+                                        </span>
                                       </button>
-                                    )}
-                                  </div>
+
+                                      {isLocked && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (document.fullscreenElement) {
+                                              document.exitFullscreen().catch(() => { });
+                                            }
+                                            navigate("/upgrade-plan");
+                                            setShowSettingsOverlay(false);
+                                          }}
+                                          className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                        >
+                                          Upgrade
+                                        </button>
+                                      )}
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                // Standard quality series for static MP4 / no HLS levels
+                                (() => {
+                                  const staticOpts = [
+                                    { id: -1, label: "Auto (Recommended)", height: 0 },
+                                    { id: 1080, label: "1080p", height: 1080 },
+                                    { id: 720, label: "720p", height: 720 },
+                                    { id: 480, label: "480p", height: 480 },
+                                    { id: 360, label: "360p", height: 360 },
+                                    { id: 240, label: "240p", height: 240 },
+                                    { id: 144, label: "144p", height: 144 },
+                                  ];
+                                  return staticOpts.map((opt) => {
+                                    const isActive = currentQuality === opt.id;
+                                    const effectiveMax = isPlayingTrailer ? 2160 : maxResolutionHeight;
+                                    const isLocked = opt.id !== -1 && opt.height > effectiveMax;
+                                    return (
+                                      <div
+                                        key={opt.id}
+                                        className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
+                                      >
+                                        <button
+                                          onClick={() => {
+                                            if (isLocked) {
+                                              if (document.fullscreenElement) {
+                                                document.exitFullscreen().catch(() => { });
+                                              }
+                                              navigate("/upgrade-plan");
+                                            } else {
+                                              setCurrentQuality(opt.id);
+                                            }
+                                            setShowSettingsOverlay(false);
+                                          }}
+                                          className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
+                                        >
+                                          <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                          <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
+                                            {opt.label}
+                                          </span>
+                                        </button>
+
+                                        {isLocked && (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              if (document.fullscreenElement) {
+                                                document.exitFullscreen().catch(() => { });
+                                              }
+                                              navigate("/upgrade-plan");
+                                              setShowSettingsOverlay(false);
+                                            }}
+                                            className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                          >
+                                            Upgrade
+                                          </button>
+                                        )}
+                                      </div>
+                                    );
+                                  });
+                                })()
+                              )}
+                            </div>
+                          </TabsContent>
+
+                          <TabsContent value="speed" className="mt-0 outline-none w-full">
+                            <div className="flex flex-col gap-1 w-full text-zinc-350">
+                              {[0.5, 0.75, 1, 1.25, 1.5, 2].map((sp) => {
+                                const isActive = playbackSpeed === sp;
+                                return (
+                                  <button
+                                    key={sp}
+                                    onClick={() => {
+                                      handleSpeedChange(sp);
+                                      setShowSettingsOverlay(false);
+                                    }}
+                                    className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
+                                  >
+                                    <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                    <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
+                                      {sp === 1 ? "1x (Normal)" : `${sp}x`}
+                                    </span>
+                                  </button>
                                 );
-                              });
-                            })()
-                          )}
-                        </div>
-                      </TabsContent>
+                              })}
+                            </div>
+                          </TabsContent>
 
-                      <TabsContent value="speed" className="mt-0 outline-none w-full">
-                        <div className="flex flex-col gap-1 w-full text-zinc-350">
-                          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((sp) => {
-                            const isActive = playbackSpeed === sp;
-                            return (
+                          <TabsContent value="subtitles" className="mt-0 outline-none w-full">
+                            <div className="flex flex-col gap-1 w-full text-zinc-350">
                               <button
-                                key={sp}
                                 onClick={() => {
-                                  handleSpeedChange(sp);
-                                  setShowSettingsOverlay(false);
-                                }}
-                                className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
-                              >
-                                <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
-                                  {sp === 1 ? "1x (Normal)" : `${sp}x`}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent value="subtitles" className="mt-0 outline-none w-full">
-                        <div className="flex flex-col gap-1 w-full text-zinc-350">
-                          <button
-                            onClick={() => {
-                              handleSubtitleChange(-1);
-                              setShowSettingsOverlay(false);
-                            }}
-                            className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
-                          >
-                            <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${currentSubtitleTrack === -1 ? "opacity-100" : "opacity-0"}`}>✓</span>
-                            <span className={currentSubtitleTrack === -1 ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
-                              Off
-                            </span>
-                          </button>
-
-                          {subtitleTracks.map((track) => {
-                            const isActive = currentSubtitleTrack === track.id;
-                            return (
-                              <button
-                                key={track.id}
-                                onClick={() => {
-                                  handleSubtitleChange(track.id);
+                                  handleSubtitleChange(-1);
                                   setShowSettingsOverlay(false);
                                 }}
                                 className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
                               >
-                                <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
-                                <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
-                                  {track.name}
+                                <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${currentSubtitleTrack === -1 ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                <span className={currentSubtitleTrack === -1 ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
+                                  Off
                                 </span>
                               </button>
-                            );
-                          })}
 
-                          {subtitleTracks.length === 0 && (
-                            <div className="text-zinc-500 text-xs py-4 text-center font-sans">
-                              No subtitles available
+                              {subtitleTracks.map((track) => {
+                                const isActive = currentSubtitleTrack === track.id;
+                                return (
+                                  <button
+                                    key={track.id}
+                                    onClick={() => {
+                                      handleSubtitleChange(track.id);
+                                      setShowSettingsOverlay(false);
+                                    }}
+                                    className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
+                                  >
+                                    <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
+                                    <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
+                                      {track.name}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+
+                              {subtitleTracks.length === 0 && (
+                                <div className="text-zinc-500 text-xs py-4 text-center font-sans">
+                                  No subtitles available
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </TabsContent>
                         </div>
-                      </TabsContent>
-                    </div>
-                  </Tabs>
+                      </Tabs>
+                    </>
+                  )}
 
 
                 </div>

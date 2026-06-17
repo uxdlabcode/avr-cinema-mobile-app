@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
+import { Dock, DockIcon } from "@/components/ui/dock";
+import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -67,7 +69,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4 lg:gap-6">
-          <Button 
+          <Button
             onClick={() => navigate("/upgrade-plan")}
             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 gap-2 text-sm font-semibold rounded-md h-9 px-3 lg:px-4 cursor-pointer"
           >
@@ -95,22 +97,29 @@ export function Navbar() {
       </header>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800/50 flex justify-around items-center z-50 px-2 pb-safe">
-        {mobileNavItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          return (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`flex flex-col items-center gap-1.5 ${isActive ? 'text-primary' : 'text-zinc-500'} hover:text-gray-300 transition-colors w-16`}
-            >
-              <Icon className={`w-6 h-6 ${isActive ? 'text-primary' : 'text-zinc-500'}`} />
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </Link>
-          )
-        })}
-      </nav>
+      <div className="md:hidden fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
+        <Dock className="bg-zinc-950/90 border border-zinc-800/50 backdrop-blur-md px-6 shadow-2xl h-16 gap-4">
+          {mobileNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <DockIcon
+                key={item.label}
+                onClick={() => navigate(item.path)}
+                className={cn(
+                  "flex flex-col items-center justify-center rounded-xl transition-all cursor-pointer w-12 h-12 gap-1",
+                  isActive
+                    ? "text-primary"
+                    : "text-zinc-400 hover:text-white"
+                )}
+              >
+                <Icon className={cn("w-5 h-5 transition-transform", isActive && "scale-110")} />
+                <span className="text-[9px] font-medium">{item.label}</span>
+              </DockIcon>
+            );
+          })}
+        </Dock>
+      </div>
     </>
   );
 }
