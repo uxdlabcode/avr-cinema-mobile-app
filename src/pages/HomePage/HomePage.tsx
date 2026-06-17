@@ -10,6 +10,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { compoundQuery, getSignedUrl, deleteDocument, createDocument, getCollectionData } from "@/Firebase";
+import { filterByUserAge } from "@/lib/ageFilter";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import RecentWatch from "./RecentWatch";
@@ -287,7 +288,7 @@ export const HomePage = () => {
               })
             );
 
-            setFeaturedMovies(enriched.length > 0 ? enriched : fallbackData);
+            setFeaturedMovies(filterByUserAge(enriched.length > 0 ? enriched : fallbackData, user?.age ?? null));
           } catch (err) {
             console.error("Error fetching featured movies", err);
             setFeaturedMovies(fallbackData);
@@ -335,9 +336,11 @@ export const HomePage = () => {
               })
             );
 
+            const filteredMedia = filterByUserAge(enriched, user?.age ?? null);
+
             // Group by genre
             const groups: Record<string, any[]> = {};
-            enriched.forEach((item) => {
+            filteredMedia.forEach((item) => {
               if (item.genres && item.genres.length > 0) {
                 item.genres.forEach((genre: string) => {
                   if (!groups[genre]) {

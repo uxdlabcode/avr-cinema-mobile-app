@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { updateAuthUser } from "@/store/slices/authSlice";
 
-import { Phone, Mail, User, CheckCircle2, Pencil, ArrowLeft, Camera, Crown, Trash2 } from "lucide-react";
+import { Phone, Mail, User, CheckCircle2, Pencil, ArrowLeft, Camera, Crown, Trash2, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ import { updateDocument } from "@/Firebase";
 interface ProfileData {
   name: string;
   phone: string;
+  age: string;
   avatar: string;
 }
 
@@ -27,18 +28,22 @@ export const UpdateProfilePage = () => {
   const [profile, setProfile] = useState<ProfileData>({
     name: user?.name || "Super Admin",
     phone: user?.phone || "",
+    age: user?.age !== null && user?.age !== undefined ? String(user.age) : "",
     avatar: user?.avatar || "",
   });
 
   const [saved, setSaved] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [phoneError, setPhoneError] = useState("");
+  const [ageError, setAgeError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setProfile({
       name: user?.name || "Super Admin",
       phone: user?.phone || "",
+      age: user?.age !== null && user?.age !== undefined ? String(user.age) : "",
       avatar: user?.avatar || "",
     });
   }, [user]);
@@ -62,6 +67,28 @@ export const UpdateProfilePage = () => {
 
   const handleUpdateProfile = async () => {
     if (!user?.id) return;
+
+    // Validate phone
+    if (profile.phone && !/^\d{0,10}$/.test(profile.phone)) {
+      setPhoneError("Phone must be digits only, max 10 digits");
+      return;
+    }
+    setPhoneError("");
+
+    // Validate age
+    if (profile.age !== "") {
+      const ageNum = parseInt(profile.age, 10);
+      if (isNaN(ageNum)) {
+        setAgeError("Please enter a valid age");
+        return;
+      }
+      if (ageNum > 200) {
+        setAgeError("Age cannot exceed 200");
+        return;
+      }
+    }
+    setAgeError("");
+
     setIsUpdating(true);
 
     try {
@@ -72,17 +99,22 @@ export const UpdateProfilePage = () => {
         newAvatarUrl = await UploadImage(avatarFile);
       }
 
-      const updateData = {
+      const ageNum = profile.age !== "" ? parseInt(profile.age, 10) : null;
+
+      const updateData: Record<string, any> = {
         name: profile.name,
         phone: profile.phone,
         avatar: newAvatarUrl,
       };
+      if (ageNum !== null) {
+        updateData.age = ageNum;
+      }
 
       // Save to Firestore
       await updateDocument("users", user.id, updateData);
 
       // Update local Redux state
-      dispatch(updateAuthUser(updateData));
+      dispatch(updateAuthUser({ name: profile.name, phone: profile.phone, age: ageNum, avatar: newAvatarUrl }));
 
       setSaved(true);
       setTimeout(() => {
@@ -127,7 +159,7 @@ export const UpdateProfilePage = () => {
             className={`focusable absolute -bottom-1 -right-1 ${editBtnSize} rounded-full shadow-lg`}
             title="Change photo"
           >
-            <Camera className={`${editIconSize}`} />
+            <Camera className={`${editIconSize} text-secondary`} />
           </Button>
 
           <Input
@@ -159,7 +191,7 @@ export const UpdateProfilePage = () => {
 
   // Shared form section
   const FormSection = ({ isDesktop = false }: { isDesktop?: boolean }) => (
-    <Card tabIndex={-1} className={`rounded-2xl ${isDesktop ? "p-8" : "p-5"} flex flex-col gap-5 shadow-sm`}>
+    <Card tabIndex={-1} className={`rounded-lg ${isDesktop ? "p-8" : "p-5"} flex flex-col gap-5 shadow-sm`}>
 
       {/* Full Name */}
       <div className="flex flex-col gap-2">
@@ -175,7 +207,7 @@ export const UpdateProfilePage = () => {
           value={profile.name}
           onChange={(e) => setProfile((p) => ({ ...p, name: e.target.value }))}
           placeholder="Enter your full name"
-          className={`focusable ${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground focus:bg-zinc-800`}
+          className={`focusable ${isDesktop ? "h-10" : "h-10"} rounded-md `}
         />
       </div>
 
@@ -193,7 +225,7 @@ export const UpdateProfilePage = () => {
           value={user?.email || "admin@avr.com"}
           readOnly
           disabled
-          className={`${isDesktop ? "h-12" : "h-11"} rounded-xl bg-muted/50 text-muted-foreground cursor-not-allowed`}
+          className={`${isDesktop ? "h-10" : "h-10"} rounded-md bg-muted/50 text-muted-foreground cursor-not-allowed`}
         />
       </div>
 
@@ -209,11 +241,44 @@ export const UpdateProfilePage = () => {
         <Input
           id="edit-phone"
           value={profile.phone}
-          onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
+          onChange={(e) => {
+            const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+            setProfile((p) => ({ ...p, phone: val }));
+            if (phoneError) setPhoneError("");
+          }}
           placeholder="Enter your phone number"
           type="tel"
-          className={`focusable ${isDesktop ? "h-12" : "h-11"} rounded-xl focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground focus:bg-zinc-800`}
+          inputMode="numeric"
+          maxLength={10}
+          className={`focusable ${isDesktop ? "h-10" : "h-10"} rounded-md`}
         />
+        {phoneError && <p className="text-xs text-destructive mt-0.5">{phoneError}</p>}
+      </div>
+
+      {/* Age */}
+      <div className="flex flex-col gap-2">
+        <Label
+          htmlFor="edit-age"
+          className="flex items-center gap-1.5 text-sm font-semibold text-foreground"
+        >
+          <CalendarDays className="w-4 h-4 text-muted-foreground" />
+          Age
+        </Label>
+        <Input
+          id="edit-age"
+          value={profile.age}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "" || val === "-" || /^-?\d+$/.test(val)) {
+              setProfile((p) => ({ ...p, age: val }));
+            }
+            if (ageError) setAgeError("");
+          }}
+          placeholder="e.g. 25"
+          type="number"
+          className={`focusable ${isDesktop ? "h-10" : "h-10"} rounded-md`}
+        />
+        {ageError && <p className="text-xs text-destructive mt-0.5">{ageError}</p>}
       </div>
 
       {/* Update Profile Button */}
@@ -221,7 +286,7 @@ export const UpdateProfilePage = () => {
         id="update-profile-btn"
         onClick={handleUpdateProfile}
         disabled={isUpdating || saved}
-        className={`focusable w-full ${isDesktop ? "h-12" : "h-10"} rounded-xl bg-primary hover:bg-primary/90 text-secondary font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2 focus:scale-102 outline-none`}
+        className={`focusable w-full ${isDesktop ? "h-10" : "h-10"} rounded-md bg-primary hover:bg-primary/90 text-secondary font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2 focus:scale-102 outline-none`}
       >
         {isUpdating ? "Saving…" : saved ? "Saved" : "Update Profile"}
       </Button>
@@ -268,8 +333,8 @@ export const UpdateProfilePage = () => {
 
         <div className="flex gap-8 lg:gap-10">
           {/* Left: Avatar Card */}
-          <div className="w-[340px] lg:w-[380px] shrink-0 sticky top-[90px] self-start">
-            <Card tabIndex={-1} className="rounded-2xl p-8 flex flex-col items-center gap-5 relative overflow-hidden">
+          <div className="w-[340px] lg:w-[380px] shrink-0 sticky top-6 self-start">
+            <Card tabIndex={-1} className="rounded-lg p-8 flex flex-col items-center gap-5 relative overflow-hidden">
               {/* Decorative top gradient */}
               <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-primary/10 to-transparent" />
               <div className="relative z-10 pt-4">
@@ -278,7 +343,11 @@ export const UpdateProfilePage = () => {
 
               {/* Membership Status */}
               <div className="w-full border-t border-border pt-4 mt-2">
-                <div className="flex flex-row items-center justify-start p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigate("/upgrade-plan")}
+                  className="w-full flex flex-row items-center justify-start p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 gap-3 cursor-pointer hover:border-primary/40 hover:from-primary/20 transition-all"
+                >
                   <div className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-primary/20">
                     <Crown className="w-5 h-5 text-primary" />
                   </div>
@@ -290,7 +359,7 @@ export const UpdateProfilePage = () => {
                       {user?.membershipPlanId ? "Enjoying exclusive perks" : "Upgrade for premium features"}
                     </p>
                   </div>
-                </div>
+                </button>
               </div>
             </Card>
 

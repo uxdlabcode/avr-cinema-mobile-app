@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Bookmark, Share2, Play, Plus, Check, X, Chev
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getMatchingData, getSignedUrl, compoundQuery, deleteDocument, createDocument } from '@/Firebase';
+import { filterByUserAge } from '@/lib/ageFilter';
 import {
   Carousel,
   CarouselContent,
@@ -346,7 +347,8 @@ const MoviesTab = () => {
           })
         );
 
-        setMovies(signedMovies);
+        const filtered = filterByUserAge(signedMovies, user?.age ?? null);
+        setMovies(filtered);
       } catch (error) {
         console.error("Error fetching movies from Firestore:", error);
       } finally {

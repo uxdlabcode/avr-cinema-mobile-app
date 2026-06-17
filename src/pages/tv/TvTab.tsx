@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMatchingData, getSignedUrl, compoundQuery, deleteDocument, createDocument } from "@/Firebase";
+import { filterByUserAge } from "@/lib/ageFilter";
 import {
   Carousel,
   CarouselContent,
@@ -471,7 +472,8 @@ const TvTab = () => {
           }),
         );
 
-        setTvShows(signedTV);
+        const filtered = filterByUserAge(signedTV, user?.age ?? null);
+        setTvShows(filtered);
       } catch (error) {
         console.error("Error fetching TV shows from Firestore:", error);
       } finally {

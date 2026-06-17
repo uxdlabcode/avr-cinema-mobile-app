@@ -8,6 +8,7 @@ export interface User {
   name?: string;
   displayName?: string;
   phone?: string;
+  age?: number | null;
   avatar?: string;
   membershipPlanId?: string;
   membershipStatus?: string;
@@ -59,6 +60,7 @@ export const loginAsync = createAsyncThunk(
           role, 
           name: userDoc?.name,
           phone: userDoc?.phone,
+          age: userDoc?.age ?? null,
           avatar: userDoc?.avatar
         },
         accessToken: token,
@@ -71,7 +73,7 @@ export const loginAsync = createAsyncThunk(
 
 export const signupAsync = createAsyncThunk(
   "auth/signup",
-  async (credentials: { email: string; password: string; name: string }, { rejectWithValue }) => {
+  async (credentials: { email: string; password: string; name: string; phone?: string; age?: number | null }, { rejectWithValue }) => {
     try {
       const authRes = await emailPasswordSignUp(credentials.name, credentials.email, credentials.password);
       if ('error' in authRes) {
@@ -79,12 +81,16 @@ export const signupAsync = createAsyncThunk(
       }
 
       // Save user to Firestore 'users' collection
-      const newUser = {
+      const newUser: Record<string, any> = {
         name: credentials.name,
         email: credentials.email,
         role: "user",
-        uid: authRes.uid
+        uid: authRes.uid,
+        phone: credentials.phone || "",
       };
+      if (credentials.age !== undefined && credentials.age !== null) {
+        newUser.age = credentials.age;
+      }
       
       await createDocument("users", authRes.uid, newUser);
       
@@ -103,7 +109,8 @@ export const signupAsync = createAsyncThunk(
           email: credentials.email, 
           role: "user", 
           name: credentials.name,
-          phone: "",
+          phone: credentials.phone || "",
+          age: credentials.age ?? null,
           avatar: ""
         },
         accessToken: token,
@@ -133,7 +140,7 @@ const authSlice = createSlice({
     setAuthLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
-    updateAuthUser(state, action: PayloadAction<{ name?: string; phone?: string; avatar?: string }>) {
+    updateAuthUser(state, action: PayloadAction<{ name?: string; phone?: string; age?: number | null; avatar?: string }>) {
       if (state.user) {
         state.user = {
           ...state.user,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import { LogOut, Trash2, Pencil, ChevronDown, ChevronRight, Trophy, HelpCircle, Clock, Crown, Bell, Bookmark, Play, Shield, HeadphonesIcon } from "lucide-react";
+import { LogOut, Trash2, Pencil, ChevronDown, ChevronRight, Trophy, HelpCircle, Clock, Crown, Bell, Bookmark, Play, Shield, HeadphonesIcon, Phone, CalendarDays } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLogout } from "@/Firebase/FirebaseAuth/UserLogOut";
 import { deleteUserData } from "@/Firebase/FirebaseAuth/DeleteUser";
@@ -212,6 +212,18 @@ export const ProfilePage = () => {
           <div className="text-center">
             <p className="text-foreground font-bold text-lg">{name}</p>
             <p className="text-muted-foreground text-sm">{user?.email || "sarah@gmail.com"}</p>
+            {user?.phone && (
+              <p className="text-muted-foreground text-xs mt-1 flex items-center justify-center gap-1">
+                <Phone className="w-3 h-3" />
+                {user.phone}
+              </p>
+            )}
+            {user?.age !== null && user?.age !== undefined && (
+              <p className="text-muted-foreground text-xs mt-0.5 flex items-center justify-center gap-1">
+                <CalendarDays className="w-3 h-3" />
+                Age: {user.age}
+              </p>
+            )}
           </div>
           <Button
             variant="secondary"
@@ -563,6 +575,18 @@ export const ProfilePage = () => {
               <p className="text-muted-foreground text-sm truncate">
                 {user?.email || "sarah@gmail.com"}
               </p>
+              {user?.phone && (
+                <p className="text-muted-foreground text-xs mt-0.5 flex items-center gap-1">
+                  <Phone className="w-3 h-3" />
+                  {user.phone}
+                </p>
+              )}
+              {user?.age !== null && user?.age !== undefined && (
+                <p className="text-muted-foreground text-xs mt-0.5 flex items-center gap-1">
+                  <CalendarDays className="w-3 h-3" />
+                  Age: {user.age}
+                </p>
+              )}
             </div>
             <Button
               variant="ghost"

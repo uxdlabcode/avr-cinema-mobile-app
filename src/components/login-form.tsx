@@ -18,8 +18,6 @@ import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 
 
-import { isTvPlatform } from "@/lib/tvUtils";
-
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -31,7 +29,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isTV = isTvPlatform();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value.toLowerCase());
@@ -49,7 +46,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     setEmailError("");
     setPasswordError("");
 
@@ -115,11 +112,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     }
   };
 
-  const loginUrl = window.location.origin + "/signin";
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(loginUrl)}`;
 
   return (
-    <div className={cn("w-full flex flex-col lg:flex-row gap-10 items-center justify-between", className)}>
+    <div className={cn("w-full", className)}>
       <form noValidate className="flex-1 flex flex-col gap-6 w-full" onSubmit={handleSubmit} tabIndex={-1} {...props}>
         <FieldGroup className="gap-6">
           <div className="flex flex-col items-center gap-1 text-center mb-4">
@@ -129,21 +124,21 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
               Welcome back, please enter your details.
             </p>
           </div>
-          
+
           <Field data-invalid={!!emailError} className="gap-2">
             <FieldLabel htmlFor="email" className="text-primary/90">Email Address</FieldLabel>
-            <Input 
-              id="email" 
-              name="email" 
-              type="email" 
-              placeholder="sarah@gmail.com" 
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="sarah@gmail.com"
               value={email}
               onChange={handleEmailChange}
-              className="focusable bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 focus:bg-zinc-800" 
+              className="focusable h-10 rounded-md"
             />
             {emailError && <FieldError>{emailError}</FieldError>}
           </Field>
-          
+
           <Field data-invalid={!!passwordError} className="gap-2">
             <FieldLabel htmlFor="password" className="text-primary/90">Password</FieldLabel>
             <div className="relative">
@@ -155,7 +150,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                 disabled={loading}
                 value={password}
                 onChange={handlePasswordChange}
-                className="focusable bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 tracking-widest focus:bg-zinc-800"
+                className="focusable h-10 rounded-md"
               />
               <button
                 type="button"
@@ -185,7 +180,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           </div>
 
           <Field className="mt-2">
-            <Button type="submit" className="focusable cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-semibold h-12 text-base focus:bg-primary/80 focus:scale-102" disabled={loading}>
+            <Button type="submit" className="focusable cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-semibold h-10 text-base focus:bg-primary/80 focus:scale-102" disabled={loading}>
               {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <svg
@@ -215,7 +210,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
               )}
             </Button>
           </Field>
-          
+
           <div className="text-center text-sm text-primary/80 mt-2">
             Don't have an account?{" "}
             <Link to="/signup" className="focusable font-semibold text-primary hover:underline px-2 py-1 focus:bg-zinc-800 rounded">
@@ -224,20 +219,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           </div>
         </FieldGroup>
       </form>
-
-      {isTV && (
-        <div className="hidden lg:flex flex-col items-center justify-center border-l border-zinc-800 pl-10 py-6 gap-6 w-[300px]">
-          <div className="bg-white p-4 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300">
-            <img src={qrUrl} alt="Login QR Code" className="w-[180px] h-[180px]" />
-          </div>
-          <div className="text-center space-y-2">
-            <h3 className="text-lg font-bold text-primary">Scan to Sign In</h3>
-            <p className="text-xs text-primary/60 leading-relaxed">
-              Scan the QR code with your mobile phone camera to register or sign in on the web.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

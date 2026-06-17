@@ -14,7 +14,6 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import { isTvPlatform } from "@/lib/tvUtils";
 
 export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
@@ -24,17 +23,20 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [age, setAge] = useState("");
   const [terms, setTerms] = useState(false);
 
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [ageError, setAgeError] = useState("");
   const [termsError, setTermsError] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const isTV = isTvPlatform();
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -56,6 +58,22 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     if (confirmPasswordError) setConfirmPasswordError("");
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Only allow numeric characters, max 10 digits
+    const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setPhone(val);
+    if (phoneError) setPhoneError("");
+  };
+
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    // Allow empty string, optional minus sign, and digits
+    if (val === "" || val === "-" || /^-?\d+$/.test(val)) {
+      setAge(val);
+    }
+    if (ageError) setAgeError("");
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -63,6 +81,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     setEmailError("");
     setPasswordError("");
     setConfirmPasswordError("");
+    setPhoneError("");
+    setAgeError("");
     setTermsError("");
 
     const emailVal = email.trim().toLowerCase();
@@ -129,13 +149,44 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       isValid = false;
     }
 
+    // Phone validation (optional field but must be digits only, max 10)
+    if (phone && phone.length > 10) {
+      setPhoneError("Phone number must be at most 10 digits");
+      if (!hasToastBeenShown) {
+        toast.error("Phone number must be at most 10 digits");
+        hasToastBeenShown = true;
+      }
+      isValid = false;
+    }
+
+    // Age validation (optional, but if provided must be a number between -200 and 200... user says max 200, can be negative)
+    if (age !== "") {
+      const ageNum = parseInt(age, 10);
+      if (isNaN(ageNum)) {
+        setAgeError("Please enter a valid age");
+        if (!hasToastBeenShown) {
+          toast.error("Please enter a valid age");
+          hasToastBeenShown = true;
+        }
+        isValid = false;
+      } else if (ageNum > 200) {
+        setAgeError("Age cannot exceed 200");
+        if (!hasToastBeenShown) {
+          toast.error("Age cannot exceed 200");
+          hasToastBeenShown = true;
+        }
+        isValid = false;
+      }
+    }
+
     if (!isValid) {
       return;
     }
 
     setLoading(true);
     try {
-      const resultAction = await dispatch(signupAsync({ name, email: emailVal, password }));
+      const ageNum = age !== "" ? parseInt(age, 10) : null;
+      const resultAction = await dispatch(signupAsync({ name, email: emailVal, password, phone: phone || undefined, age: ageNum }));
 
       if (signupAsync.fulfilled.match(resultAction)) {
         toast.success("Account created successfully!");
@@ -154,21 +205,19 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     }
   };
 
-  const signupUrl = window.location.origin + "/signup";
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(signupUrl)}`;
 
   return (
-    <div className={cn("w-full flex flex-col lg:flex-row gap-10 items-center justify-between", className)}>
-      <form noValidate className="flex-1 flex flex-col gap-6 w-full" onSubmit={handleSubmit} tabIndex={-1} {...props}>
+    <div className={cn("w-full", className)}>
+      <form noValidate className="flex-1 flex flex-col gap-3 w-full" onSubmit={handleSubmit} tabIndex={-1} {...props}>
         <FieldGroup className="gap-6">
-          <div className="flex flex-col items-center gap-1 text-center mb-4">
+          <div className="flex flex-col items-center gap-1 text-center mb-1">
             <img src="/assets/headerLogo.png" alt="AVR Cinema" className="h-20 w-auto object-contain mb-2" />
             <h1 className="text-2xl font-bold text-primary">Create an Account</h1>
             <p className="text-primary/70 text-sm">
               Sign up now to get started with an account.
             </p>
           </div>
-          
+
           <Field data-invalid={!!nameError} className="gap-2">
             <FieldLabel htmlFor="name" className="text-primary/90">
               Full Name<span className="text-red-500">*</span>
@@ -180,11 +229,47 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               placeholder="John Doe"
               value={name}
               onChange={handleNameChange}
-              className="focusable bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 focus:bg-zinc-800"
+              className="focusable h-10 rounded-md"
             />
             {nameError && <FieldError>{nameError}</FieldError>}
           </Field>
-          
+          {/* Phone & Age — single row */}
+          <div className="grid grid-cols-2 gap-3">
+            <Field data-invalid={!!phoneError} className="gap-2">
+              <FieldLabel htmlFor="phone" className="text-primary/90">
+                Phone <span className="text-primary/40 font-normal text-xs">(Optional)</span>
+              </FieldLabel>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                placeholder="1234567890"
+                value={phone}
+                onChange={handlePhoneChange}
+                maxLength={10}
+                className="focusable h-10 rounded-md"
+              />
+              {phoneError && <FieldError>{phoneError}</FieldError>}
+            </Field>
+
+            <Field data-invalid={!!ageError} className="gap-2">
+              <FieldLabel htmlFor="age" className="text-primary/90">
+                Age <span className="text-primary/40 font-normal text-xs">(Optional)</span>
+              </FieldLabel>
+              <Input
+                id="age"
+                name="age"
+                type="number"
+                placeholder="e.g. 25"
+                value={age}
+                onChange={handleAgeChange}
+                className="focusable h-10 rounded-md"
+              />
+              {ageError && <FieldError>{ageError}</FieldError>}
+            </Field>
+          </div>
+
           <Field data-invalid={!!emailError} className="gap-2">
             <FieldLabel htmlFor="email" className="text-primary/90">
               Email Address<span className="text-red-500">*</span>
@@ -196,11 +281,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               placeholder="sarah@gmail.com"
               value={email}
               onChange={handleEmailChange}
-              className="focusable bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 focus:bg-zinc-800"
+              className="focusable h-10 rounded-md"
             />
             {emailError && <FieldError>{emailError}</FieldError>}
           </Field>
-          
+
           <Field data-invalid={!!passwordError} className="gap-2">
             <FieldLabel htmlFor="password" className="text-primary/90">
               Password<span className="text-red-500">*</span>
@@ -214,7 +299,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 disabled={loading}
                 value={password}
                 onChange={handlePasswordChange}
-                className="focusable bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 tracking-widest focus:bg-zinc-800"
+                className="focusable h-10 rounded-md"
               />
               <button
                 type="button"
@@ -227,7 +312,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             </div>
             {passwordError && <FieldError>{passwordError}</FieldError>}
           </Field>
-          
+
           <Field data-invalid={!!confirmPasswordError} className="gap-2">
             <FieldLabel htmlFor="confirmPassword" className="text-primary/90">
               Confirm Password<span className="text-red-500">*</span>
@@ -241,7 +326,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 disabled={loading}
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
-                className="focusable bg-transparent border-primary/20 text-primary placeholder:text-primary/40 focus-visible:ring-primary/50 tracking-widest focus:bg-zinc-800"
+                className="focusable h-10 rounded-md"
               />
               <button
                 type="button"
@@ -254,6 +339,8 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             </div>
             {confirmPasswordError && <FieldError>{confirmPasswordError}</FieldError>}
           </Field>
+
+
 
           <Field data-invalid={!!termsError} className="gap-1.5 mt-1">
             <div className="flex items-center space-x-2">
@@ -275,9 +362,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
             </div>
             {termsError && <FieldError>{termsError}</FieldError>}
           </Field>
-          
+
           <Field className="mt-2">
-            <Button type="submit" className="focusable cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-semibold h-12 text-base focus:bg-primary/80 focus:scale-102" disabled={loading}>
+            <Button type="submit" className="focusable cursor-pointer w-full bg-primary text-secondary hover:bg-primary/90 font-semibold h-10 text-base focus:bg-primary/80 focus:scale-102" disabled={loading}>
               {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <svg className="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -291,7 +378,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
               )}
             </Button>
           </Field>
-          
+
           <div className="text-center text-sm text-primary/80 mt-2">
             Already have an account?{" "}
             <Link to="/signin" className="focusable font-semibold text-primary hover:underline px-2 py-1 focus:bg-zinc-800 rounded">
@@ -300,20 +387,6 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
           </div>
         </FieldGroup>
       </form>
-
-      {isTV && (
-        <div className="hidden lg:flex flex-col items-center justify-center border-l border-zinc-800 pl-10 py-6 gap-6 w-[300px]">
-          <div className="bg-white p-4 rounded-2xl shadow-xl hover:scale-105 transition-all duration-300">
-            <img src={qrUrl} alt="Signup QR Code" className="w-[180px] h-[180px]" />
-          </div>
-          <div className="text-center space-y-2">
-            <h3 className="text-lg font-bold text-primary">Scan to Register</h3>
-            <p className="text-xs text-primary/60 leading-relaxed">
-              Scan the QR code with your mobile phone camera to fill in your registration details on the web.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
