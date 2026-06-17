@@ -891,12 +891,14 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     try {
       const payload = {
         userId,
-        movieId: movie?.id || "",
-        movieTitle: movie?.title || "",
-        episodeId: currentEpisode?.id || null,
-        episodeTitle: currentPlayingEpisodeTitle || null,
+        mediaId: movie?.id || "",
+        contentTitle: movie?.title || "",
         issueType,
-        timestamp: serverTimestamp(),
+        createdAt: serverTimestamp(),
+        ...(currentEpisode ? {
+          episodeId: currentEpisode.id || null,
+          episodeTitle: currentPlayingEpisodeTitle || currentEpisode.title || null,
+        } : {})
       };
       await addDocument("reports", payload);
       toast.success("Thank you! Your report has been submitted.");
@@ -1483,18 +1485,18 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     </div>
                   ) : (
                     <>
-                      <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-zinc-900 shrink-0">
+                      <div className="flex items-center justify-between md:mb-2.5 pb-2 border-b border-zinc-900 shrink-0">
                         <button
                           onClick={() => setShowReportSection(true)}
                           className="focusable text-[10px] md:text-xs font-semibold text-zinc-450 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 outline-none"
                         >
-                          <AlertCircle className="w-4 h-4 text-yellow-500" />
+                          <AlertCircle className="w-4 h-4 text-primary-foreground" />
                           <span>Report an Issue</span>
                         </button>
                       </div>
 
                       <Tabs defaultValue="quality" value={activeSettingTab} onValueChange={(val) => setActiveSettingTab(val as any)} className="w-full flex flex-col flex-1 min-h-0">
-                        <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mb-2 w-full shrink-0">
+                        <TabsList className="grid grid-cols-2 bg-zinc-900 p-0.5 mdmb-2 w-full shrink-0">
                           <TabsTrigger value="quality" className="focusable rounded-md font-semibold text-xs py-1 cursor-pointer data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-400 w-full text-center outline-none">
                             Quality
                           </TabsTrigger>
@@ -1509,7 +1511,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         {/* Content Options */}
                         <div className="overflow-y-auto w-full my-0.5 pr-1 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent flex-1 min-h-0">
                           <TabsContent value="quality" className="mt-0 outline-none w-full">
-                            <div className="flex flex-col gap-1 w-full text-zinc-300">
+                            <div className="flex flex-col md:gap-1 w-full text-zinc-300">
                               {qualities.length > 0 ? (
                                 qualities.map((q) => {
                                   const isActive = currentQuality === q.id;

@@ -288,14 +288,19 @@ export const GetSupportPage = () => {
             variant="outline"
             size="icon"
             onClick={handleBack}
-            className="focusable w-9 h-9 rounded-full z-10 border-border focus:bg-zinc-850"
+            className="focusable absolute left-4 w-9 h-9 rounded-full z-10 border-border focus:bg-zinc-850"
             id="support-back-btn"
           >
-            {viewState.view === "list"
-              ? <ChevronLeft className="w-4 h-4 text-foreground" />
-              : <ArrowLeft className="w-4 h-4 text-foreground" />}
+            {viewState.view === "list" ? (
+              <ChevronLeft className="w-4 h-4 text-foreground" />
+            ) : (
+              <ArrowLeft className="w-4 h-4 text-foreground" />
+            )}
           </Button>
-          <h1 className="text-foreground font-bold text-lg">{headerTitle()}</h1>
+
+          <h1 className="text-foreground font-bold text-lg text-center">
+            {headerTitle()}
+          </h1>
         </div>
       </div>
 

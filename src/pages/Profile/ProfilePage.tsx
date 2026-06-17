@@ -819,10 +819,10 @@ export const ProfilePage = () => {
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <Card tabIndex={-1} className="w-full max-w-sm rounded-3xl p-6 shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-9 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <Card tabIndex={-1} className="w-full max-w-sm rounded-xl p-6 shadow-xl flex flex-col gap-5 animate-in zoom-in-95 duration-200">
             <div className="flex flex-col gap-2 text-center items-center">
-              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
+              <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
                 <LogOut className="w-6 h-6 text-destructive" />
               </div>
               <h3 className="text-xl font-bold text-foreground">Log Out</h3>
@@ -834,7 +834,7 @@ export const ProfilePage = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowLogoutModal(false)}
-                className="focusable flex-1 h-auto py-3 rounded-xl border-border hover:bg-muted font-semibold focus:bg-zinc-800 outline-none"
+                className="focusable flex-1 h-10 py-3 rounded-md border-border hover:bg-muted font-semibold focus:bg-zinc-800 outline-none"
               >
                 Cancel
               </Button>
@@ -844,7 +844,7 @@ export const ProfilePage = () => {
                   setShowLogoutModal(false);
                   logout();
                 }}
-                className="focusable flex-1 h-auto py-3 rounded-xl shadow-sm hover:bg-destructive/90 font-semibold focus:bg-destructive/80 focus:scale-102 outline-none"
+                className="focusable flex-1 h-10 py-3 rounded-md shadow-sm hover:bg-destructive/90 font-semibold focus:bg-destructive/80 focus:scale-102 outline-none"
               >
                 Yes, Log Out
               </Button>
