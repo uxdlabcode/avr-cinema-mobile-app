@@ -2,9 +2,18 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+interface NotificationItem {
+  id: number;
+  title: string;
+  description: string;
+  time: string;
+  image: string;
+  badge: number | null;
+  read: boolean;
+}
 
-
-
+const notifications: NotificationItem[] = [];
+const recommended: NotificationItem[] = [];
 export const NotificationsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"general" | "recommended">("general");
