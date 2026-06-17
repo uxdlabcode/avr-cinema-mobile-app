@@ -25,7 +25,7 @@ export function isAdultRating(ageRating: string | undefined | null): boolean {
  * @param items  Array of media items — each must have an optional `ageRating` field.
  * @param userAge The user's age (null/undefined = not provided → treat as restricted).
  */
-export function filterByUserAge<T extends { ageRating?: string }>(
+export function filterByUserAge<T extends Record<string, any>>(
   items: T[],
   userAge: number | null | undefined
 ): T[] {
