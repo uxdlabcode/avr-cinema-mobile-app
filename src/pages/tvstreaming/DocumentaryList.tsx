@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Plus, Check, Film } from 'lucide-react';
-import { getMatchingData, getSignedUrl } from '@/Firebase';
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchDocumentaryMedia } from "@/store/slices/documentarySlice";
+import { getSignedUrl } from '@/Firebase';
 
 interface DocItem {
   id: string;
@@ -24,6 +27,10 @@ interface Props {
 
 const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], toggleWatchlist }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const mediaItems = useSelector((state: RootState) => state.documentary.items);
+  const mediaStatus = useSelector((state: RootState) => state.documentary.status);
+
   const [items, setItems] = useState<DocItem[]>([]);
   const [groupedItems, setGroupedItems] = useState<Record<string, DocItem[]>>({});
   const rowRef = useRef<HTMLDivElement>(null);
@@ -57,39 +64,50 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
   }, [items]);
 
   useEffect(() => {
-    const fetchDocs = async () => {
+    if (mediaStatus === "idle") {
+      dispatch(fetchDocumentaryMedia());
+    }
+  }, [mediaStatus, dispatch]);
+
+  useEffect(() => {
+    const processDocs = async () => {
       try {
-        const docs = await getMatchingData('media', 'category', '==', 'Documentary');
+        const fetchedDocs = mediaItems.filter(item => item.category === "Documentary");
 
         // Sort by createdAt desc
-        const sorted = (docs || []).sort((a: any, b: any) => {
+        const sortedDocs = (fetchedDocs || []).sort((a: any, b: any) => {
           const timeA = a.createdAt?.toMillis?.() || new Date(a.createdAt || 0).getTime();
           const timeB = b.createdAt?.toMillis?.() || new Date(b.createdAt || 0).getTime();
           return timeB - timeA;
         });
 
         const signed = await Promise.all(
-          sorted.map(async (doc: any) => {
-            let thumb = doc.thumbnailUrl || '';
-            if (thumb) {
+          sortedDocs.map(async (doc: any) => {
+            let signedThumb = doc.thumbnailUrl || "";
+            if (signedThumb) {
               try {
-                thumb = await getSignedUrl(doc.thumbnailUrl);
-              } catch {
-                thumb = doc.thumbnailUrl;
+                signedThumb = await getSignedUrl(doc.thumbnailUrl);
+              } catch (err) {
+                console.error("Error signing URL:", err);
               }
             }
-            return { ...doc, signedThumbnailUrl: thumb } as DocItem;
+            return {
+              ...doc,
+              signedThumbnailUrl: signedThumb
+            } as DocItem;
           })
         );
 
         setItems(signed);
       } catch (err) {
-        console.error('Error fetching Documentaries:', err);
+        console.error('Error processing documentaries:', err);
       }
     };
 
-    fetchDocs();
-  }, []);
+    if (mediaStatus === "succeeded") {
+      processDocs();
+    }
+  }, [mediaItems, mediaStatus]);
 
   const updateScrollButtons = () => {
     if (rowRef.current) {

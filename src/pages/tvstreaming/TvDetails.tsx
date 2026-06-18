@@ -12,7 +12,10 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import { getMatchingData, getSignedUrl, getCollectionData, compoundQuery, deleteDocument, createDocument } from '@/Firebase';
+import { compoundQuery, deleteDocument, createDocument } from '@/Firebase';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store';
+import { fetchTvMedia } from '@/store/slices/tvSlice';
 import Header from '@/components/Header';
 import RecentTVShows from './Episode';
 import DocumentaryList from './DocumentaryList';
@@ -265,14 +268,17 @@ const MediaCategoryRow = ({
 
 const TvDetails = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
+  const mediaItems = useSelector((state: RootState) => state.tv.items);
+  const mediaStatus = useSelector((state: RootState) => state.tv.status);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'For You';
   const setActiveTab = (tab: string) => setSearchParams({ tab });
   const [activeDay, setActiveDay] = useState('TODAY');
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = mediaStatus === "loading" || mediaStatus === "idle";
   const [tvShows, setTvShows] = useState<TvShowItem[]>([]);
   const [groupedTvAndDocs, setGroupedTvAndDocs] = useState<Record<string, any[]>>({});
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
@@ -357,120 +363,47 @@ const TvDetails = () => {
     }
   };
 
-  // Fetch TV shows and dynamic categories from Firestore
+  // Fetch media from Redux
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
+    if (mediaStatus === "idle") {
+      dispatch(fetchTvMedia());
+    }
+  }, [mediaStatus, dispatch]);
 
-        // 1. Fetch TV Shows for Hero and Popular rows
-        const fetchTvShowsPromise = (async () => {
-          try {
-            const fetchedShows = await getMatchingData("media", "category", "==", "TV Show");
+  useEffect(() => {
+    if (mediaItems.length > 0) {
+      // 1. TV Shows for hero banner
+      const shows = mediaItems.filter(item => item.category === "TV Show") as TvShowItem[];
+      setTvShows(shows);
 
-            const signedShows = await Promise.all(
-              fetchedShows.map(async (show) => {
-                let signedThumb = show.thumbnailUrl || "";
-                if (signedThumb) {
-                  try {
-                    signedThumb = await getSignedUrl(show.thumbnailUrl);
-                  } catch (err) {
-                    console.error("Error signing URL:", err);
-                  }
-                }
-                return {
-                  ...show,
-                  signedThumbnailUrl: signedThumb
-                } as TvShowItem;
-              })
-            );
-
-            setTvShows(signedShows);
-          } catch (err) {
-            console.error("Error fetching TV Shows:", err);
+      // 2. Group TV Shows and Documentaries
+      const tvAndDocs = mediaItems.filter(
+        item => item.category === "TV Show" || item.category === "Documentary"
+      );
+      const groups: Record<string, any[]> = {};
+      tvAndDocs.forEach((item) => {
+        if (item.genres && item.genres.length > 0) {
+          item.genres.forEach((genre: string) => {
+            if (!groups[genre]) {
+              groups[genre] = [];
+            }
+            if (!groups[genre].some((m) => m.id === item.id)) {
+              groups[genre].push(item);
+            }
+          });
+        } else {
+          const fallback = "Trending";
+          if (!groups[fallback]) {
+            groups[fallback] = [];
           }
-        })();
-
-        // 2. Fetch all media, filter for TV Show and Documentary, and group by genres
-        const fetchAllMediaPromise = (async () => {
-          try {
-            const docs = await getCollectionData("media");
-
-            const tvAndDocs = docs.filter(
-              item => item.category === "TV Show" || item.category === "Documentary"
-            );
-
-            const sorted = (tvAndDocs || [])
-              .sort((a, b) => {
-                const timeA = a.createdAt?.toMillis?.() || new Date(a.createdAt || 0).getTime();
-                const timeB = b.createdAt?.toMillis?.() || new Date(b.createdAt || 0).getTime();
-                return timeB - timeA;
-              });
-
-            const enriched = await Promise.all(
-              sorted.map(async (doc) => {
-                let image = "/assets/poster.png";
-                if (doc.thumbnailUrl) {
-                  try {
-                    image = await getSignedUrl(doc.thumbnailUrl);
-                  } catch {
-                    image = doc.thumbnailUrl;
-                  }
-                }
-                return {
-                  id: doc.id,
-                  title: doc.title,
-                  image: image,
-                  description: doc.description || "",
-                  category: doc.category || "TV Show",
-                  releaseYear: doc.releaseYear || doc.year || "2026",
-                  ageRating: doc.ageRating || doc.rating || "U/A 13+",
-                  language: doc.language || "Hindi",
-                  genres: doc.genres || [],
-                  duration: doc.duration || "N/A"
-                };
-              })
-            );
-
-            // Group by genre
-            const groups: Record<string, any[]> = {};
-            enriched.forEach((item) => {
-              if (item.genres && item.genres.length > 0) {
-                item.genres.forEach((genre: string) => {
-                  if (!groups[genre]) {
-                    groups[genre] = [];
-                  }
-                  if (!groups[genre].some((m) => m.id === item.id)) {
-                    groups[genre].push(item);
-                  }
-                });
-              } else {
-                const fallback = "Trending";
-                if (!groups[fallback]) {
-                  groups[fallback] = [];
-                }
-                if (!groups[fallback].some((m) => m.id === item.id)) {
-                  groups[fallback].push(item);
-                }
-              }
-            });
-
-            setGroupedTvAndDocs(groups);
-          } catch (err) {
-            console.error("Error fetching and grouping TV and Docs:", err);
+          if (!groups[fallback].some((m) => m.id === item.id)) {
+            groups[fallback].push(item);
           }
-        })();
-
-        await Promise.all([fetchTvShowsPromise, fetchAllMediaPromise]);
-      } catch (error) {
-        console.error("Error fetching TvDetails data from Firestore:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+        }
+      });
+      setGroupedTvAndDocs(groups);
+    }
+  }, [mediaItems]);
 
   // Synchronize carousel slide snaps
   useEffect(() => {

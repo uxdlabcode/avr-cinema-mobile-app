@@ -16,7 +16,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getMatchingData, getSignedUrl, compoundQuery, deleteDocument, createDocument } from "@/Firebase";
+import { compoundQuery, deleteDocument, createDocument } from "@/Firebase";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store";
+import { fetchTvMedia } from "@/store/slices/tvSlice";
 import { filterByUserAge } from "@/lib/ageFilter";
 import {
   Carousel,
@@ -352,10 +355,13 @@ const TVCategoryRow = ({
 
 const TvTab = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
+  const mediaItems = useSelector((state: RootState) => state.tv.items);
+  const mediaStatus = useSelector((state: RootState) => state.tv.status);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = mediaStatus === "loading" || mediaStatus === "idle";
   const [tvShows, setTvShows] = useState<TVItem[]>([]);
   const [groupedTV, setGroupedTV] = useState<Record<string, TVItem[]>>({});
   const [searchParams, setSearchParams] = useSearchParams();
@@ -444,45 +450,20 @@ const TvTab = () => {
     }
   };
 
+  // Fetch media from Redux
   useEffect(() => {
-    const fetchTVShows = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedTV = await getMatchingData(
-          "media",
-          "category",
-          "==",
-          "TV Show",
-        );
+    if (mediaStatus === "idle") {
+      dispatch(fetchTvMedia());
+    }
+  }, [mediaStatus, dispatch]);
 
-        const signedTV = await Promise.all(
-          fetchedTV.map(async (show) => {
-            let signedThumb = show.thumbnailUrl || "";
-            if (signedThumb) {
-              try {
-                signedThumb = await getSignedUrl(show.thumbnailUrl);
-              } catch (err) {
-                console.error("Error signing URL:", err);
-              }
-            }
-            return {
-              ...show,
-              signedThumbnailUrl: signedThumb,
-            } as TVItem;
-          }),
-        );
-
-        const filtered = filterByUserAge(signedTV, user?.age ?? null);
-        setTvShows(filtered);
-      } catch (error) {
-        console.error("Error fetching TV shows from Firestore:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTVShows();
-  }, []);
+  useEffect(() => {
+    if (mediaItems.length > 0) {
+      const shows = mediaItems.filter(item => item.category === "TV Show") as TVItem[];
+      const filtered = filterByUserAge(shows, user?.age ?? null);
+      setTvShows(filtered);
+    }
+  }, [mediaItems, user?.age]);
 
   // Dynamically group TV shows by genre
   useEffect(() => {

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import type { RootState } from '@/store';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '@/store';
 import { ChevronLeft, ChevronRight, Bookmark, Share2, Play, Plus, Check, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getMatchingData, getSignedUrl, compoundQuery, deleteDocument, createDocument } from '@/Firebase';
+import { compoundQuery, deleteDocument, createDocument } from '@/Firebase';
+import { fetchMovieMedia } from '@/store/slices/movieSlice';
 import { filterByUserAge } from '@/lib/ageFilter';
 import {
   Carousel,
@@ -235,10 +236,13 @@ const MovieCategoryRow = ({
 
 const MoviesTab = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
+  const mediaItems = useSelector((state: RootState) => state.movie.items);
+  const mediaStatus = useSelector((state: RootState) => state.movie.status);
+  const isLoading = mediaStatus === "loading" || mediaStatus === "idle";
 
-  const [isLoading, setIsLoading] = useState(true);
   const [movies, setMovies] = useState<MovieItem[]>([]);
   const [groupedMovies, setGroupedMovies] = useState<Record<string, MovieItem[]>>({});
 
@@ -282,7 +286,7 @@ const MoviesTab = () => {
           setWatchlist(prev => prev.filter(id => id !== movieId.toString()));
           toast.success("Removed from wishlist");
         } catch (err) {
-          console.error("Error removing from watchlist:", err);
+          console.error("Error removing from wishlist:", err);
         }
       } else {
         try {
@@ -324,40 +328,20 @@ const MoviesTab = () => {
     }
   };
 
+  // Fetch media from Redux
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedMovies = await getMatchingData("media", "category", "==", "Movie");
+    if (mediaStatus === "idle") {
+      dispatch(fetchMovieMedia());
+    }
+  }, [mediaStatus, dispatch]);
 
-        const signedMovies = await Promise.all(
-          fetchedMovies.map(async (movie) => {
-            let signedThumb = movie.thumbnailUrl || "";
-            if (signedThumb) {
-              try {
-                signedThumb = await getSignedUrl(movie.thumbnailUrl);
-              } catch (err) {
-                console.error("Error signing URL:", err);
-              }
-            }
-            return {
-              ...movie,
-              signedThumbnailUrl: signedThumb
-            } as MovieItem;
-          })
-        );
-
-        const filtered = filterByUserAge(signedMovies, user?.age ?? null);
-        setMovies(filtered);
-      } catch (error) {
-        console.error("Error fetching movies from Firestore:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMovies();
-  }, []);
+  useEffect(() => {
+    if (mediaItems.length > 0) {
+      const allMovies = mediaItems.filter(item => item.category === "Movie") as MovieItem[];
+      const filtered = filterByUserAge(allMovies, user?.age ?? null);
+      setMovies(filtered);
+    }
+  }, [mediaItems, user?.age]);
 
   // Dynamically group movies by genre
   useEffect(() => {

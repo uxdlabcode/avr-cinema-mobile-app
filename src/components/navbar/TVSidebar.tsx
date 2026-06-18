@@ -53,15 +53,13 @@ export function TVSidebar() {
 
   return (
     <aside
-      className={`fixed left-0 top-0 bottom-0 h-screen z-50 transition-all duration-300 flex flex-col items-start pt-8 pb-8 backdrop-blur-md border-r-0 pointer-events-none ${isExpanded
-        ? "w-60 bg-gradient-to-r from-black via-black/95 to-transparent"
+      className={`fixed left-0 top-0 bottom-0 h-screen z-50 transition-all duration-300 ease-in-out flex flex-col items-start pt-8 pb-8 border-r-0 overflow-hidden pointer-events-none ${isExpanded
+        ? "w-[280px] bg-gradient-to-r from-black/80 via-black/88 via-[50%] to-transparent"
         : "w-[80px] bg-gradient-to-r from-black via-black/90 to-transparent"
         }`}
     >
       <div
-        className={`h-full flex flex-col items-start pointer-events-auto transition-all duration-300 ${
-          isExpanded ? "w-[210px]" : "w-[80px]"
-        }`}
+        className="h-full flex flex-col items-start pointer-events-auto w-[250px] shrink-0"
         onFocus={() => setIsExpanded(true)}
         onBlur={(e) => {
           // Only collapse if the new focus target is not inside the sidebar
@@ -73,11 +71,11 @@ export function TVSidebar() {
         onMouseLeave={() => setIsExpanded(false)}
       >
         {/* App Logo */}
-        <div className="w-full flex items-center mb-10 overflow-hidden h-14 pl-[18px]">
+        <div className="w-full flex items-center mb-10 h-14 pl-7">
           <img
             src="/assets/logo.jpg"
             alt="AVR Logo"
-            className="h-10 w-10 rounded-full object-cover shadow-md transition-all duration-300"
+            className="h-10 w-[45px] object-contain transition-transform duration-300 hover:scale-105"
           />
         </div>
 
@@ -91,18 +89,17 @@ export function TVSidebar() {
               <Link
                 key={item.label}
                 to={item.path}
-                className={`focusable flex items-center gap-5 py-3 w-full outline-none transition-all duration-200 group pl-[28px] ${
-                  isActive
-                    ? "text-primary font-bold"
-                    : "text-zinc-400 hover:text-white"
-                }`}
+                className={`focusable flex items-center gap-5 py-3 w-full outline-none transition-colors duration-300 group pl-[28px] ${isActive
+                  ? "text-primary font-bold"
+                  : "text-zinc-400 hover:text-white"
+                  }`}
               >
                 <Icon
-                  className={`w-5 h-5 flex-shrink-0 transition-all duration-200 ${isActive ? "text-primary scale-110" : "text-zinc-400 group-hover:text-white group-hover:scale-105"
+                  className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${isActive ? "text-primary scale-110" : "text-zinc-400 group-hover:text-white group-hover:scale-105"
                     }`}
                 />
                 <span
-                  className={`text-[15px] font-semibold transition-all duration-200 whitespace-nowrap ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 w-0 overflow-hidden"
+                  className={`text-[15px] font-semibold transition-all duration-300 ease-in-out whitespace-nowrap ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3 pointer-events-none"
                     } ${isActive ? "text-primary" : "text-zinc-400 group-hover:text-white"
                     }`}
                 >
@@ -118,40 +115,43 @@ export function TVSidebar() {
           {user?.membershipStatus === "active" ? (
             <Link
               to="/membership"
-              className="focusable mb-4 py-2 flex items-center gap-4 transition-all duration-200 text-primary w-full pl-[28px]"
+              className="focusable mb-4 py-2 flex items-center gap-4 text-primary w-full pl-[28px]"
               title="Premium Active"
             >
               <Crown className="w-5 h-5 text-amber-400 shrink-0" />
-              {isExpanded && (
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider truncate animate-in fade-in duration-300">
-                  {currentPlanName}
-                </span>
-              )}
+              <span
+                className={`text-xs font-bold text-amber-400 uppercase tracking-wider truncate transition-all duration-300 ease-in-out whitespace-nowrap ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3 pointer-events-none"
+                  }`}
+              >
+                {currentPlanName}
+              </span>
             </Link>
           ) : (
-            isExpanded && (
-              <div className="mb-4 text-[10px] text-zinc-500 font-bold uppercase tracking-wider text-left w-full pl-8">
-                {currentPlanName}
-              </div>
-            )
+            <div
+              className={`text-[10px] text-zinc-500 font-bold uppercase tracking-wider text-left w-full pl-8 transition-all duration-300 ease-in-out whitespace-nowrap overflow-hidden ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3 pointer-events-none"
+                }`}
+            >
+              {currentPlanName}
+            </div>
           )}
           <Link
             to="/profile"
-            className="focusable flex items-center w-full py-2 rounded-lg gap-4 transition-all duration-200 outline-none border border-transparent focus:border-zinc-700 hover:bg-zinc-800/35 cursor-pointer pl-[22px]"
+            className="focusable flex items-center w-full py-2 rounded-lg gap-4 transition-colors duration-200 outline-none border border-transparent focus:border-zinc-700 hover:bg-zinc-800/35 cursor-pointer pl-[22px]"
           >
             <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold text-white shadow shrink-0">
               {user?.name?.[0]?.toUpperCase() || "U"}
             </div>
-            {isExpanded && (
-              <div className="flex flex-col overflow-hidden text-left animate-in fade-in duration-300">
-                <span className="text-xs font-semibold text-zinc-300 truncate">
-                  {user?.name || "Guest User"}
-                </span>
-                <span className="text-[10px] text-zinc-500 truncate">
-                  {user?.membershipStatus === "active" ? "Premium" : "Free Plan"}
-                </span>
-              </div>
-            )}
+            <div
+              className={`flex flex-col text-left transition-all duration-300 ease-in-out ${isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-3 pointer-events-none"
+                }`}
+            >
+              <span className="text-xs font-semibold text-zinc-300 truncate">
+                {user?.name || "Guest User"}
+              </span>
+              <span className="text-[10px] text-zinc-500 truncate">
+                {user?.membershipStatus === "active" ? "Premium" : "Free Plan"}
+              </span>
+            </div>
           </Link>
         </div>
       </div>

@@ -1009,7 +1009,6 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
       ref={containerRef}
       className="w-full h-full relative flex items-center justify-center bg-black select-none"
       onMouseMove={triggerControlsShow}
-      onTouchStart={triggerControlsShow}
     >
       <div
         className="w-full h-full relative flex items-center justify-center bg-black"
@@ -1075,7 +1074,20 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               ref={videoRef}
               tabIndex={-1}
               className="w-full h-full object-contain cursor-pointer"
-              onClick={togglePlayPause}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowControls((prev) => {
+                  const nextVal = !prev;
+                  if (nextVal) {
+                    triggerControlsShow();
+                  } else {
+                    if (controlsTimeoutRef.current) {
+                      clearTimeout(controlsTimeoutRef.current);
+                    }
+                  }
+                  return nextVal;
+                });
+              }}
               onTimeUpdate={handleTimeUpdate}
               onDurationChange={handleDurationChange}
               onEnded={handleEnded}
@@ -1098,6 +1110,18 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 />
               ))}
             </video>
+
+            {/* Click/Tap cover to show controls when hidden */}
+            {!showControls && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowControls(true);
+                  triggerControlsShow();
+                }}
+                className="absolute inset-0 z-[9] bg-transparent cursor-pointer"
+              />
+            )}
 
             {/* Loading Spinner Overlay */}
             {isVideoLoading && (
@@ -1160,10 +1184,22 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             )}
 
             {/* Premium Controls Overlay */}
-            <div className={`absolute inset-0 bg-black/40 flex flex-col justify-between transition-opacity duration-300 z-10 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowControls(false);
+                if (controlsTimeoutRef.current) {
+                  clearTimeout(controlsTimeoutRef.current);
+                }
+              }}
+              className={`absolute inset-0 bg-black/40 flex flex-col justify-between transition-opacity duration-300 z-10 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            >
 
               {/* Top Controls Bar */}
-              <div className="p-4 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="p-4 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent"
+              >
                 <div className="flex items-center gap-3">
                   <button
                     onClick={(e) => {
@@ -1243,7 +1279,10 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Left vertical edge: Brightness slider */}
-              <div className="flex flex-col items-center gap-2 absolute left-8 top-1/2 -translate-y-1/2 z-20">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="flex flex-col items-center gap-2 absolute left-8 top-1/2 -translate-y-1/2 z-20"
+              >
                 <Sun className="w-5 h-5 text-zinc-350" />
                 <div className="h-24 w-6 flex items-center justify-center relative">
                   <input
@@ -1267,7 +1306,10 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Right vertical edge: Volume slider */}
-              <div className="flex flex-col items-center gap-2 absolute right-8 top-1/2 -translate-y-1/2 z-20">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="flex flex-col items-center gap-2 absolute right-8 top-1/2 -translate-y-1/2 z-20"
+              >
                 <button
                   onClick={toggleMute}
                   onTouchStart={(e) => {
@@ -1337,7 +1379,10 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Bottom Controls Bar */}
-              <div className="p-4 bg-gradient-to-t from-black/80 to-transparent space-y-3">
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="p-4 bg-gradient-to-t from-black/80 to-transparent space-y-3"
+              >
                 {/* Progress Bar/Scrubber */}
                 <div className="flex items-center gap-3">
                   <input

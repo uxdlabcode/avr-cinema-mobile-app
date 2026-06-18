@@ -9,10 +9,11 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { compoundQuery, getSignedUrl, deleteDocument, createDocument, getCollectionData } from "@/Firebase";
+import { compoundQuery, deleteDocument, createDocument } from "@/Firebase";
 import { filterByUserAge } from "@/lib/ageFilter";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchHomeMedia } from "@/store/slices/homeSlice";
 import RecentWatch from "./RecentWatch";
 import TrendNow from "./TrendNow";
 import Header from "@/components/Header";
@@ -25,9 +26,10 @@ const fallbackData = [
     id: "1",
     title: "Anweshippin Kandethum",
     image: "/assets/poster.png",
+    thumbnailUrl: "",
     description: "Wrongfully suspended while pursuing the culprit in a missing persons case, a cop seeks redemption – and justice – when he gets a new assignment.",
     category: "Movie",
-    releaseYear: "2024",
+    releaseYear: 2024,
     ageRating: "A",
     language: "Malayalam",
     publisher: "AVR Cinema Pictures",
@@ -41,9 +43,10 @@ const fallbackData = [
     id: "2",
     title: "Lord of the Rings",
     image: "/assets/episode2.webp",
+    thumbnailUrl: "",
     description: "A meek Hobbit from the Shire and eight companions set out on a journey to destroy the powerful One Ring and save Middle-earth.",
     category: "Movie",
-    releaseYear: "2001",
+    releaseYear: 2001,
     ageRating: "U/A 13+",
     language: "English",
     publisher: "New Line Cinema",
@@ -227,156 +230,61 @@ const MediaCategoryRow = ({
 
 export const HomePage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
+  const mediaItems = useSelector((state: RootState) => state.home.items);
+  const mediaStatus = useSelector((state: RootState) => state.home.status);
 
   const [featuredMovies, setFeaturedMovies] = useState<any[]>([]);
   const [groupedMedia, setGroupedMedia] = useState<Record<string, any[]>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = mediaStatus === "loading" || mediaStatus === "idle";
   const [watchlist, setWatchlist] = useState<string[]>([]);
   const [expandedMovieId, setExpandedMovieId] = useState<string | null>(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
-  // Load featured movies and all media grouped by genres in parallel
+  // Fetch media from Redux
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
+    if (mediaStatus === "idle") {
+      dispatch(fetchHomeMedia());
+    }
+  }, [mediaStatus, dispatch]);
 
-        // 1. Fetch featured movies
-        const fetchFeaturedPromise = (async () => {
-          try {
-            const docs = await compoundQuery("media", [
-              { key: "featured", operator: "==", value: true },
-            ]);
+  // Compute featured and grouped media from Redux state
+  useEffect(() => {
+    if (mediaItems.length > 0) {
+      const featured = mediaItems.filter((item) => item.featured === true).slice(0, 7);
+      setFeaturedMovies(filterByUserAge(featured.length > 0 ? featured : fallbackData, user?.age ?? null));
 
-            const sorted = (docs || [])
-              .sort((a, b) => {
-                const timeA = a.createdAt?.toMillis?.() || a.createdAt || 0;
-                const timeB = b.createdAt?.toMillis?.() || b.createdAt || 0;
-                return timeB - timeA;
-              })
-              .slice(0, 7);
-
-            const enriched = await Promise.all(
-              sorted.map(async (doc) => {
-                let image = "/assets/poster.png";
-                if (doc.thumbnailUrl) {
-                  try {
-                    image = await getSignedUrl(doc.thumbnailUrl);
-                  } catch {
-                    image = doc.thumbnailUrl;
-                  }
-                }
-                return {
-                  id: doc.id,
-                  title: doc.title,
-                  image: image,
-                  description: doc.description || "Wrongfully suspended while pursuing the culprit in a missing persons case, a cop seeks redemption – and justice – when he gets a new assignment.",
-                  category: doc.category || "Movie",
-                  releaseYear: doc.releaseYear || doc.year || "2026",
-                  ageRating: doc.ageRating || doc.rating || "U/A 13+",
-                  language: doc.language || "Hindi",
-                  publisher: doc.publisher || "Almighty Motion Picture",
-                  contentDescriptor: doc.contentDescriptor || "foul language, tobacco depictions, alcohol use",
-                  seasons: doc.seasons || [],
-                  genres: doc.genres || [],
-                  tags: doc.genres && doc.genres.length > 0 ? doc.genres : (doc.category ? [doc.category] : ["Featured", "Trending"]),
-                  cast: doc.cast || [],
-                };
-              })
-            );
-
-            setFeaturedMovies(filterByUserAge(enriched.length > 0 ? enriched : fallbackData, user?.age ?? null));
-          } catch (err) {
-            console.error("Error fetching featured movies", err);
-            setFeaturedMovies(fallbackData);
+      const filteredMedia = filterByUserAge(mediaItems, user?.age ?? null);
+      const groups: Record<string, any[]> = {};
+      
+      filteredMedia.forEach((item) => {
+        if (item.genres && item.genres.length > 0) {
+          item.genres.forEach((genre: string) => {
+            if (!groups[genre]) {
+              groups[genre] = [];
+            }
+            if (!groups[genre].some((m) => m.id === item.id)) {
+              groups[genre].push(item);
+            }
+          });
+        } else {
+          const fallback = "Trending";
+          if (!groups[fallback]) {
+            groups[fallback] = [];
           }
-        })();
-
-        // 2. Fetch all media and group by genres
-        const fetchAllMediaPromise = (async () => {
-          try {
-            const docs = await getCollectionData("media");
-
-            const sorted = (docs || [])
-              .sort((a, b) => {
-                const timeA = a.createdAt?.toMillis?.() || a.createdAt || 0;
-                const timeB = b.createdAt?.toMillis?.() || b.createdAt || 0;
-                return timeB - timeA;
-              });
-
-            const enriched = await Promise.all(
-              sorted.map(async (doc) => {
-                let image = "/assets/poster.png";
-                if (doc.thumbnailUrl) {
-                  try {
-                    image = await getSignedUrl(doc.thumbnailUrl);
-                  } catch {
-                    image = doc.thumbnailUrl;
-                  }
-                }
-                return {
-                  id: doc.id,
-                  title: doc.title,
-                  image: image,
-                  description: doc.description || "",
-                  category: doc.category || "Movie",
-                  releaseYear: doc.releaseYear || doc.year || "2026",
-                  ageRating: doc.ageRating || doc.rating || "U/A 13+",
-                  language: doc.language || "Hindi",
-                  publisher: doc.publisher || "",
-                  contentDescriptor: doc.contentDescriptor || "",
-                  seasons: doc.seasons || [],
-                  genres: doc.genres || [],
-                  cast: doc.cast || [],
-                  duration: doc.duration || "N/A"
-                };
-              })
-            );
-
-            const filteredMedia = filterByUserAge(enriched, user?.age ?? null);
-
-            // Group by genre
-            const groups: Record<string, any[]> = {};
-            filteredMedia.forEach((item) => {
-              if (item.genres && item.genres.length > 0) {
-                item.genres.forEach((genre: string) => {
-                  if (!groups[genre]) {
-                    groups[genre] = [];
-                  }
-                  if (!groups[genre].some((m) => m.id === item.id)) {
-                    groups[genre].push(item);
-                  }
-                });
-              } else {
-                const fallback = "Trending";
-                if (!groups[fallback]) {
-                  groups[fallback] = [];
-                }
-                if (!groups[fallback].some((m) => m.id === item.id)) {
-                  groups[fallback].push(item);
-                }
-              }
-            });
-
-            setGroupedMedia(groups);
-          } catch (err) {
-            console.error("Error fetching all media for genre grouping", err);
+          if (!groups[fallback].some((m) => m.id === item.id)) {
+            groups[fallback].push(item);
           }
-        })();
-
-        await Promise.all([fetchFeaturedPromise, fetchAllMediaPromise]);
-      } catch (err) {
-        console.error("Error loading homepage data", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+        }
+      });
+      setGroupedMedia(groups);
+    } else if (mediaStatus === "failed") {
+      setFeaturedMovies(filterByUserAge(fallbackData, user?.age ?? null));
+    }
+  }, [mediaItems, mediaStatus, user?.age]);
 
   // Fetch watchlist state
   useEffect(() => {

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Plus, Check, Tv } from 'lucide-react';
-import { getMatchingData, getSignedUrl } from '@/Firebase';
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchEpisodeMedia } from "@/store/slices/episodeSlice";
+import { getSignedUrl } from '@/Firebase';
 
 interface TvShowItem {
   id: string;
@@ -22,11 +25,21 @@ interface Props {
 
 const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggleWatchlist }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const mediaItems = useSelector((state: RootState) => state.episode.items);
+  const mediaStatus = useSelector((state: RootState) => state.episode.status);
+
   const [items, setItems] = useState<TvShowItem[]>([]);
   const [groupedItems, setGroupedItems] = useState<Record<string, TvShowItem[]>>({});
   const rowRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
+
+  useEffect(() => {
+    if (mediaStatus === "idle") {
+      dispatch(fetchEpisodeMedia());
+    }
+  }, [mediaStatus, dispatch]);
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -55,12 +68,12 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
   }, [items]);
 
   useEffect(() => {
-    const fetchShows = async () => {
+    const processShows = async () => {
       try {
-        const shows = await getMatchingData('media', 'category', '==', 'TV Show');
+        const tvShows = mediaItems.filter(item => item.category === "TV Show");
 
         // Sort by createdAt desc (most recent first)
-        const sorted = (shows || []).sort((a, b) => {
+        const sorted = (tvShows || []).sort((a, b) => {
           const timeA = a.createdAt?.toMillis?.() || new Date(a.createdAt || 0).getTime();
           const timeB = b.createdAt?.toMillis?.() || new Date(b.createdAt || 0).getTime();
           return timeB - timeA;
@@ -82,12 +95,14 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
 
         setItems(signed);
       } catch (err) {
-        console.error('Error fetching TV Shows:', err);
+        console.error('Error processing TV Shows:', err);
       }
     };
 
-    fetchShows();
-  }, []);
+    if (mediaStatus === "succeeded") {
+      processShows();
+    }
+  }, [mediaItems, mediaStatus]);
 
   const updateScrollButtons = () => {
     if (rowRef.current) {

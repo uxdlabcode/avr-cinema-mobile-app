@@ -15,6 +15,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 
 export function Navbar() {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -96,9 +97,17 @@ export function Navbar() {
         </div>
       </header>
 
+      {/* Bottom screen blur fade */}
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 h-8 z-40 pointer-events-none backdrop-blur-md bg-black/90"
+        style={{
+          maskImage: "linear-gradient(to top, black, transparent)",
+          WebkitMaskImage: "linear-gradient(to top, black, transparent)"
+        }}
+      />
       {/* Mobile Bottom Nav */}
-      <div className="md:hidden fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4">
-        <Dock className="bg-zinc-950/90 border border-zinc-800/50 backdrop-blur-md px-6 shadow-2xl h-16 gap-4">
+      <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 flex justify-center">
+        <Dock className="w-full max-w-sm bg-black/40 border border-zinc-800/50 backdrop-blur-lg px-2 mx-0 shadow-2xl h-14 gap-1">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -107,14 +116,24 @@ export function Navbar() {
                 key={item.label}
                 onClick={() => navigate(item.path)}
                 className={cn(
-                  "flex flex-col items-center justify-center rounded-xl transition-all cursor-pointer w-12 h-12 gap-1",
+                  "relative flex-1 flex flex-col items-center justify-center transition-all cursor-pointer gap-1 h-12",
                   isActive
                     ? "text-primary"
-                    : "text-zinc-400 hover:text-white"
+                    : "text-primary/80  hover:text-primary"
                 )}
               >
-                <Icon className={cn("w-5 h-5 transition-transform", isActive && "scale-110")} />
-                <span className="text-[9px] font-medium">{item.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="active-nav-bg"
+                    className="absolute inset-0 dark:bg-primary/20 bg-primary/10 rounded-3xl -z-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  />
+                )}
+                <Icon className={cn("w-4 h-4 transition-transform font-semibold z-10", isActive && "scale-110")} />
+                <span className="text-[10px]  z-10">{item.label}</span>
               </DockIcon>
             );
           })}

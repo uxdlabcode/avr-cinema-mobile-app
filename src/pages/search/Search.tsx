@@ -191,7 +191,7 @@ const Search = () => {
             {/* MOBILE LAYOUT (Remains exactly same) */}
             <div className="md:hidden min-h-screen bg-[#0f1014] text-white pb-24 w-full">
                 {/* STICKY TOP SECTION */}
-                <div className="sticky top-0 z-50 bg-[#0f1014] pt-4 px-4 shadow-sm">
+                <div className="sticky top-0 z-50 bg-[#0f1014] pt-4 px-4 shadow-sm mb-2">
                     <div className="max-w-7xl mx-auto space-y-4 pt-4">
                         {/* Search Header */}
                         <div className="space-y-1">
@@ -200,7 +200,7 @@ const Search = () => {
                         </div>
 
                         {/* Search Input Bar */}
-                        <form tabIndex={-1} onSubmit={handleSearchSubmit} className="relative w-full group">
+                        <form tabIndex={-1} onSubmit={handleSearchSubmit} className="relative w-full group mb-2">
                             <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-white transition-colors" />
                             <Input
                                 type="text"
@@ -232,11 +232,11 @@ const Search = () => {
                     </div>
 
                     {/* Gradient blend */}
-                    <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-b from-[#0f1014] to-transparent translate-y-full pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 right-0 h-4 bg-transparent translate-y-full pointer-events-none" />
                 </div>
 
                 {/* SCROLLABLE MAIN CONTENT */}
-                <div className="max-w-7xl mx-auto px-4 pt-6 space-y-2">
+                <div className="max-w-7xl mx-auto px-4 pt-6 space-y-2 mt-2">
                     {/* Recent Searches Section - Show when query is empty */}
                     {query.trim().length === 0 && (
                         <div className="space-y-4">
@@ -425,7 +425,7 @@ const Search = () => {
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast1.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">TV SHOWS</span>
                             </button>
- 
+
                             <button
                                 onClick={() => navigate("/movies")}
                                 className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
@@ -433,7 +433,7 @@ const Search = () => {
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast2.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">MOVIES</span>
                             </button>
- 
+
                             <button
                                 onClick={() => navigate("/tv?tab=Documentaries")}
                                 className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
