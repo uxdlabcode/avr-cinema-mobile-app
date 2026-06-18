@@ -58,8 +58,9 @@ export default function Layout({ children }: Props) {
 
               return {
                 id: `media_${doc.id}`,
-                title: "New Content Uploaded! 🎬",
-                description: `Watch the newly added ${data.category || "Movie"} "${data.title || "media"}" now streaming.`,
+                title: data.title || "media",
+                category: data.category || "Movie",
+                description: data.description || `Watch the newly added ${data.category || "Movie"} "${data.title || "media"}" now streaming.`,
                 type: "media_upload" as const,
                 image: data.thumbnailUrl || "/assets/poster.png",
                 read: readIds.includes(`media_${doc.id}`),

@@ -18,6 +18,7 @@ interface NotificationItem {
   read: boolean;
   createdAt: number;
   link?: string;
+  category?: string;
 }
 
 export const NotificationsPage = () => {
@@ -171,8 +172,8 @@ export const NotificationsPage = () => {
     switch (type) {
       case "media_upload":
         return (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center border-2 border-background shadow-md">
-            <Play className="w-2.5 h-2.5 fill-white text-white" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center border-2 border-background shadow-md">
+            <Play className="w-2.5 h-2.5 fill-secondary text-white" />
           </div>
         );
       case "membership":
@@ -194,15 +195,11 @@ export const NotificationsPage = () => {
 
   const renderDescription = (item: NotificationItem) => {
     if (item.type === "media_upload") {
-      const catMatch = item.description.match(/added the newly added (.*?) "(.*?)"/);
-      const category = catMatch ? catMatch[1] : "Movie";
-      const title = catMatch ? catMatch[2] : item.title;
-
       return (
         <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">
           <span className="font-semibold text-foreground">AVR Cinema</span> uploaded a new content in{" "}
-          <span className="font-semibold text-primary-foreground">{category}</span>. Watch{" "}
-          <span className="font-semibold text-foreground">"{title}"</span> now streaming in HD.
+          <span className="font-semibold text-primary">{item.category}</span>. Watch{" "}
+          <span className="font-semibold text-foreground">"{item.title}"</span> now streaming in HD.
         </p>
       );
     }
@@ -253,7 +250,7 @@ export const NotificationsPage = () => {
   const NotificationsSkeleton = () => (
     <div className="space-y-3 mt-1">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i} className="border border-border/40 bg-card/20 outline-none">
+        <Card key={i} className="border border-border/40 outline-none py-1">
           <CardContent className="p-3.5 flex items-start gap-3.5">
             <Skeleton className="w-13 h-13 rounded-full shrink-0 bg-muted/40" />
             <div className="flex-1 space-y-2 py-1">
@@ -306,7 +303,7 @@ export const NotificationsPage = () => {
             variant={filter === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("all")}
-            className={`focusable rounded-full text-xs font-semibold px-4 h-7.5 transition-colors ${filter === "all" ? "bg-primary-foreground text-background hover:bg-primary-foreground/90" : "border-border text-foreground hover:bg-muted/50"
+            className={`focusable rounded-full text-xs font-semibold px-4 h-7.5 transition-colors ${filter === "all" ? "bg-primary text-secondary hover:bg-primary/90" : "border-border text-foreground hover:bg-muted/50"
               }`}
           >
             All
@@ -315,7 +312,7 @@ export const NotificationsPage = () => {
             variant={filter === "unread" ? "default" : "outline"}
             size="sm"
             onClick={() => setFilter("unread")}
-            className={`focusable rounded-full text-xs font-semibold px-4 h-7.5 transition-colors ${filter === "unread" ? "bg-primary-foreground text-background hover:bg-primary-foreground/90" : "border-border text-foreground hover:bg-muted/50"
+            className={`focusable rounded-full text-xs font-semibold px-4 h-7.5 transition-colors ${filter === "unread" ? "bg-primary text-secondary hover:bg-primary/90" : "border-border text-foreground hover:bg-muted/50"
               }`}
           >
             Unread
@@ -341,7 +338,7 @@ export const NotificationsPage = () => {
       </div>
 
       {/* Notification List container (Tightened spacing and card padding) */}
-      <div className="flex-1 flex flex-col pt-3 max-w-[700px] md:max-w-[1000px] mx-auto w-full px-4 pb-20">
+      <div className="flex-1 flex flex-col pt-3 max-w-[700px] md:max-w-[1000px] mx-auto w-full px-4 pb-6">
         {loading ? (
           <NotificationsSkeleton />
         ) : filteredNotifications.length === 0 ? (
@@ -370,7 +367,7 @@ export const NotificationsPage = () => {
                     <Card
                       key={item.id}
                       onClick={() => handleMarkAsRead(item)}
-                      className={`focusable transition-all duration-200 border border-border/45 hover:border-primary-foreground/25 bg-card/40 hover:bg-card/70 cursor-pointer relative overflow-hidden outline-none ${!item.read ? "border-l-[3px] border-l-primary-foreground" : ""
+                      className={`focusable transition-all py-1 duration-200 border border-border/45 hover:border-primary-foreground/25 bg-card/40 hover:bg-card/70 cursor-pointer relative overflow-hidden outline-none ${!item.read ? "border-l-[3px] border-l-primary-foreground" : ""
                         }`}
                     >
                       <CardContent className="px-3.5 flex items-start gap-3.5">
@@ -431,7 +428,7 @@ export const NotificationsPage = () => {
                     <Card
                       key={item.id}
                       onClick={() => handleMarkAsRead(item)}
-                      className="focusable transition-all duration-200 border border-border/45 hover:border-primary-foreground/25 bg-card/20 hover:bg-card/45 cursor-pointer relative overflow-hidden outline-none"
+                      className="focusable transition-all duration-200 border border-border/45 hover:border-primary-foreground/25 bg-card/20 hover:bg-card/45 cursor-pointer relative overflow-hidden outline-none py-1"
                     >
                       <CardContent className="p-3.5 flex items-start gap-3.5">
                         {/* Avatar container */}
@@ -449,7 +446,7 @@ export const NotificationsPage = () => {
                         </div>
 
                         {/* Content block */}
-                        <div className="flex-1 min-w-0 pr-3">
+                        <div className="flex-1 min-w-0 ">
                           {renderDescription(item)}
                           <p className="text-muted-foreground text-[10px] mt-1 font-medium">
                             {formatNotificationTime(item.createdAt)}
@@ -457,7 +454,7 @@ export const NotificationsPage = () => {
                         </div>
 
                         {/* Interactive toggle unread/read indicators */}
-                        <div className="shrink-0 self-center flex items-center gap-2">
+                        {/* <div className="shrink-0 self-center flex items-center gap-2">
                           <button
                             onClick={(e) => handleToggleRead(e, item)}
                             className="focusable w-6 h-6 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-primary-foreground transition-colors outline-none"
@@ -469,7 +466,7 @@ export const NotificationsPage = () => {
                               <span className="w-2 h-2 rounded-full border border-muted-foreground/40 block" />
                             )}
                           </button>
-                        </div>
+                        </div> */}
                       </CardContent>
                     </Card>
                   ))}
@@ -479,11 +476,11 @@ export const NotificationsPage = () => {
 
             {/* Load More Button for balanced lazy loading */}
             {filteredNotifications.length > displayCount && (
-              <div className="flex justify-center pt-2">
+              <div className="flex justify-center ">
                 <Button
                   variant="outline"
                   onClick={() => setDisplayCount((prev) => prev + 10)}
-                  className="focusable text-xs font-semibold px-6 py-2 rounded-full border-border hover:bg-muted/50 transition-colors"
+                  className="focusable text-xs font-semibold "
                 >
                   Load More
                 </Button>

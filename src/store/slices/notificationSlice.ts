@@ -9,6 +9,7 @@ export interface NotificationItem {
   read: boolean;
   createdAt: number;
   link?: string;
+  category?: string;
 }
 
 interface NotificationState {
