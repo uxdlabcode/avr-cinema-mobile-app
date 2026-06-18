@@ -11,8 +11,8 @@ import {
     deleteSearch,
     clearHistory
 } from '@/store/slices/searchSlice';
+import { fetchAllMedia } from '@/store/slices/mediaSlice';
 import type { RootState, AppDispatch } from '@/store';
-import { getCollectionData } from '@/Firebase/CloudFirestore/GetData';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const ALL_GENRES = [
@@ -23,10 +23,12 @@ const ALL_GENRES = [
 
 // Helper to get thumbnail from varied data structures
 const getThumbnail = (media: any) => {
-    return media?.thumbnailUrl ||
+    return media?.signedThumbnailUrl ||
+        media?.image ||
+        media?.thumbnailUrl ||
         media?.poster_url ||
         media?.thumbnail ||
-        media?.image ||
+        media?.seasons?.[0]?.signedThumbnailUrl ||
         media?.seasons?.[0]?.thumbnailUrl ||
         media?.seasons?.[0]?.episodes?.[0]?.thumbnailUrl ||
         '';
@@ -38,15 +40,20 @@ const Search = () => {
     const [query, setQuery] = useState(urlQuery);
     const [isSearching, setIsSearching] = useState(false);
 
-    const [allMedia, setAllMedia] = useState<any[]>([]);
     const [filteredMedia, setFilteredMedia] = useState<any[]>([]);
     const [activeFilter, setActiveFilter] = useState<string>('India');
-    const [isLoadingMedia, setIsLoadingMedia] = useState(true);
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+    
+    // Redux selectors
     const { history } = useSelector((state: RootState) => state.search);
     const user = useSelector((state: RootState) => state.auth.user);
+    const allMedia = useSelector((state: RootState) => state.media.items);
+    const mediaStatus = useSelector((state: RootState) => state.media.status);
+    const mediaError = useSelector((state: RootState) => state.media.error);
+
+    const isLoadingMedia = mediaStatus === 'loading' || mediaStatus === 'idle';
 
     useEffect(() => {
         setQuery(urlQuery);
@@ -59,19 +66,10 @@ const Search = () => {
     }, [dispatch, user]);
 
     useEffect(() => {
-        const fetchMedia = async () => {
-            try {
-                const data = await getCollectionData('media');
-                setAllMedia(data);
-                setFilteredMedia(data);
-            } catch (error) {
-                console.error('Error fetching media:', error);
-            } finally {
-                setIsLoadingMedia(false);
-            }
-        };
-        fetchMedia();
-    }, []);
+        if (mediaStatus === 'idle') {
+            dispatch(fetchAllMedia());
+        }
+    }, [mediaStatus, dispatch]);
 
     // Dynamically filter the grid based on BOTH activeFilter and query
     useEffect(() => {

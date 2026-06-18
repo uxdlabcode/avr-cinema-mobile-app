@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Play } from "lucide-react";
 import { getCollectionData, getSignedUrl } from "@/Firebase";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchTrailerMedia } from "@/store/slices/trailerSlice";
 
 interface TrailerItem {
   id: string;
@@ -16,50 +19,18 @@ interface TrailerItem {
 
 const Trailer = () => {
   const navigate = useNavigate();
-  const [trailers, setTrailers] = useState<TrailerItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const trailers = useSelector((state: RootState) => state.trailer.items);
+  const trailerStatus = useSelector((state: RootState) => state.trailer.status);
+  const trailerError = useSelector((state: RootState) => state.trailer.error);
 
   useEffect(() => {
-    const fetchTrailers = async () => {
-      try {
-        const mediaList = await getCollectionData("media");
+    if (trailerStatus === "idle") {
+      dispatch(fetchTrailerMedia());
+    }
+  }, [trailerStatus, dispatch]);
 
-        // Filter media that belong to Movie, TV Show, or Documentary categories
-        const filteredMedia = mediaList.filter(
-          (item) =>
-            item.category === "Movie" ||
-            item.category === "TV Show" ||
-            item.category === "Documentary"
-        );
-
-        // Sign all thumbnail URLs
-        const signedList = await Promise.all(
-          filteredMedia.map(async (item) => {
-            let signedThumb = item.thumbnailUrl || "";
-            if (signedThumb) {
-              try {
-                signedThumb = await getSignedUrl(item.thumbnailUrl);
-              } catch (err) {
-                console.error("Error signing URL:", err);
-              }
-            }
-            return {
-              ...item,
-              signedThumbnailUrl: signedThumb,
-            } as TrailerItem;
-          })
-        );
-
-        setTrailers(signedList);
-      } catch (error) {
-        console.error("Error fetching trailers:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTrailers();
-  }, []);
+  const isLoading = trailerStatus === "loading" || trailerStatus === "idle";
 
   return (
     <div className="min-h-screen bg-black text-white px-4 md:px-12 lg:px-16  pb-24 w-full">
@@ -82,6 +53,12 @@ const Trailer = () => {
                 <Skeleton className="h-4 w-1/2 bg-zinc-800" />
               </div>
             ))}
+          </div>
+        ) : trailerError ? (
+          /* Error State */
+          <div className="flex flex-col items-center justify-center py-20 text-center border border-zinc-900 rounded-2xl bg-zinc-950/20">
+            <h3 className="text-lg font-bold text-rose-500 mb-2">Failed to load trailers</h3>
+            <p className="text-zinc-500 text-sm">{trailerError}</p>
           </div>
         ) : trailers.length === 0 ? (
           /* Empty State */

@@ -7,6 +7,9 @@ import tvReducer from './slices/tvSlice';
 import movieReducer from './slices/movieSlice';
 import episodeReducer from './slices/episodeSlice';
 import documentaryReducer from './slices/documentarySlice';
+import trailerReducer from './slices/trailerSlice';
+import quizReducer from './slices/quizSlice';
+import mediaReducer from './slices/mediaSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -17,6 +20,9 @@ const rootReducer = combineReducers({
   movie: movieReducer,
   episode: episodeReducer,
   documentary: documentaryReducer,
+  trailer: trailerReducer,
+  quiz: quizReducer,
+  media: mediaReducer,
 });
 
 export default rootReducer;

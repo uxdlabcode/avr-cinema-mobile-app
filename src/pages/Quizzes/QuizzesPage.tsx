@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchQuizzes } from "@/store/slices/quizSlice";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +10,7 @@ import {
   ArrowLeft, Clock, HelpCircle, Trophy, Search,
   ChevronRight, Zap, Film, Tv, Star, BookOpen,
 } from "lucide-react";
-import { getCollectionData } from "@/Firebase/CloudFirestore/GetData";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface QuizOption { id: string; text: string; }
@@ -35,8 +38,6 @@ const getCategoryColor = (category: string): string => {
   if (lower.includes("trivia")) return "bg-purple-500/15 text-purple-400 border-purple-500/20";
   return "bg-amber-500/15 text-amber-400 border-amber-500/20";
 };
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 // ── Skeleton ──────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -90,27 +91,22 @@ const QuizCard = ({ quiz, onClick, tabIndex }: { quiz: Quiz; onClick: () => void
 // ── Main Component ─────────────────────────────────────────────────────────
 export const QuizzesPage = () => {
   const navigate = useNavigate();
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const quizzes = useSelector((state: RootState) => state.quiz.items);
+  const quizStatus = useSelector((state: RootState) => state.quiz.status);
+  const quizError = useSelector((state: RootState) => state.quiz.error);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   useEffect(() => {
-    const fetchQuizzes = async () => {
-      try {
-        setLoading(true);
-        const data = await getCollectionData("quizzes");
-        setQuizzes(data as unknown as Quiz[]);
-      } catch (err) {
-        console.error("Error fetching quizzes:", err);
-        setError("Failed to load quizzes. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuizzes();
-  }, []);
+    if (quizStatus === "idle") {
+      dispatch(fetchQuizzes());
+    }
+  }, [quizStatus, dispatch]);
+
+  const loading = quizStatus === "loading" || quizStatus === "idle";
+  const error = quizError;
 
   const categories = ["All", ...Array.from(new Set(quizzes.map((q) => q.category)))];
   const filtered = quizzes.filter((q) => {

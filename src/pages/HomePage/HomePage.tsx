@@ -259,7 +259,7 @@ export const HomePage = () => {
 
       const filteredMedia = filterByUserAge(mediaItems, user?.age ?? null);
       const groups: Record<string, any[]> = {};
-      
+
       filteredMedia.forEach((item) => {
         if (item.genres && item.genres.length > 0) {
           item.genres.forEach((genre: string) => {
@@ -598,7 +598,7 @@ export const HomePage = () => {
                           >
                             <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                               {watchlist.includes(movie.id.toString()) ? (
-                                <Check className="w-3.5 h-3.5 stroke-[3] text-[#DECB94]" />
+                                <Check className="w-3.5 h-3.5 stroke-[3] text-primary" />
                               ) : (
                                 <Plus className="w-3.5 h-3.5 stroke-[3]" />
                               )}

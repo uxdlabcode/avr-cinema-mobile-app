@@ -1,9 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { RootState } from "@/store";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchQuizzes } from "@/store/slices/quizSlice";
 import { addDocument } from "@/Firebase";
 import { db } from "@/Firebase/firebase";
 import { getDocumentData } from "@/Firebase/CloudFirestore/GetData";
@@ -174,6 +175,14 @@ export const QuizResultPage = () => {
   const [resultData, setResultData] = useState<LocationState | null>(state);
   const [loading, setLoading] = useState(!state);
 
+  // Redux cache
+  const dispatch = useDispatch<AppDispatch>();
+  const quizzes = useSelector((s: RootState) => s.quiz.items);
+  const quizStatus = useSelector((s: RootState) => s.quiz.status);
+
+  const [latestQuizId, setLatestQuizId] = useState<string | null>(null);
+  const [latestResultDoc, setLatestResultDoc] = useState<any>(null);
+
   useEffect(() => {
     if (!state || savedRef.current) return;
     savedRef.current = true;
@@ -197,6 +206,7 @@ export const QuizResultPage = () => {
     saveResult();
   }, [state, user]);
 
+  // Phase 1: Retrieve the latest result document to get the quizId
   useEffect(() => {
     if (state) return; // already loaded from state
     if (!user?.id) {
@@ -219,26 +229,64 @@ export const QuizResultPage = () => {
         const docs = querySnapshot.docs.map((d) => d.data());
         // Sort in memory to avoid index requirements
         const latestDoc = docs.sort((a, b) => b.completedAt - a.completedAt)[0];
-        const quizDoc = await getDocumentData("quizzes", latestDoc.quizId);
-
-        if (quizDoc) {
-          setResultData({
-            quiz: quizDoc as unknown as Quiz,
-            answers: latestDoc.answers || {},
-            score: latestDoc.score,
-            correct: latestDoc.correct,
-            total: latestDoc.total,
-          });
-        }
+        setLatestResultDoc(latestDoc);
+        setLatestQuizId(latestDoc.quizId);
       } catch (err) {
         console.error("Error fetching latest result:", err);
-      } finally {
         setLoading(false);
       }
     };
 
     fetchLatestResult();
   }, [user?.id, state]);
+
+  // Phase 2: Resolve the quiz document using Redux cache/dispatch or direct fallback
+  useEffect(() => {
+    if (state || !latestQuizId || !latestResultDoc) return;
+
+    // 1. Try finding in the cached Redux store
+    const cached = quizzes.find((q) => q.id === latestQuizId);
+    if (cached) {
+      setResultData({
+        quiz: cached,
+        answers: latestResultDoc.answers || {},
+        score: latestResultDoc.score,
+        correct: latestResultDoc.correct,
+        total: latestResultDoc.total,
+      });
+      setLoading(false);
+      return;
+    }
+
+    // 2. If quizzes aren't loaded yet in Redux, trigger loading of all quizzes
+    if (quizStatus === "idle") {
+      dispatch(fetchQuizzes());
+      return;
+    }
+
+    // 3. Fallback to direct DB fetch if Redux finished loading/failed but the quiz isn't there
+    if (quizStatus === "succeeded" || quizStatus === "failed") {
+      const fetchDirect = async () => {
+        try {
+          const quizDoc = await getDocumentData("quizzes", latestQuizId);
+          if (quizDoc) {
+            setResultData({
+              quiz: quizDoc as unknown as Quiz,
+              answers: latestResultDoc.answers || {},
+              score: latestResultDoc.score,
+              correct: latestResultDoc.correct,
+              total: latestResultDoc.total,
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching quiz directly:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchDirect();
+    }
+  }, [latestQuizId, latestResultDoc, quizzes, quizStatus, dispatch, state]);
 
   if (loading) {
     return <QuizResultPageSkeleton />;

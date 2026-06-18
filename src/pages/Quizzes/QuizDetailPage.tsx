@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchQuizzes } from "@/store/slices/quizSlice";
 import {
   ArrowLeft, HelpCircle, CheckCircle2, XCircle,
   ChevronRight, Trophy, AlertCircle, Clock,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getDocumentData } from "@/Firebase/CloudFirestore/GetData";
 import type { Quiz } from "./QuizzesPage";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -81,18 +83,44 @@ export const QuizDetailPage = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [finished, setFinished] = useState(false);
 
+  const quizzes = useSelector((state: RootState) => state.quiz.items);
+  const quizStatus = useSelector((state: RootState) => state.quiz.status);
+  const dispatch = useDispatch<AppDispatch>();
+
   useEffect(() => {
     if (!id) return;
-    const fetchQuiz = async () => {
-      try {
-        const data = await getDocumentData("quizzes", id);
-        if (!data) { setError("Quiz not found."); return; }
-        setQuiz(data as unknown as Quiz);
-      } catch { setError("Failed to load quiz."); }
-      finally { setLoading(false); }
-    };
-    fetchQuiz();
-  }, [id]);
+
+    // 1. Try finding in the cached Redux store
+    const cached = quizzes.find((q) => q.id === id);
+    if (cached) {
+      setQuiz(cached);
+      setLoading(false);
+      return;
+    }
+
+    // 2. If quizzes aren't loaded yet in Redux, trigger loading of all quizzes
+    if (quizStatus === "idle") {
+      dispatch(fetchQuizzes());
+      return;
+    }
+
+    // 3. Fallback to direct DB fetch if Redux finished loading but the quiz isn't there
+    if (quizStatus === "succeeded") {
+      const found = quizzes.find((q) => q.id === id);
+      if (found) {
+        setQuiz(found);
+      } else {
+        setError("Quiz not found.");
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (quizStatus === "failed") {
+      setError("Failed to load quiz.");
+      setLoading(false);
+    }
+  }, [id, quizzes, quizStatus, dispatch]);
 
   const handleFinish = () => { setFinished(true); setStarted(false); };
 
