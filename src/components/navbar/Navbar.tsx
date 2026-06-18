@@ -6,7 +6,8 @@ import {
   Search,
   Film,
   User,
-  Crown
+  Crown,
+  Bell
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ export function Navbar() {
 
     { label: "Quiz", path: "/quiz" },
     { label: "Trailers", path: "/trailers" },
+    { label: "Notifications", path: "/notifications" },
   ];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -84,6 +86,14 @@ export function Navbar() {
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => navigate("/notifications")}
+            className="p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            aria-label="Notifications"
+          >
+            <Bell className="w-5 h-5" />
           </button>
 
           <Link to="/profile">

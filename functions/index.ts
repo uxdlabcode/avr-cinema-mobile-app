@@ -117,6 +117,29 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
         lastPaymentId: razorpay_payment_id,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       }, { merge: true });
+
+      // Fetch plan details to get the plan name
+      let planName = "Premium";
+      try {
+        const planDoc = await db.collection('plans').doc(planId).get();
+        if (planDoc.exists) {
+          planName = planDoc.data()?.name || "Premium";
+        }
+      } catch (err) {
+        console.log("Error fetching plan name in Cloud Function:", err);
+      }
+
+      // Save membership notification
+      await db.collection('notifications').add({
+        userId,
+        title: "Subscription Purchased! 👑",
+        description: `You successfully subscribed to the ${planName} plan.`,
+        type: "membership",
+        image: "/assets/headerLogo.png",
+        read: false,
+        createdAt: Date.now(),
+        link: "/profile"
+      });
     }
 
     console.log("Payment verified and saved");

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/Firebase/firebase";
+import { addDocument } from "@/Firebase";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { ArrowLeft, Check, X, Zap, Shield, Download, Monitor, Wifi, Crown, CrownIcon, Sparkles } from "lucide-react";
 import LogoImage from "@/assets/Media (3) 1.png";
@@ -166,6 +167,23 @@ export const UpgradePlanPage = () => {
               if (verifyRazorpayPaymentAsync.fulfilled.match(verifyAction)) {
                 toast.success("Plan upgraded successfully! 🎉");
                 setProcessingPlan(null);
+
+                // Save upgrade notification
+                try {
+                  await addDocument("notifications", {
+                    userId: user.id,
+                    title: "Plan Upgraded! 👑",
+                    description: `You successfully upgraded to the ${plan.name} plan.`,
+                    type: "membership",
+                    image: "/assets/headerLogo.png",
+                    read: false,
+                    createdAt: Date.now(),
+                    link: "/profile"
+                  });
+                } catch (err) {
+                  console.error("Error creating upgrade notification:", err);
+                }
+
                 navigate("/profile");
               } else {
                 toast.error((verifyAction.payload as string) || "Verification failed");

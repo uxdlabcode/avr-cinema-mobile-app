@@ -10,6 +10,7 @@ import documentaryReducer from './slices/documentarySlice';
 import trailerReducer from './slices/trailerSlice';
 import quizReducer from './slices/quizSlice';
 import mediaReducer from './slices/mediaSlice';
+import notificationReducer from './slices/notificationSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   trailer: trailerReducer,
   quiz: quizReducer,
   media: mediaReducer,
+  notifications: notificationReducer,
 });
 
 export default rootReducer;

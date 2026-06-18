@@ -199,6 +199,18 @@ export const QuizResultPage = () => {
           answers: state.answers, // Save user options so they can be restored on page refresh
           completedAt: Date.now(),
         });
+
+        // Save a quiz completion notification
+        await addDocument("notifications", {
+          userId: user?.id || "",
+          title: "Quiz Completed! 🏆",
+          description: `You completed the "${state.quiz.title}" quiz with a score of ${state.score}%.`,
+          type: "quiz",
+          image: "/assets/cast1.webp",
+          read: false,
+          createdAt: Date.now(),
+          link: `/quizzes/${state.quiz.id}/result`
+        });
       } catch (err) {
         console.error("Error saving quiz result:", err);
       }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/Firebase/firebase";
+import { addDocument } from "@/Firebase";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setPlans, setLoading, setError, createRazorpayOrderAsync, verifyRazorpayPaymentAsync } from "@/store/slices/membershipSlice";
 import { useRazorpay } from "react-razorpay";
@@ -201,6 +202,22 @@ export default function Membership() {
                                 toast.success("Payment successful! 🎉");
                                 setLocalLoadingPlan(null);
                                 setSearchParams({ success: "true" });
+
+                                // Save membership notification
+                                try {
+                                    await addDocument("notifications", {
+                                        userId: user.id,
+                                        title: "Subscription Purchased! 👑",
+                                        description: `You successfully subscribed to the ${plan.name} plan.`,
+                                        type: "membership",
+                                        image: "/assets/headerLogo.png",
+                                        read: false,
+                                        createdAt: Date.now(),
+                                        link: "/profile"
+                                    });
+                                } catch (err) {
+                                    console.error("Error creating purchase notification:", err);
+                                }
                             } else {
                                 const errorMsg = (verifyAction.payload as string) || "Verification failed";
                                 console.error("Verification failed:", errorMsg);

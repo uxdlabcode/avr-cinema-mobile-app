@@ -29,8 +29,8 @@ const QuizDetailPageSkeleton = () => (
     <div className="md:hidden flex-1 p-4 flex flex-col gap-4">
       <Skeleton className="h-36 w-full rounded-2xl" />
       <div className="grid grid-cols-2 gap-3">
-        <Skeleton className="h-16 w-full rounded-lg" />
-        <Skeleton className="h-16 w-full rounded-lg" />
+        <Skeleton className="h-8 w-full rounded-md" />
+        <Skeleton className="h-8 w-full rounded-md" />
       </div>
       <div className="border border-border rounded-lg p-4 space-y-3">
         <Skeleton className="h-4 w-24" />

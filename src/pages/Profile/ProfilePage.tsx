@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import LogoImage from "@/assets/Media (3) 1.png";
 import { db } from "@/Firebase/firebase";
 import { getSignedUrl } from "@/Firebase";
-import { collection, getDocs, getDoc, doc, query, where } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, query, where, onSnapshot } from "firebase/firestore";
 import { getCollectionData } from "@/Firebase/CloudFirestore/GetData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,7 @@ export const ProfilePage = () => {
   const [loadingQuizzes, setLoadingQuizzes] = useState(true);
 
   const [currentPlanName, setCurrentPlanName] = useState("Free Plan");
+  const unreadCount = useSelector((state: RootState) => state.notifications.unreadCount);
 
   useEffect(() => {
     if (!user?.membershipPlanId) {
@@ -284,7 +285,7 @@ export const ProfilePage = () => {
           <Button
             variant="ghost"
             onClick={() => navigate("/notifications")}
-            className="focusable hidden w-full justify-start gap-3 px-5 py-3.5 h-auto text-left group rounded-none outline-none"
+            className="focusable w-full justify-start gap-2 px-5 py-2.5 h-auto text-left group rounded-none outline-none"
             id="notifications-btn-desktop"
           >
             <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
@@ -292,8 +293,17 @@ export const ProfilePage = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-foreground font-medium text-sm">Notifications</p>
-              <p className="text-muted-foreground text-xs">No new notifications</p>
+              <p className="text-muted-foreground text-xs">
+                {unreadCount > 0
+                  ? `${unreadCount} new notification${unreadCount > 1 ? "s" : ""}`
+                  : "No new notifications"}
+              </p>
             </div>
+            {unreadCount > 0 && (
+              <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary-foreground text-background text-[10px] font-bold mr-2 shadow-[0_0_8px_rgba(222,203,148,0.5)] animate-pulse">
+                {unreadCount}
+              </span>
+            )}
             <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </Button>
 
@@ -546,7 +556,7 @@ export const ProfilePage = () => {
         </div>
 
         {/* ═══════════ MOBILE LAYOUT (unchanged) ═══════════ */}
-        <div className="md:hidden flex flex-col gap-5 px-4 pt-[72px] pb-7">
+        <div className="md:hidden flex flex-col gap-3 px-4 pt-[72px] pb-7">
 
           {/* Top Bar — Logo + Logout */}
           <div className="fixed top-0 left-0 right-0 z-50 bg-background pt-6 pb-3 flex items-center justify-between px-4">
@@ -636,18 +646,23 @@ export const ProfilePage = () => {
             <ChevronRight className="w-4 h-4" />
           </Button>
 
-          {/* Notifications Row */}
+          {/* Notifications Button */}
           <Button
-            variant="ghost"
+            variant="outline"
             onClick={() => navigate("/notifications")}
-            className="focusable hidden w-full justify-between py-3 h-auto rounded-none border-t border-border hover:bg-transparent text-left outline-none"
-            id="notifications-btn"
+            className="focusable w-full justify-between py-3 px-4 h-auto rounded-lg border-primary/30 text-primary hover:text-primary hover:bg-primary/10 tracking-wider font-semibold text-sm focus:scale-102 outline-none mt-3"
+            id="notifications-btn-mobile"
           >
-            <div>
-              <h3 className="text-foreground font-bold text-base text-left">Notifications</h3>
-              <p className="text-muted-foreground text-sm mt-0.5">No new notifications</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            <span className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              Notifications
+              {unreadCount > 0 && (
+                <span className="flex items-center justify-center px-1.5 py-0.5 rounded-full bg-primary-foreground text-background text-[10px] font-bold shadow-[0_0_8px_rgba(222,203,148,0.5)] animate-pulse">
+                  {unreadCount}
+                </span>
+              )}
+            </span>
+            <ChevronRight className="w-4 h-4" />
           </Button>
 
           {/* Watchlist Section */}

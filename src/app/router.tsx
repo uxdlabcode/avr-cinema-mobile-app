@@ -20,7 +20,7 @@ import MoviesTab from "@/pages/movies/MoviesTab";
 import Membership from "@/pages/membership/Membership";
 import Episode from "@/pages/tvstreaming/Episode";
 import { GetSupportPage } from "@/pages/GetSupport/GetSupportPage";
-// import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
+import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
 import { QuizzesPage } from "@/pages/Quizzes/QuizzesPage";
 import { QuizDetailPage } from "@/pages/Quizzes/QuizDetailPage";
 import { QuizResultPage } from "@/pages/Quizzes/QuizResultPage";
@@ -185,14 +185,14 @@ export const appRoutes: RouteObject[] = [
           </ProtectedRoute>
         ),
       },
-      // {
-      //   path: "notifications",
-      //   element: (
-      //     <ProtectedRoute allowedRoles={["superadmin", "user"]}>
-      //       <NotificationsPage />
-      //     </ProtectedRoute>
-      //   ),
-      // },
+      {
+        path: "notifications",
+        element: (
+          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+            <NotificationsPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "quiz",
         element: (
