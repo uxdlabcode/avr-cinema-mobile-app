@@ -4,7 +4,7 @@ export interface NotificationItem {
   id: string;
   title: string;
   description: string;
-  type: "media_upload" | "membership" | "quiz";
+  type: "media_upload" | "membership" | "quiz" | "upcoming" | "upcoming_upload";
   image: string;
   read: boolean;
   createdAt: number;

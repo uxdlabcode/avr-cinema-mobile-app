@@ -45,7 +45,7 @@ const Search = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    
+
     // Redux selectors
     const { history } = useSelector((state: RootState) => state.search);
     const user = useSelector((state: RootState) => state.auth.user);
@@ -243,7 +243,7 @@ const Search = () => {
                                 {history.length > 0 && (
                                     <button
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                        className="focusable text-xs font-bold text-blue-500 hover:text-blue-400"
+                                        className="focusable text-xs font-bold text-primary hover:text-primary/80"
                                     >
                                         Clear All
                                     </button>
@@ -450,7 +450,7 @@ const Search = () => {
                                 {history.length > 0 && (
                                     <button
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                        className="focusable text-xs font-bold text-blue-500 hover:text-blue-400 cursor-pointer outline-none"
+                                        className="focusable text-xs font-bold text-primary hover:text-primary/80 cursor-pointer outline-none"
                                     >
                                         Clear All
                                     </button>

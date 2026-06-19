@@ -132,6 +132,10 @@ export const verifyRazorpayPayment = functions.https.onCall(async (data, context
       // Save membership notification
       await db.collection('notifications').add({
         userId,
+        uid: userId,
+        planId,
+        startDate: Date.now(),
+        endDate: expiryDate.getTime(),
         title: "Subscription Purchased! 👑",
         description: `You successfully subscribed to the ${planName} plan.`,
         type: "membership",

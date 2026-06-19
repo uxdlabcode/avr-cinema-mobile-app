@@ -34,7 +34,7 @@ export default function Layout({ children }: Props) {
             id: doc.id,
             title: data.title || "Update",
             description: data.description || "",
-            type: (data.type || "membership") as "membership" | "quiz",
+            type: (data.type || "membership") as "membership" | "quiz" | "upcoming" | "upcoming_upload",
             image: data.image || "/assets/poster.png",
             read: data.read || false,
             createdAt: data.createdAt || Date.now(),
@@ -55,13 +55,16 @@ export default function Layout({ children }: Props) {
             const mediaNotifsList = mediaSnap.docs.map((doc) => {
               const data = doc.data();
               const time = data.createdAt?.toMillis?.() || new Date(data.createdAt || 0).getTime() || Date.now();
+              const isUpcoming = data.status === "upcoming" || data.isUpcoming === true || data.upcoming === true || data.category?.toLowerCase() === "upcoming";
 
               return {
                 id: `media_${doc.id}`,
                 title: data.title || "media",
                 category: data.category || "Movie",
-                description: data.description || `Watch the newly added ${data.category || "Movie"} "${data.title || "media"}" now streaming.`,
-                type: "media_upload" as const,
+                description: data.description || (isUpcoming 
+                  ? `Get ready! The upcoming ${data.category || "Movie"} "${data.title || "media"}" is releasing soon.`
+                  : `Watch the newly added ${data.category || "Movie"} "${data.title || "media"}" now streaming.`),
+                type: (isUpcoming ? "upcoming_upload" : "media_upload") as "media_upload" | "upcoming_upload",
                 image: data.thumbnailUrl || "/assets/poster.png",
                 read: readIds.includes(`media_${doc.id}`),
                 createdAt: time,

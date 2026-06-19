@@ -205,8 +205,16 @@ export default function Membership() {
 
                                 // Save membership notification
                                 try {
+                                    const startDate = Date.now();
+                                    const durationDays = billingCycle === "monthly" ? 30 : 365;
+                                    const endDate = startDate + durationDays * 24 * 60 * 60 * 1000;
+
                                     await addDocument("notifications", {
                                         userId: user.id,
+                                        uid: user.id,
+                                        planId: plan.id,
+                                        startDate,
+                                        endDate,
                                         title: "Subscription Purchased! 👑",
                                         description: `You successfully subscribed to the ${plan.name} plan.`,
                                         type: "membership",

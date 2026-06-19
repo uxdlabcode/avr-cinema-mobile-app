@@ -51,6 +51,43 @@ export function TVSidebar() {
     { label: "Profile", path: "/profile", icon: User },
   ];
 
+  const getActiveTab = () => {
+    const mainPaths = [
+      "/dashboard",
+      "/tv",
+      "/movies",
+      "/search",
+      "/profile",
+      "/quiz",
+      "/trailers",
+      "/notifications"
+    ];
+    const currentPath = location.pathname;
+
+    if (currentPath.startsWith("/profile") || currentPath.startsWith("/update-profile") || currentPath.startsWith("/support")) {
+      localStorage.setItem("avr_active_tab", "/profile");
+      return "/profile";
+    }
+    if (currentPath === "/quizzes" || currentPath.startsWith("/quizzes/")) {
+      localStorage.setItem("avr_active_tab", "/quiz");
+      return "/quiz";
+    }
+
+    if (mainPaths.includes(currentPath)) {
+      localStorage.setItem("avr_active_tab", currentPath);
+      return currentPath;
+    }
+
+    const stored = localStorage.getItem("avr_active_tab");
+    if (stored && mainPaths.includes(stored)) {
+      return stored;
+    }
+
+    return "/dashboard";
+  };
+
+  const activeTab = getActiveTab();
+
   return (
     <aside
       className={`fixed left-0 top-0 bottom-0 h-screen z-50 transition-all duration-300 ease-in-out flex flex-col items-start pt-8 pb-8 border-r-0 overflow-hidden pointer-events-none ${isExpanded
@@ -83,7 +120,7 @@ export function TVSidebar() {
         <nav className="focusable flex-1 w-full flex flex-col space-y-4">
           {tvNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = activeTab === item.path || (activeTab === "/notifications" && item.path === "/profile");
 
             return (
               <Link

@@ -170,8 +170,16 @@ export const UpgradePlanPage = () => {
 
                 // Save upgrade notification
                 try {
+                  const startDate = Date.now();
+                  const durationDays = 30; // Upgrades on this page are monthly
+                  const endDate = startDate + durationDays * 24 * 60 * 60 * 1000;
+
                   await addDocument("notifications", {
                     userId: user.id,
+                    uid: user.id,
+                    planId: plan.id,
+                    startDate,
+                    endDate,
                     title: "Plan Upgraded! 👑",
                     description: `You successfully upgraded to the ${plan.name} plan.`,
                     type: "membership",

@@ -40,6 +40,43 @@ function App() {
                 const userData = docSnapshot.data();
                 const role = (userData.role || "user").toLowerCase();
 
+                const expiryTime = userData.membershipExpiryDate?.seconds
+                  ? userData.membershipExpiryDate.seconds * 1000
+                  : (userData.membershipExpiryDate instanceof Date 
+                      ? userData.membershipExpiryDate.getTime() 
+                      : Number(userData.membershipExpiryDate) || 0);
+
+                if (userData.membershipStatus === "active" && expiryTime > 0 && Date.now() > expiryTime) {
+                  import("@/Firebase").then(async ({ updateDocument, addDocument }) => {
+                    try {
+                      await updateDocument("users", docSnapshot.id, {
+                        membershipStatus: "expired",
+                        updatedAt: new Date()
+                      });
+                      await addDocument("notifications", {
+                        userId: docSnapshot.id,
+                        uid: docSnapshot.id,
+                        planId: userData.membershipPlanId || "",
+                        startDate: userData.membershipStartDate?.seconds
+                          ? userData.membershipStartDate.seconds * 1000
+                          : (userData.membershipStartDate instanceof Date 
+                              ? userData.membershipStartDate.getTime() 
+                              : Number(userData.membershipStartDate) || Date.now()),
+                        endDate: expiryTime,
+                        title: "Subscription Expired 👑",
+                        description: `Your subscription plan has ended. Renew now to continue enjoying AVR Cinema!`,
+                        type: "membership",
+                        image: "/assets/headerLogo.png",
+                        read: false,
+                        createdAt: Date.now(),
+                        link: "/profile"
+                      });
+                    } catch (err) {
+                      console.error("Failed to process membership expiration:", err);
+                    }
+                  });
+                }
+
                 dispatch(
                   setAuthUser({
                     user: {

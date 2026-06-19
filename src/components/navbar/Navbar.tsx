@@ -42,6 +42,41 @@ export function Navbar() {
     { label: "Notifications", path: "/notifications" },
   ];
 
+  const getActiveTab = () => {
+    const mainPaths = [
+      "/dashboard",
+      "/tv",
+      "/movies",
+      "/search",
+      "/profile",
+      "/quiz",
+      "/trailers",
+      "/notifications"
+    ];
+    const currentPath = location.pathname;
+
+    if (currentPath.startsWith("/profile") || currentPath.startsWith("/update-profile") || currentPath.startsWith("/support")) {
+      localStorage.setItem("avr_active_tab", "/profile");
+      return "/profile";
+    }
+    if (currentPath === "/quizzes" || currentPath.startsWith("/quizzes/")) {
+      localStorage.setItem("avr_active_tab", "/quiz");
+      return "/quiz";
+    }
+
+    if (mainPaths.includes(currentPath)) {
+      localStorage.setItem("avr_active_tab", currentPath);
+      return currentPath;
+    }
+
+    const stored = localStorage.getItem("avr_active_tab");
+    if (stored && mainPaths.includes(stored)) {
+      return stored;
+    }
+
+    return "/dashboard";
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -49,13 +84,15 @@ export function Navbar() {
     }
   };
 
+  const activeTab = getActiveTab();
+
   return (
     <>
       {/* Desktop Top Nav */}
       <header className="hidden md:flex items-center justify-between h-[70px] px-6 lg:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50 sticky top-0 z-50 transition-all relative">
         <div className="flex items-center">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <img src="/assets/headerLogo.png" alt="AVR Logo" className="h-6 md:h-14 object-contain" />
+            <img src="/assets/headerLogo.png" alt="AV Logo" className="h-6 md:h-14 object-contain" />
           </Link>
         </div>
 
@@ -64,7 +101,7 @@ export function Navbar() {
             <Link
               key={item.label}
               to={item.path}
-              className={`text-sm font-medium hover:text-white transition-colors ${location.pathname === item.path ? 'text-white font-semibold' : 'text-gray-400'}`}
+              className={`text-sm font-medium hover:text-white transition-colors ${activeTab === item.path ? 'text-white font-semibold' : 'text-gray-400'}`}
             >
               {item.label}
             </Link>
@@ -120,7 +157,7 @@ export function Navbar() {
         <Dock className="w-full max-w-sm bg-black/40 border border-zinc-800/50 backdrop-blur-lg px-2 mx-0 shadow-2xl h-14 gap-1">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const isActive = activeTab === item.path || (activeTab === "/notifications" && item.path === "/profile");
             return (
               <DockIcon
                 key={item.label}

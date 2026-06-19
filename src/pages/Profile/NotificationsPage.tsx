@@ -8,12 +8,13 @@ import { getSignedUrl, updateDocument } from "@/Firebase";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store";
 import { toggleLocalRead, markAllLocalRead } from "@/store/slices/notificationSlice";
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty";
 
 interface NotificationItem {
   id: string;
   title: string;
   description: string;
-  type: "media_upload" | "membership" | "quiz";
+  type: "media_upload" | "membership" | "quiz" | "upcoming" | "upcoming_upload";
   image: string;
   read: boolean;
   createdAt: number;
@@ -95,7 +96,7 @@ export const NotificationsPage = () => {
     // Instantly update Redux state (for zero-latency UI update)
     dispatch(toggleLocalRead(item.id));
 
-    if (item.type === "media_upload") {
+    if (item.type === "media_upload" || item.type === "upcoming_upload") {
       const updatedReadIds = [...localReadIds, item.id];
       localStorage.setItem("avr_read_notifications", JSON.stringify(updatedReadIds));
       setLocalReadIds(updatedReadIds);
@@ -118,7 +119,7 @@ export const NotificationsPage = () => {
     // Instantly update Redux state
     dispatch(toggleLocalRead(item.id));
 
-    if (item.type === "media_upload") {
+    if (item.type === "media_upload" || item.type === "upcoming_upload") {
       let updatedReadIds;
       if (item.read) {
         updatedReadIds = localReadIds.filter((id) => id !== item.id);
@@ -144,11 +145,11 @@ export const NotificationsPage = () => {
     dispatch(markAllLocalRead());
 
     const mediaUnreadIds = unreadItems
-      .filter((n) => n.type === "media_upload")
+      .filter((n) => n.type === "media_upload" || n.type === "upcoming_upload")
       .map((n) => n.id);
 
     const firestoreUnreadIds = unreadItems
-      .filter((n) => n.type !== "media_upload")
+      .filter((n) => n.type !== "media_upload" && n.type !== "upcoming_upload")
       .map((n) => n.id);
 
     if (mediaUnreadIds.length > 0) {
@@ -172,20 +173,27 @@ export const NotificationsPage = () => {
     switch (type) {
       case "media_upload":
         return (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center border-2 border-background shadow-md">
-            <Play className="w-2.5 h-2.5 fill-secondary text-white" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-secondary flex items-center justify-center border-2 border-background shadow-md">
+            <Play className="w-2.5 h-2.5 fill-secondary text-secondary" />
+          </div>
+        );
+      case "upcoming":
+      case "upcoming_upload":
+        return (
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-secondary flex items-center justify-center border-2 border-background shadow-md">
+            <Bell className="w-2.5 h-2.5 text-secondary fill-current animate-pulse" />
           </div>
         );
       case "membership":
         return (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary-foreground text-background flex items-center justify-center border-2 border-background shadow-md">
-            <Crown className="w-2.5 h-2.5 fill-current" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-secondary flex items-center justify-center border-2 border-background shadow-md">
+            <Crown className="w-2.5 h-2.5 fill-current text-secondary" />
           </div>
         );
       case "quiz":
         return (
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center border-2 border-background shadow-md">
-            <Trophy className="w-2.5 h-2.5 text-white" />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary text-secondary flex items-center justify-center border-2 border-background shadow-md">
+            <Trophy className="w-2.5 h-2.5 text-secondary fill-current" />
           </div>
         );
       default:
@@ -197,9 +205,18 @@ export const NotificationsPage = () => {
     if (item.type === "media_upload") {
       return (
         <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">
-          <span className="font-semibold text-foreground">AVR Cinema</span> uploaded a new content in{" "}
+          <span className="font-semibold text-foreground">AVR Cinema</span> uploaded new content in{" "}
           <span className="font-semibold text-primary">{item.category}</span>. Watch{" "}
           <span className="font-semibold text-foreground">"{item.title}"</span> now streaming in HD.
+        </p>
+      );
+    }
+    if (item.type === "upcoming" || item.type === "upcoming_upload") {
+      return (
+        <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">
+          <span className="font-semibold text-primary">Upcoming Upload</span>. Get ready for{" "}
+          <span className="font-semibold text-foreground">"{item.title}"</span> in{" "}
+          <span className="font-semibold text-primary">{item.category || "AVR Cinema"}</span>. Watch the trailer now!
         </p>
       );
     }
@@ -211,7 +228,7 @@ export const NotificationsPage = () => {
       return (
         <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">
           <span className="font-semibold text-foreground">Membership Plan</span> upgraded/renewed. You successfully subscribed to the{" "}
-          <span className="font-semibold text-primary-foreground">{planName}</span> plan.
+          <span className="font-semibold text-primary">{planName}</span> plan.
         </p>
       );
     }
@@ -224,8 +241,8 @@ export const NotificationsPage = () => {
       return (
         <p className="text-muted-foreground text-xs mt-0.5 leading-relaxed">
           <span className="font-semibold text-foreground">Quiz Completed</span> challenge in{" "}
-          <span className="font-semibold text-primary-foreground">{quizName}</span>. You scored a massive{" "}
-          <span className="font-semibold text-primary-foreground">{score}%</span>!
+          <span className="font-semibold text-primary">{quizName}</span>. You scored a massive{" "}
+          <span className="font-semibold text-primary">{score}%</span>!
         </p>
       );
     }
@@ -317,7 +334,7 @@ export const NotificationsPage = () => {
           >
             Unread
             {notifications.filter((n) => !n.read).length > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary-foreground text-background text-[9px] font-black">
+              <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-background text-[9px] font-black">
                 {notifications.filter((n) => !n.read).length}
               </span>
             )}
@@ -329,7 +346,7 @@ export const NotificationsPage = () => {
             variant="ghost"
             size="sm"
             onClick={handleMarkAllAsRead}
-            className="focusable text-xs text-primary-foreground hover:text-primary-foreground/80 flex items-center gap-1 h-7.5 px-2 rounded-lg hover:bg-primary-foreground/10"
+            className="focusable text-xs text-primary hover:text-primary/80 flex items-center gap-1 h-7.5 px-2 rounded-lg hover:bg-primary/10"
           >
             <CheckSquare className="w-3.5 h-3.5" />
             Mark all as read
@@ -342,15 +359,19 @@ export const NotificationsPage = () => {
         {loading ? (
           <NotificationsSkeleton />
         ) : filteredNotifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
-            <Bell className="w-10 h-10 opacity-30 text-primary-foreground" />
-            <p className="text-sm font-semibold">No notifications found</p>
-            <p className="text-xs text-muted-foreground/50 text-center max-w-[280px]">
-              {filter === "unread"
-                ? "You've read all your notifications!"
-                : "When you take quizzes, buy subscriptions, or new content is uploaded, notifications will show up here."}
-            </p>
-          </div>
+          <Empty className="py-20 border border-dashed border-border/40 bg-card/25 rounded-2xl">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-primary text-secondary">
+                <Bell className="w-5 h-5 text-secondary" />
+              </EmptyMedia>
+              <EmptyTitle className="text-foreground font-semibold">No notifications yet</EmptyTitle>
+              <EmptyDescription className="text-muted-foreground max-w-[280px] mx-auto text-xs">
+                {filter === "unread"
+                  ? "You've read all your notifications!"
+                  : "When you take quizzes, buy subscriptions, or new content is uploaded, notifications will show up here."}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className="space-y-4">
             {/* New Notifications */}
@@ -358,7 +379,7 @@ export const NotificationsPage = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5 py-0.5">
                   <h2 className="text-foreground font-bold text-sm">New</h2>
-                  <span className="flex items-center justify-center px-2 py-0.5 rounded-full bg-primary-foreground/15 text-primary-foreground text-[10px] font-bold">
+                  <span className="flex items-center justify-center px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold">
                     {newItems.length}
                   </span>
                 </div>
@@ -367,7 +388,7 @@ export const NotificationsPage = () => {
                     <Card
                       key={item.id}
                       onClick={() => handleMarkAsRead(item)}
-                      className={`focusable transition-all py-1 duration-200 border border-border/45 hover:border-primary-foreground/25 bg-card/40 hover:bg-card/70 cursor-pointer relative overflow-hidden outline-none ${!item.read ? "border-l-[3px] border-l-primary-foreground" : ""
+                      className={`focusable transition-all py-1 duration-200 border border-border/45 hover:border-primary/25 bg-card/40 hover:bg-card/70 cursor-pointer relative overflow-hidden outline-none ${!item.read ? "border-l-[3px] border-l-primary" : ""
                         }`}
                     >
                       <CardContent className="px-3.5 flex items-start gap-3.5">
@@ -397,11 +418,11 @@ export const NotificationsPage = () => {
                         <div className="shrink-0 self-center flex items-center gap-2">
                           <button
                             onClick={(e) => handleToggleRead(e, item)}
-                            className="focusable w-6 h-6 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-primary-foreground transition-colors outline-none"
+                            className="focusable w-6 h-6 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-primary transition-colors outline-none"
                             title={item.read ? "Mark as unread" : "Mark as read"}
                           >
                             {!item.read ? (
-                              <span className="w-2.5 h-2.5 rounded-full bg-primary-foreground block shadow-[0_0_8px_rgba(222,203,148,0.7)]" />
+                              <span className="w-2.5 h-2.5 rounded-full bg-primary block shadow-[0_0_8px_rgba(255,255,255,0.7)]" />
                             ) : (
                               <span className="w-2 h-2 rounded-full border border-muted-foreground/40 block" />
                             )}
@@ -428,7 +449,7 @@ export const NotificationsPage = () => {
                     <Card
                       key={item.id}
                       onClick={() => handleMarkAsRead(item)}
-                      className="focusable transition-all duration-200 border border-border/45 hover:border-primary-foreground/25 bg-card/20 hover:bg-card/45 cursor-pointer relative overflow-hidden outline-none py-1"
+                      className="focusable transition-all duration-200 border border-border/45 hover:border-primary/25 bg-card/20 hover:bg-card/45 cursor-pointer relative overflow-hidden outline-none py-1"
                     >
                       <CardContent className="p-3.5 flex items-start gap-3.5">
                         {/* Avatar container */}
@@ -480,7 +501,7 @@ export const NotificationsPage = () => {
                 <Button
                   variant="outline"
                   onClick={() => setDisplayCount((prev) => prev + 10)}
-                  className="focusable text-xs font-semibold "
+                  className="focusable text-xs font-semibold border border-none  ring-transparent"
                 >
                   Load More
                 </Button>
