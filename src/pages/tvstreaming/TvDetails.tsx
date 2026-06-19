@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
-import { Play, ChevronRight, ChevronDown, ChevronLeft, Plus, Check, X, Volume2, VolumeX } from 'lucide-react';
+import { Play, ChevronRight, ChevronDown, ChevronLeft, Plus, Check, X, Volume2, VolumeX, Tv, Film } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,54 +47,7 @@ const LIVE_CHANNELS = [
   { id: 5, name: 'News Live', logo: '/assets/cast2.webp', color: 'from-purple-700 to-purple-500' },
 ];
 
-// Skeleton Loading Component
-const TvDetailsSkeleton = () => (
-  <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 animate-pulse">
-    {/* Logo */}
-    <div className="flex justify-center pt-4 pb-2">
-      <Skeleton className="w-24 h-8 rounded" />
-    </div>
 
-    {/* Tabs */}
-    <div className="flex gap-4 px-4 py-3 overflow-x-auto">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Skeleton key={i} className="h-8 w-20 rounded-full shrink-0" />
-      ))}
-    </div>
-
-    {/* Hero */}
-    <div className="px-4 pt-2">
-      <Skeleton className="w-full aspect-video rounded-xl" />
-    </div>
-
-    {/* Dots */}
-    <div className="flex gap-2 justify-center py-4">
-      {[1, 2, 3].map((i) => (
-        <Skeleton key={i} className="w-2 h-2 rounded-full" />
-      ))}
-    </div>
-
-    {/* Live Channels */}
-    <div className="px-4 space-y-3 pt-4">
-      <Skeleton className="h-6 w-40 rounded" />
-      <div className="flex gap-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="w-16 h-16 rounded-full shrink-0" />
-        ))}
-      </div>
-    </div>
-
-    {/* Live Movies */}
-    <div className="px-4 space-y-3 pt-6">
-      <Skeleton className="h-6 w-36 rounded" />
-      <div className="flex gap-4">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="w-48 aspect-video rounded-lg shrink-0" />
-        ))}
-      </div>
-    </div>
-  </div>
-);
 
 const MediaCategoryRow = ({
   genreName,
@@ -466,8 +419,6 @@ const TvDetails = () => {
     };
   }, [carouselApi, tvShows, expandedShowId]);
 
-  if (isLoading) return <TvDetailsSkeleton />;
-
   const featuredShows = tvShows.slice(0, 4);
 
   return (
@@ -490,6 +441,99 @@ const TvDetails = () => {
           </button>
         ))}
       </div>
+
+      {/* Loading Skeletons */}
+      {isLoading && activeTab === 'For You' && (
+        <div className="animate-pulse space-y-5 pt-4 pb-6">
+          {/* Hero Banner Skeleton — matches min-h-[75vh] md:min-h-[88vh] */}
+          <div className="relative w-full min-h-[55vh] md:min-h-[88vh] flex flex-col justify-end">
+            <Skeleton className="absolute inset-0 w-full h-full bg-zinc-900 rounded-none" />
+            {/* Mobile hero overlay */}
+            <div className="md:hidden relative z-10 flex flex-col items-center text-center px-4 pb-10 gap-3">
+              <Skeleton className="h-8 w-3/4 bg-zinc-800 rounded" />
+              <Skeleton className="h-4 w-1/2 bg-zinc-700 rounded" />
+              <div className="flex gap-3 w-full mt-1">
+                <Skeleton className="flex-1 h-12 rounded-md bg-zinc-800" />
+                <Skeleton className="flex-1 h-12 rounded-md bg-zinc-800" />
+              </div>
+            </div>
+            {/* Desktop hero overlay */}
+            <div className="hidden md:flex relative z-10 flex-col items-start px-16 pb-20 gap-3 max-w-2xl">
+              <Skeleton className="h-5 w-24 bg-zinc-800 rounded" />
+              <Skeleton className="h-14 w-80 bg-zinc-800 rounded" />
+              <Skeleton className="h-5 w-48 bg-zinc-700 rounded" />
+              <div className="flex items-center gap-4 mt-3">
+                <Skeleton className="h-12 w-36 rounded-md bg-zinc-800" />
+                <Skeleton className="h-12 w-36 rounded-md bg-zinc-800" />
+              </div>
+            </div>
+          </div>
+
+          {/* Popular TV Shows skeleton — matches w-48 md:w-56 aspect-video landscape cards */}
+          <div className="px-4 space-y-3">
+            <Skeleton className="h-5 w-44 rounded bg-zinc-800" />
+            <div className="flex gap-4 overflow-hidden">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="shrink-0 w-48 md:w-56 aspect-video rounded-lg bg-zinc-900" />
+              ))}
+            </div>
+          </div>
+
+          {/* Documentaries row skeleton — matches portrait cards from DocumentaryList */}
+          <div className="px-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Film className="w-4 h-4 text-zinc-700" />
+              <Skeleton className="h-6 w-32 bg-zinc-800 rounded" />
+            </div>
+            <div className="flex gap-3 overflow-hidden">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton
+                  key={i}
+                  className="shrink-0 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isLoading && activeTab === 'TV Shows' && (
+        <div className="px-4 pt-6 space-y-8 w-full text-left animate-pulse">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Tv className="w-4 h-4 text-zinc-700" />
+              <Skeleton className="h-6 w-32 bg-zinc-800" />
+            </div>
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="w-full aspect-[2/3] rounded-md bg-zinc-900"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isLoading && activeTab === 'Documentaries' && (
+        <div className="px-4 pt-6 space-y-8 w-full text-left animate-pulse">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Film className="w-4 h-4 text-zinc-700" />
+              <Skeleton className="h-6 w-32 bg-zinc-800" />
+            </div>
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="w-full aspect-[2/3] rounded-md bg-zinc-900"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Carousel (FOR YOU tab) */}
       {activeTab === 'For You' && featuredShows.length > 0 && (

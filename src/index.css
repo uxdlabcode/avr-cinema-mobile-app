@@ -123,11 +123,16 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body,
+  #root {
+    background-color: #141414;
+    color: #ffffff;
   }
 
   body {
-    @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
 }

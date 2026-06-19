@@ -10,7 +10,7 @@ import { getSignedUrl } from "@/Firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const WatchlistSkeleton = () => (
+export const WatchlistPageSkeleton = () => (
   <div className="min-h-screen flex flex-col bg-background pb-24 md:pb-16">
     {/* MOBILE Header Skeleton */}
     <div className="md:hidden fixed top-0 left-0 right-0 w-full z-50 bg-background border-b border-border">
@@ -90,7 +90,7 @@ export const WatchlistPage = () => {
   }, [user?.id, state]);
 
   if (loading) {
-    return <WatchlistSkeleton />;
+    return <WatchlistPageSkeleton />;
   }
 
   if (error) {

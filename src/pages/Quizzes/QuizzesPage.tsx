@@ -39,7 +39,8 @@ const getCategoryColor = (category: string): string => {
   return "bg-amber-500/15 text-amber-400 border-amber-500/20";
 };
 
-// ── Skeleton ──────────────────────────────────────────────────────────────
+// ── Skeleton ─────────────────────────────────────────────────────────────
+// Single quiz list-card skeleton — icon + title + description + 2 chips
 const SkeletonCard = () => (
   <div className="bg-card border border-border rounded-2xl p-4 flex gap-4 items-center">
     <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
@@ -49,6 +50,114 @@ const SkeletonCard = () => (
       <div className="flex gap-2 mt-2">
         <Skeleton className="h-5 w-20 rounded-full" />
         <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+    </div>
+  </div>
+);
+
+/**
+ * Full-page skeleton that mirrors the EXACT Quizzes page layout:
+ * Mobile: fixed header → hero banner (trophy + stats) → search bar → quiz cards
+ * Desktop: back btn + title + stat cards → search + filter chips → 2-3 col grid
+ */
+export const QuizzesPageSkeleton = () => (
+  <div className="min-h-screen flex flex-col bg-background animate-pulse">
+
+    {/* ── MOBILE skeleton ── */}
+    <div className="md:hidden">
+      {/* Fixed mobile header: back arrow + "Quizzes" title */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
+          <Skeleton className="absolute left-4 w-9 h-9 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded" />
+        </div>
+      </div>
+
+      {/* Scrollable body */}
+      <div className="pt-[64px] pb-24 px-4 space-y-4 max-w-[700px] mx-auto w-full">
+        {/* Hero banner — gradient card with trophy icon + title + 3 stat counters */}
+        <div className="mt-4 rounded-2xl overflow-hidden p-5 bg-muted/20 border border-border space-y-4">
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-8 h-8 rounded-lg" />
+            <Skeleton className="h-3.5 w-28 rounded" />
+          </div>
+          <Skeleton className="h-6 w-3/4 rounded" />
+          <Skeleton className="h-3.5 w-full rounded" />
+          {/* Stat counters: Quizzes | Questions | Categories */}
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-5 w-6 rounded" />
+              <Skeleton className="h-3 w-12 rounded" />
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-5 w-6 rounded" />
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-5 w-6 rounded" />
+              <Skeleton className="h-3 w-20 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* Search input */}
+        <Skeleton className="w-full h-9 rounded-md" />
+
+        {/* Category filter chips */}
+        <div className="flex gap-2 overflow-hidden">
+          {[56, 40, 64, 72, 52].map((w, i) => (
+            <Skeleton key={i} className="h-8 rounded-lg shrink-0" style={{ width: w }} />
+          ))}
+        </div>
+
+        {/* Quiz list cards */}
+        <div className="flex flex-col gap-3">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      </div>
+    </div>
+
+    {/* ── DESKTOP skeleton ── */}
+    <div className="hidden md:flex flex-col flex-1 max-w-[1400px] mx-auto w-full px-6 lg:px-10 xl:px-16 py-8 gap-6">
+      {/* Desktop header row: back btn + title + 3 stat cards */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Skeleton className="w-10 h-10 rounded-xl" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-7 w-24 rounded" />
+            <Skeleton className="h-4 w-40 rounded" />
+          </div>
+        </div>
+        {/* 3 stat mini-cards */}
+        <div className="flex items-center gap-1.5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex flex-col items-center gap-1 p-2.5 rounded-md border border-border min-w-[80px]">
+              <Skeleton className="w-4 h-4 rounded" />
+              <Skeleton className="h-4 w-8 rounded" />
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Search bar + filter chips row */}
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-11 w-full max-w-sm rounded-md" />
+        <div className="flex items-center gap-2">
+          {[40, 64, 56, 80, 52].map((w, i) => (
+            <Skeleton key={i} className="h-9 rounded-lg" style={{ width: w }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Quiz 2-3 col grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
       </div>
     </div>
   </div>
@@ -186,7 +295,8 @@ export const QuizzesPage = () => {
           </div>
         )}
         <div className="px-4 mt-5 flex flex-col gap-3">
-          {loading && <><SkeletonCard /><SkeletonCard /><SkeletonCard /></>}
+          {/* MOBILE loading state: full page skeleton */}
+          {loading && <QuizzesPageSkeleton />}
           {error && !loading && <div className="flex flex-col items-center py-16 gap-3"><HelpCircle className="w-7 h-7 text-rose-400" /><p className="text-muted-foreground text-sm">{error}</p></div>}
           {!loading && !error && filtered.length === 0 && <div className="flex flex-col items-center py-16 gap-3"><Trophy className="w-7 h-7 text-primary/40" /><p className="text-muted-foreground text-sm text-center">{searchQuery || selectedCategory !== "All" ? "No quizzes match your filters." : "No quizzes available yet."}</p></div>}
           {!loading && !error && filtered.map((quiz) => <QuizCard key={quiz.id} quiz={quiz} tabIndex={-1} onClick={() => navigate(`/quizzes/${quiz.id}`)} />)}
@@ -268,11 +378,8 @@ export const QuizzesPage = () => {
         </div>
 
         {/* Quiz grid */}
-        {loading && (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
-          </div>
-        )}
+        {/* Desktop loading state: full page skeleton */}
+        {loading && <QuizzesPageSkeleton />}
         {error && !loading && (
           <div className="flex flex-col items-center justify-center flex-1 gap-4">
             <HelpCircle className="w-10 h-10 text-rose-400/50" />

@@ -7,13 +7,14 @@ import { HomePageSkeleton } from "@/pages/HomePage/HomePageSkeleton";
 interface Props {
   allowedRoles: string[];
   children: React.ReactElement;
+  skeleton?: React.ReactNode;
 }
 
-export default function ProtectedRoute({ allowedRoles, children }: Props) {
+export default function ProtectedRoute({ allowedRoles, children, skeleton }: Props) {
   const { user, token, loading, isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (loading) {
-    return <HomePageSkeleton />;
+    return <>{skeleton || <HomePageSkeleton />}</>;
   }
 
   if (!isAuthenticated || !token || !user) {

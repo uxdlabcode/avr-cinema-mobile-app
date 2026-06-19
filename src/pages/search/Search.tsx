@@ -34,6 +34,109 @@ const getThumbnail = (media: any) => {
         '';
 };
 
+/**
+ * Mobile Search Skeleton — mirrors the scrollable content of the mobile Search page:
+ * Recent Searches row → filter chips → 3-col media grid
+ * (The sticky header is always rendered separately above this)
+ */
+const MobileSearchSkeleton = () => (
+    <div className="animate-pulse px-4 pt-4 space-y-5 pb-4">
+        {/* Recent Searches section skeleton */}
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <Skeleton className="h-6 w-36 rounded bg-zinc-800" />
+                <Skeleton className="h-4 w-14 rounded bg-zinc-800" />
+            </div>
+            {/* Horizontal row of landscape thumbnail cards — w-[140px] aspect-video */}
+            <div className="flex gap-3 overflow-hidden">
+                {[1, 2, 3].map((i) => (
+                    <Skeleton
+                        key={i}
+                        className="shrink-0 w-[140px] aspect-video rounded-md bg-zinc-900"
+                    />
+                ))}
+            </div>
+        </div>
+
+        {/* "Trending in" label + filter chips */}
+        <div className="space-y-2">
+            <Skeleton className="h-6 w-28 rounded bg-zinc-800" />
+            <div className="flex gap-2 overflow-hidden">
+                {/* Chips with varying widths to mirror real labels */}
+                {[56, 64, 60, 64, 72, 60].map((w, i) => (
+                    <Skeleton
+                        key={i}
+                        className="shrink-0 h-7 rounded-md bg-zinc-800"
+                        style={{ width: w }}
+                    />
+                ))}
+            </div>
+        </div>
+
+        {/* 3-column media grid — index 6 (i % 9 === 6) = col-span-2 row-span-2, same as real grid */}
+        <div className="grid grid-cols-3 gap-2 pb-4 mt-2">
+            {Array.from({ length: 12 }).map((_, i) => (
+                <Skeleton
+                    key={i}
+                    className={`w-full rounded-md bg-zinc-800/60 ${
+                        i % 9 === 6
+                            ? 'col-span-2 row-span-2 aspect-[2/3]'
+                            : 'col-span-1 row-span-1 aspect-[2/3]'
+                    }`}
+                />
+            ))}
+        </div>
+    </div>
+);
+
+/**
+ * Desktop Search Skeleton — matches the centred desktop layout:
+ * search bar + close button → category cards → recent searches → filter chips → 3-5 col grid
+ */
+const DesktopSearchSkeleton = () => (
+    <div className="max-w-3xl mx-auto w-full animate-pulse">
+        {/* Search bar + close button row */}
+        <div className="flex items-center gap-6 w-full mb-8">
+            <Skeleton className="flex-1 h-10 rounded-md bg-zinc-800" />
+            <Skeleton className="w-10 h-10 rounded-full bg-zinc-800 shrink-0" />
+        </div>
+
+        {/* Category cards: 3-col grid, h-20 */}
+        <div className="grid grid-cols-3 gap-4 w-full mb-12">
+            {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-20 rounded-md bg-zinc-800" />
+            ))}
+        </div>
+
+        {/* Recent Searches */}
+        <div className="space-y-3 mb-8">
+            <Skeleton className="h-5 w-36 rounded bg-zinc-800" />
+            <div className="flex gap-4 overflow-hidden">
+                {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="shrink-0 w-[180px] aspect-video rounded-md bg-zinc-900" />
+                ))}
+            </div>
+        </div>
+
+        {/* Trending in + chips */}
+        <div className="space-y-3 mb-4">
+            <Skeleton className="h-5 w-28 rounded bg-zinc-800" />
+            <div className="flex gap-2 overflow-hidden">
+                {[48, 56, 52, 64, 56, 52, 60].map((w, i) => (
+                    <Skeleton key={i} className="h-7 rounded-md bg-zinc-800 shrink-0" style={{ width: w }} />
+                ))}
+            </div>
+        </div>
+
+        {/* Media grid — 3–5 col depending on breakpoint */}
+        <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4 mt-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+                <Skeleton key={i} className="w-full aspect-[2/3] rounded-md bg-zinc-800/50" />
+            ))}
+        </div>
+    </div>
+);
+
 const Search = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const urlQuery = searchParams.get('q') || '';
@@ -234,6 +337,9 @@ const Search = () => {
                 </div>
 
                 {/* SCROLLABLE MAIN CONTENT */}
+                {isLoadingMedia ? (
+                    <MobileSearchSkeleton />
+                ) : (
                 <div className="max-w-7xl mx-auto px-4 pt-6 space-y-2 mt-2">
                     {/* Recent Searches Section - Show when query is empty */}
                     {query.trim().length === 0 && (
@@ -304,14 +410,7 @@ const Search = () => {
 
                     {/* Default View Grid - Always used now */}
                     {isLoadingMedia ? (
-                        <div className="grid grid-cols-3 gap-2 pb-4">
-                            {Array.from({ length: 12 }).map((_, i) => (
-                                <Skeleton
-                                    key={i}
-                                    className={`w-full aspect-[2/3] rounded-md bg-zinc-800/50 ${i % 9 === 6 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'}`}
-                                />
-                            ))}
-                        </div>
+                        <MobileSearchSkeleton />
                     ) : filteredMedia.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20">
                             <div className="bg-zinc-800/50 p-4 rounded-full mb-4">
@@ -365,6 +464,7 @@ const Search = () => {
                         </div>
                     )}
                 </div>
+                )}
             </div>
 
             {/* DESKTOP/LARGE SCREEN LAYOUT */}
@@ -511,14 +611,7 @@ const Search = () => {
                         </div>
 
                         {isLoadingMedia ? (
-                            <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 pb-4 mt-4">
-                                {Array.from({ length: 12 }).map((_, i) => (
-                                    <Skeleton
-                                        key={i}
-                                        className="w-full aspect-[2/3] rounded-md bg-zinc-800/50"
-                                    />
-                                ))}
-                            </div>
+                            <DesktopSearchSkeleton />
                         ) : filteredMedia.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 px-4 text-center border border-zinc-800/50 rounded-2xl bg-zinc-900/20">
                                 <div className="bg-zinc-800/50 p-4 rounded-full mb-4">

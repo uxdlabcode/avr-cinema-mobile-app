@@ -529,7 +529,7 @@ export const HomePage = () => {
                           e.stopPropagation();
                           navigate(`/video/${movie.id}`);
                         }}
-                        className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full outline-none"
+                        className="focusable flex-1 bg-primary hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full outline-none"
                       >
                         <Play className="w-4 h-4 fill-current text-black" />
                         <span>Play</span>
@@ -650,13 +650,13 @@ export const HomePage = () => {
                         )}
 
                         {/* Sponsor Brand Logos */}
-                        <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
+                        {/* <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
                           <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
                           <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
                           <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
                           <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
                           <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
-                        </div>
+                        </div> */}
 
                         {/* Metadata Details Row */}
                         <div className="flex items-center gap-3 text-xs font-bold text-zinc-300 mb-6 select-none">

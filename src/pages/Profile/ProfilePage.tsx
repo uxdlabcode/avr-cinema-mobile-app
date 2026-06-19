@@ -14,6 +14,7 @@ import { getCollectionData } from "@/Firebase/CloudFirestore/GetData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ContinueItem {
   id: string;
@@ -22,6 +23,168 @@ interface ContinueItem {
   poster: string;
   progress: number;
 }
+
+const WatchlistSkeleton = () => (
+  <>
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex-shrink-0 w-[130px] md:w-auto flex flex-col gap-2">
+        <Skeleton className="w-[130px] h-[175px] md:w-full md:aspect-[2/3] rounded-xl bg-zinc-800" />
+        <Skeleton className="h-4 w-3/4 rounded bg-zinc-800" />
+      </div>
+    ))}
+  </>
+);
+
+const ContinueWatchingSkeleton = () => (
+  <>
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex-shrink-0 w-[130px] md:w-auto flex flex-col gap-2">
+        <Skeleton className="w-[130px] h-[100px] md:w-full md:aspect-video rounded-xl bg-zinc-800" />
+        <Skeleton className="h-4 w-3/4 rounded bg-zinc-800" />
+      </div>
+    ))}
+  </>
+);
+
+const QuizzesSkeletonMobile = () => (
+  <>
+    {Array.from({ length: 3 }).map((_, i) => (
+      <Card key={i} className="flex-shrink-0 w-[240px] flex flex-col gap-2 p-3 rounded-2xl border-border/40">
+        <div className="flex items-center gap-3">
+          <Skeleton className="shrink-0 w-10 h-10 rounded-xl bg-zinc-800" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-full rounded bg-zinc-800" />
+            <Skeleton className="h-3 w-16 rounded-full bg-zinc-800" />
+          </div>
+        </div>
+        <div className="flex items-center gap-3 mt-1">
+          <Skeleton className="h-3 w-12 rounded bg-zinc-800" />
+          <Skeleton className="h-3 w-12 rounded bg-zinc-800" />
+        </div>
+      </Card>
+    ))}
+  </>
+);
+
+const QuizzesSkeletonDesktop = () => (
+  <>
+    {Array.from({ length: 4 }).map((_, i) => (
+      <div key={i} className="flex items-center gap-4 p-4 border border-border/40 rounded-xl bg-muted/10">
+        <Skeleton className="shrink-0 w-12 h-12 rounded-xl bg-zinc-800" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-4 w-1/2 rounded bg-zinc-800" />
+          <div className="flex items-center gap-3 mt-1">
+            <Skeleton className="h-4 w-16 rounded-full bg-zinc-800" />
+            <Skeleton className="h-3 w-12 rounded bg-zinc-800" />
+            <Skeleton className="h-3 w-12 rounded bg-zinc-800" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </>
+);
+
+export const ProfilePageSkeleton = () => (
+  <div className="min-h-screen flex flex-col bg-background animate-pulse">
+    <div className="hidden md:flex flex-col px-6 lg:px-10 xl:px-16 pb-16 max-w-7xl mx-auto w-full">
+      <div className="sticky top-0 z-40 bg-background pt-8 pb-6">
+        <h1 className="text-3xl font-bold text-foreground">Profile</h1>
+      </div>
+      <div className="flex gap-6 lg:gap-8 w-full">
+        {/* Sidebar */}
+      <div className="flex flex-col gap-5 w-[320px] lg:w-[360px] shrink-0 self-start">
+        {/* User Card */}
+        <Card className="p-6 flex flex-col items-center gap-4 rounded-lg">
+          <Skeleton className="w-20 h-20 rounded-full bg-zinc-800" />
+          <div className="flex flex-col items-center gap-2 w-full">
+            <Skeleton className="h-6 w-32 bg-zinc-800" />
+            <Skeleton className="h-4 w-40 bg-zinc-800" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-xl bg-zinc-800 mt-2" />
+          <div className="w-full border-t border-border pt-4 mt-2 flex justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20 bg-zinc-800" />
+              <Skeleton className="h-3 w-16 bg-zinc-800" />
+            </div>
+            <Skeleton className="h-8 w-20 rounded-full bg-zinc-800" />
+          </div>
+        </Card>
+        {/* Quick Actions */}
+        <Card className="rounded-lg p-0">
+          <div className="px-5 py-3 border-b border-border"><Skeleton className="h-4 w-24 bg-zinc-800" /></div>
+          <div className="flex flex-col p-2 space-y-2">
+            {[1, 2, 3].map(i => <Skeleton key={i} className="h-12 w-full rounded-md bg-zinc-800" />)}
+          </div>
+        </Card>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex flex-col gap-6 flex-1 min-w-0">
+        <Card className="rounded-lg p-6 space-y-4">
+          <Skeleton className="h-6 w-32 bg-zinc-800" />
+          <div className="flex gap-4 overflow-hidden"><WatchlistSkeleton /></div>
+        </Card>
+        <Card className="rounded-lg p-6 space-y-4">
+          <Skeleton className="h-6 w-40 bg-zinc-800" />
+          <div className="flex gap-4 overflow-hidden"><ContinueWatchingSkeleton /></div>
+        </Card>
+        <Card className="rounded-lg p-6 space-y-4">
+          <Skeleton className="h-6 w-24 bg-zinc-800" />
+          <div className="grid grid-cols-2 gap-4"><QuizzesSkeletonDesktop /></div>
+        </Card>
+      </div>
+    </div>
+    </div>
+
+    {/* ═══════════ MOBILE LAYOUT ═══════════ */}
+    <div className="md:hidden flex flex-col gap-3 px-4 pt-[72px] pb-7 w-full max-w-[700px] mx-auto">
+      {/* Top Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background pt-6 pb-3 flex items-center justify-between px-4">
+        <Skeleton className="h-8 w-24 bg-zinc-800" />
+        <Skeleton className="h-6 w-16 bg-zinc-800" />
+      </div>
+
+      <h1 className="text-2xl font-bold text-foreground mt-2 mb-1 px-1">Profile</h1>
+
+      {/* User Info Card */}
+      <Card className="flex items-center gap-4 p-4 rounded-2xl flex-row">
+        <Skeleton className="w-14 h-14 rounded-full bg-zinc-800 shrink-0" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-3/4 bg-zinc-800" />
+          <Skeleton className="h-4 w-full bg-zinc-800" />
+        </div>
+        <Skeleton className="w-8 h-8 rounded-full bg-zinc-800 shrink-0" />
+      </Card>
+
+      {/* Tier + Upgrade */}
+      <div className="flex items-center justify-between py-2">
+        <div className="space-y-2">
+          <Skeleton className="h-5 w-24 bg-zinc-800" />
+          <Skeleton className="h-3 w-32 bg-zinc-800" />
+        </div>
+        <Skeleton className="h-8 w-20 rounded-full bg-zinc-800" />
+      </div>
+
+      {/* Buttons */}
+      <Skeleton className="w-full h-12 rounded-lg bg-zinc-800 mt-2" />
+      <Skeleton className="w-full h-12 rounded-lg bg-zinc-800 mt-2" />
+
+      {/* Sections */}
+      <div className="flex flex-col gap-3 mt-4">
+        <Skeleton className="h-6 w-24 bg-zinc-800" />
+        <div className="flex gap-3 overflow-hidden -mx-1 px-1"><WatchlistSkeleton /></div>
+      </div>
+      <div className="flex flex-col gap-3 mt-4">
+        <Skeleton className="h-6 w-32 bg-zinc-800" />
+        <div className="flex gap-3 overflow-hidden -mx-1 px-1"><ContinueWatchingSkeleton /></div>
+      </div>
+      <div className="flex flex-col gap-3 mt-4">
+        <Skeleton className="h-6 w-20 bg-zinc-800" />
+        <div className="flex gap-3 overflow-hidden -mx-1 px-1"><QuizzesSkeletonMobile /></div>
+      </div>
+    </div>
+  </div>
+);
 
 export const ProfilePage = () => {
   const user = useSelector((state: RootState) => state.auth.user);
@@ -357,7 +520,7 @@ export const ProfilePage = () => {
         <div className="p-6">
           <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {loadingWatchlist ? (
-              <div className="col-span-full flex items-center justify-center h-[200px] text-sm text-muted-foreground">Loading watchlist...</div>
+              <WatchlistSkeleton />
             ) : watchlist.length > 0 ? (
               watchlist.slice(0, 10).map((item) => (
                 <div
@@ -415,7 +578,7 @@ export const ProfilePage = () => {
         <div className="p-6">
           <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {loadingContinue ? (
-              <div className="col-span-full flex items-center justify-center h-[140px] text-sm text-muted-foreground">Loading...</div>
+              <ContinueWatchingSkeleton />
             ) : continueWatching.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center h-[140px] text-muted-foreground gap-2">
                 <Play className="w-8 h-8 opacity-40" />
@@ -471,7 +634,7 @@ export const ProfilePage = () => {
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {loadingQuizzes ? (
-              <div className="col-span-full flex items-center justify-center h-32 text-sm text-muted-foreground">Loading quizzes...</div>
+              <QuizzesSkeletonDesktop />
             ) : quizzes.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center h-32 text-muted-foreground gap-2">
                 <Trophy className="w-8 h-8 opacity-40" />
@@ -550,9 +713,14 @@ export const ProfilePage = () => {
       <div className="min-h-screen flex flex-col bg-background">
 
         {/* ═══════════ DESKTOP LAYOUT ═══════════ */}
-        <div className="hidden md:flex gap-6 lg:gap-8 px-6 lg:px-10 xl:px-16 pt-8 pb-16 max-w-7xl mx-auto w-full">
-          <DesktopSidebar />
-          <DesktopContent />
+        <div className="hidden md:flex flex-col px-6 lg:px-10 xl:px-16 pb-16 max-w-7xl mx-auto w-full">
+          <div className="sticky top-0 z-40 bg-background pt-8 pb-6">
+            <h1 className="text-3xl font-bold text-foreground">Profile</h1>
+          </div>
+          <div className="flex gap-6 lg:gap-8 w-full">
+            <DesktopSidebar />
+            <DesktopContent />
+          </div>
         </div>
 
         {/* ═══════════ MOBILE LAYOUT (unchanged) ═══════════ */}
@@ -571,6 +739,8 @@ export const ProfilePage = () => {
               Log Out
             </Button>
           </div>
+
+          <h1 className="text-2xl font-bold text-foreground mt-2 mb-1 px-1">Profile</h1>
 
           {/* User Info Card */}
           <Card tabIndex={-1} className="flex items-center gap-4 p-4 rounded-2xl p-4 gap-4 flex-row">
@@ -682,7 +852,7 @@ export const ProfilePage = () => {
             </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
               {loadingWatchlist ? (
-                <div className="flex items-center justify-center h-[175px] w-full text-sm text-muted-foreground">Loading watchlist...</div>
+                <WatchlistSkeleton />
               ) : watchlist.length > 0 ? (
                 watchlist.slice(0, 5).map((item) => (
                   <div
@@ -725,7 +895,7 @@ export const ProfilePage = () => {
             </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
               {loadingContinue ? (
-                <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">Loading...</div>
+                <ContinueWatchingSkeleton />
               ) : continueWatching.length === 0 ? (
                 <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">Nothing in progress</div>
               ) : (
@@ -765,7 +935,7 @@ export const ProfilePage = () => {
             </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
               {loadingQuizzes ? (
-                <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">Loading quizzes...</div>
+                <QuizzesSkeletonMobile />
               ) : quizzes.length === 0 ? (
                 <div className="flex items-center justify-center h-[100px] w-full text-sm text-muted-foreground">No quizzes available</div>
               ) : (

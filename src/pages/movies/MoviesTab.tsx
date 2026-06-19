@@ -32,18 +32,110 @@ interface MovieItem {
 }
 
 const MoviesTabSkeleton = () => (
-  <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 pt-24 px-4 animate-pulse">
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Hero banner skeleton */}
-      <div className="w-full h-[50vh] md:h-[65vh] bg-zinc-950 rounded-lg" />
+  <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 animate-pulse relative pt-16 md:pt-0">
 
-      {/* Dynamic categories skeleton */}
-      {[1, 2].map((categoryIdx) => (
-        <div key={categoryIdx} className="space-y-4">
-          <Skeleton className="h-6 w-40 bg-zinc-900 rounded" />
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide">
+    {/* ─── HERO BANNER ─── */}
+    {/* Mobile: min-h-[75vh] | Desktop: min-h-[88vh] */}
+    <div className="relative w-full min-h-[75vh] md:min-h-[88vh] flex flex-col justify-end bg-zinc-950">
+      {/* Background fill */}
+      <div className="absolute inset-0 bg-zinc-900" />
+
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black via-black/80 to-transparent z-[1]" />
+
+      {/* ── MOBILE hero content ── centered, stacked */}
+      <div className="md:hidden relative z-10 flex flex-col items-center text-center px-6 pb-14 gap-3 w-full">
+        {/* Title */}
+        <Skeleton className="h-9 w-3/4 max-w-xs bg-zinc-800 rounded" />
+        {/* Genre tags row */}
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3.5 w-16 bg-zinc-700 rounded" />
+          <div className="w-1 h-1 rounded-full bg-zinc-700" />
+          <Skeleton className="h-3.5 w-14 bg-zinc-700 rounded" />
+          <div className="w-1 h-1 rounded-full bg-zinc-700" />
+          <Skeleton className="h-3.5 w-12 bg-zinc-700 rounded" />
+        </div>
+        {/* Play + My List buttons */}
+        <div className="flex gap-3 w-full px-2 mt-2">
+          <Skeleton className="flex-1 h-12 rounded-md bg-zinc-800" />
+          <Skeleton className="flex-1 h-12 rounded-md bg-zinc-800" />
+        </div>
+      </div>
+
+      {/* ── DESKTOP hero content ── left-aligned */}
+      <div className="hidden md:flex relative z-10 flex-col items-start px-16 pb-20 gap-3 max-w-2xl">
+        {/* "Featured Movie" badge */}
+        <Skeleton className="h-5 w-28 rounded bg-zinc-800" />
+        {/* Main title */}
+        <Skeleton className="h-14 w-96 rounded bg-zinc-800" />
+        {/* Sub-title */}
+        <Skeleton className="h-7 w-64 rounded bg-zinc-800" />
+        {/* Sponsor badge row */}
+        <div className="flex items-center gap-2 mt-1">
+          <Skeleton className="h-4 w-20 rounded-sm bg-zinc-800" />
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-5 w-12 rounded-sm bg-zinc-800" />
+          ))}
+        </div>
+        {/* Genre meta */}
+        <Skeleton className="h-4 w-48 rounded bg-zinc-700 mt-1" />
+        {/* Action buttons: Play (150px) + More Info (150px) + Add to My List text */}
+        <div className="flex items-center gap-4 mt-3">
+          <Skeleton className="h-12 w-[150px] rounded-md bg-zinc-800" />
+          <Skeleton className="h-12 w-[150px] rounded-md bg-zinc-800" />
+          <Skeleton className="h-5 w-28 rounded bg-zinc-700" />
+        </div>
+      </div>
+
+      {/* Dot indicators at bottom of hero */}
+      <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className={`h-1.5 rounded-full bg-zinc-700 ${i === 1 ? 'w-6' : 'w-2'}`}
+          />
+        ))}
+      </div>
+    </div>
+
+    {/* ─── CONTENT ROWS ─── */}
+    <div className="px-4 md:px-12 lg:px-16 pt-5 md:pt-10 pb-16 md:pb-24 space-y-6 md:space-y-10 w-full">
+
+      {/* TrendNow-style row: portrait cards with giant rank numbers shifted left */}
+      <div className="space-y-1">
+        <Skeleton className="h-8 w-44 rounded bg-zinc-800" />
+        <div className="flex overflow-hidden gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20 pt-4 pb-4 md:pb-6">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex-none relative pt-4">
+              <span
+                className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-10 pointer-events-none"
+                style={{
+                  WebkitTextStroke: '2px #27272a',
+                  color: '#18181b',
+                  fontFamily: 'Impact, Arial Black, sans-serif',
+                  translate: '-50% 0px',
+                }}
+              >
+                {i}
+              </span>
+              <Skeleton className="relative z-20 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Genre category rows — portrait cards */}
+      {[1, 2, 3].map((rowIdx) => (
+        <div key={rowIdx} className="space-y-1">
+          <div className="flex items-center justify-between pr-4">
+            <Skeleton className="h-7 w-32 rounded bg-zinc-800" />
+          </div>
+          <div className="flex gap-4 overflow-hidden">
             {[1, 2, 3, 4, 5].map((i) => (
-              <Skeleton key={i} className="w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900 shrink-0" />
+              <Skeleton
+                key={i}
+                className="shrink-0 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900"
+              />
             ))}
           </div>
         </div>
@@ -51,6 +143,7 @@ const MoviesTabSkeleton = () => (
     </div>
   </div>
 );
+
 
 const MovieCategoryRow = ({
   genreName,

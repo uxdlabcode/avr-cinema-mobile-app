@@ -13,55 +13,119 @@ import type { Quiz } from "./QuizzesPage";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const QuizDetailPageSkeleton = () => (
-  <div className="min-h-screen flex flex-col bg-background">
-    {/* Header Skeleton */}
-    <div className="border-b border-border py-4 px-4 md:px-10">
-      <div className="max-w-[1100px] mx-auto flex items-center gap-4">
-        <Skeleton className="w-9 h-9 md:w-10 md:h-10 rounded-full md:rounded-xl" />
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-16 hidden md:block" />
-          <Skeleton className="h-5 md:h-6 w-40 md:w-48" />
+  <div className="min-h-screen flex flex-col bg-background animate-pulse">
+
+    {/* ── MOBILE skeleton ── */}
+    <div className="md:hidden">
+      {/* Fixed mobile header: back arrow (absolute left) + centered quiz title */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+        <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
+          <Skeleton className="absolute left-4 w-9 h-9 rounded-full" />
+          <Skeleton className="h-5 w-40 rounded" />
         </div>
       </div>
+
+      {/* Scrollable body */}
+      <div className="pt-[64px] pb-8 px-4 flex flex-col gap-3 max-w-[700px] mx-auto w-full">
+        {/* Trophy hero card — gradient bg, centered, icon + title + description */}
+        <div className="mt-4 rounded-2xl p-4 flex flex-col items-center gap-2 text-center bg-muted/20 border border-border">
+          <Skeleton className="w-10 h-10 rounded-xl" />
+          <Skeleton className="h-5 w-3/4 rounded" />
+          <Skeleton className="h-3.5 w-full rounded" />
+          <Skeleton className="h-3.5 w-2/3 rounded" />
+        </div>
+
+        {/* 2 stat cards: Questions | Category */}
+        <div className="grid grid-cols-2 gap-3">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex flex-col items-center gap-1.5 p-3 rounded-lg border border-border bg-card">
+              <Skeleton className="w-5 h-5 rounded" />
+              <Skeleton className="h-4 w-8 rounded" />
+              <Skeleton className="h-3 w-16 rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* How to Play card — 4 numbered tips */}
+        <div className="rounded-lg border border-border bg-card p-3 space-y-2">
+          <Skeleton className="h-4 w-24 rounded" />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-start gap-3">
+              <Skeleton className="shrink-0 w-5 h-5 rounded-full" />
+              <Skeleton className="h-4 flex-1 rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Start Quiz button */}
+        <Skeleton className="w-full h-9 rounded-md mt-auto" />
+      </div>
     </div>
 
-    {/* Mobile layout */}
-    <div className="md:hidden flex-1 p-4 flex flex-col gap-4">
-      <Skeleton className="h-36 w-full rounded-2xl" />
-      <div className="grid grid-cols-2 gap-3">
-        <Skeleton className="h-8 w-full rounded-md" />
-        <Skeleton className="h-8 w-full rounded-md" />
-      </div>
-      <div className="border border-border rounded-lg p-4 space-y-3">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-8 w-full rounded-md" />
-        <Skeleton className="h-8 w-full rounded-md" />
-      </div>
-      <Skeleton className="h-9 w-full rounded-md mt-auto" />
-    </div>
-
-    {/* Desktop layout */}
+    {/* ── DESKTOP skeleton ── */}
     <div className="hidden md:flex flex-1 max-w-[1100px] mx-auto w-full px-6 lg:px-10 py-8 gap-8">
+      {/* Left column: back btn + title + hero banner + How-to-Play */}
       <div className="flex-1 flex flex-col gap-4">
-        <Skeleton className="h-36 w-full rounded-lg" />
-        <div className="border border-border rounded-lg p-6 space-y-4">
-          <Skeleton className="h-5 w-32" />
-          <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-12 w-full rounded-lg" />
-            <Skeleton className="h-12 w-full rounded-lg" />
+        {/* Back btn + title */}
+        <div className="flex items-center gap-4">
+          <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-3.5 w-12 rounded" />
+            <Skeleton className="h-7 w-56 rounded" />
+          </div>
+        </div>
+
+        {/* Gradient hero banner: icon + description + meta chips */}
+        <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
+          <div className="flex items-start gap-4">
+            <Skeleton className="w-10 h-10 rounded-md shrink-0 mt-2" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-full rounded" />
+              <Skeleton className="h-4 w-4/5 rounded" />
+              <div className="flex items-center gap-4 mt-2">
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-4 w-16 rounded" />
+                <Skeleton className="h-4 w-20 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* How to Play card — 2×2 grid of numbered tips */}
+        <div className="rounded-md border border-border bg-card p-4 space-y-3">
+          <Skeleton className="h-5 w-28 rounded" />
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-start gap-3">
+                <Skeleton className="shrink-0 w-6 h-6 rounded-full mt-0.5" />
+                <Skeleton className="h-4 flex-1 rounded" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
-      <div className="w-[300px] lg:w-[340px] shrink-0">
-        <div className="border border-border rounded-lg p-6 space-y-4">
-          <Skeleton className="h-6 w-32" />
+
+      {/* Right column: sticky "Ready to start?" card */}
+      <div className="w-[300px] lg:w-[340px] shrink-0 self-start">
+        <div className="rounded-xl border border-border bg-card p-4 flex flex-col gap-5">
+          {/* "Ready to start?" heading */}
+          <Skeleton className="h-6 w-32 rounded" />
+          {/* 4 stat items in 2×2 grid */}
           <div className="grid grid-cols-2 gap-2">
-            <Skeleton className="h-12 w-full rounded-lg" />
-            <Skeleton className="h-12 w-full rounded-lg" />
-            <Skeleton className="h-12 w-full rounded-lg" />
-            <Skeleton className="h-12 w-full rounded-lg" />
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center gap-2 p-2 rounded-xl bg-muted/50">
+                <Skeleton className="w-4 h-4 rounded shrink-0" />
+                <div className="flex-1 space-y-1">
+                  <Skeleton className="h-3 w-full rounded" />
+                  <Skeleton className="h-4 w-3/4 rounded" />
+                </div>
+              </div>
+            ))}
           </div>
-          <Skeleton className="h-10 w-full rounded-lg" />
+          {/* Start Quiz button */}
+          <Skeleton className="h-9 w-full rounded-md" />
+          {/* "You can retake..." helper text */}
+          <Skeleton className="h-3 w-40 mx-auto rounded" />
         </div>
       </div>
     </div>

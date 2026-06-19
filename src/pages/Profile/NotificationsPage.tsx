@@ -22,6 +22,28 @@ interface NotificationItem {
   category?: string;
 }
 
+export const NotificationsPageSkeleton = () => (
+  <div className="min-h-screen bg-background flex flex-col w-full animate-pulse">
+    {/* Mobile top bar */}
+    <div className="md:hidden flex items-center justify-center px-4 pt-4 pb-3 relative min-h-[50px]">
+      <Skeleton className="w-8.5 h-8.5 rounded-full absolute left-4 bg-zinc-800" />
+      <Skeleton className="h-5 w-32 bg-zinc-800" />
+    </div>
+    {/* Desktop inline header */}
+    <div className="hidden md:flex items-center justify-center px-4 pt-6 pb-3 relative min-h-[60px] w-full">
+      <Skeleton className="w-9.5 h-9.5 rounded-xl absolute left-4 bg-zinc-800" />
+      <Skeleton className="h-6 w-36 bg-zinc-800" />
+    </div>
+    <div className="pt-[58px] md:pt-3 max-w-[700px] md:max-w-[1000px] mx-auto w-full px-4 flex items-center gap-2">
+      <Skeleton className="h-7.5 w-16 rounded-full bg-zinc-800" />
+      <Skeleton className="h-7.5 w-20 rounded-full bg-zinc-800" />
+    </div>
+    <div className="flex-1 flex flex-col pt-3 max-w-[700px] md:max-w-[1000px] mx-auto w-full px-4 pb-6 gap-4">
+       {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-24 w-full rounded-2xl bg-zinc-900" />)}
+    </div>
+  </div>
+);
+
 export const NotificationsPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -265,14 +287,26 @@ export const NotificationsPage = () => {
   const earlierItems = displayedNotifications.filter((item) => !isItemNew(item));
 
   const NotificationsSkeleton = () => (
-    <div className="space-y-3 mt-1">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i} className="border border-border/40 outline-none py-1">
-          <CardContent className="p-3.5 flex items-start gap-3.5">
-            <Skeleton className="w-13 h-13 rounded-full shrink-0 bg-muted/40" />
-            <div className="flex-1 space-y-2 py-1">
-              <Skeleton className="h-4 w-3/4 bg-muted/40" />
-              <Skeleton className="h-3.5 w-1/2 bg-muted/40" />
+    <div className="space-y-3 mt-1 w-full animate-pulse">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Card key={i} className="border border-border/40 outline-none">
+          <CardContent className="p-3.5 md:p-4 flex gap-3.5 items-start relative">
+            {/* Avatar + Sub-icon badge */}
+            <div className="relative shrink-0 mt-0.5">
+              <Skeleton className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-zinc-800" />
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-background bg-zinc-700" />
+            </div>
+            
+            {/* Content area */}
+            <div className="flex-1 min-w-0 pr-6 space-y-2">
+              <div className="flex items-start justify-between gap-2">
+                <Skeleton className="h-5 w-1/2 md:w-1/3 bg-zinc-800 rounded" />
+                <Skeleton className="h-3 w-16 bg-zinc-800 rounded mt-1 shrink-0" />
+              </div>
+              <div className="space-y-1.5">
+                <Skeleton className="h-3.5 w-full bg-zinc-800/60 rounded" />
+                <Skeleton className="h-3.5 w-5/6 bg-zinc-800/60 rounded" />
+              </div>
             </div>
           </CardContent>
         </Card>

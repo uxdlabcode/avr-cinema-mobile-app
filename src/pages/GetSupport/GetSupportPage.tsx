@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import {
   collection,
@@ -115,6 +116,70 @@ export const useSupportTopics = () => {
 import { NewTicketForm } from "./NewTicketForm";
 import { NewTicketSheet } from "./NewTicketSheet";
 import { DesktopChatPanel } from "./DesktopChatPanel";
+
+const SupportTopicsSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <Card key={i} className="flex flex-row items-center justify-between gap-4 px-4 py-2 rounded-lg border border-border shadow-sm bg-card/60">
+        <Skeleton className="w-10 h-10 rounded-full bg-zinc-800 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <Skeleton className="h-4 w-3/4 bg-zinc-800" />
+        </div>
+        <ChevronRight className="w-5 h-5 text-muted-foreground/30 flex-shrink-0" />
+      </Card>
+    ))}
+  </div>
+);
+
+const SupportTicketsSkeletonDesktop = () => (
+  <div className="flex flex-col py-2">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div key={i} className="flex flex-col gap-1.5 px-4 py-4 text-left border-l-2 border-l-transparent">
+        <div className="flex items-start justify-between gap-2">
+          <Skeleton className="h-4 w-2/3 bg-zinc-800" />
+          <Skeleton className="h-4 w-12 rounded-full bg-zinc-800" />
+        </div>
+        <Skeleton className="h-3 w-1/2 bg-zinc-800" />
+        <Skeleton className="h-3 w-1/3 bg-zinc-800 mt-1" />
+      </div>
+    ))}
+  </div>
+);
+
+const SupportTicketsSkeletonMobile = () => (
+  <div className="flex flex-col gap-3">
+    {Array.from({ length: 4 }).map((_, i) => (
+      <Card key={i} className="flex flex-col gap-2 p-4 rounded-lg border-border shadow-sm">
+        <div className="flex items-start justify-between gap-2">
+          <Skeleton className="h-4 w-2/3 bg-zinc-800" />
+          <Skeleton className="h-4 w-12 rounded-full bg-zinc-800" />
+        </div>
+        <Skeleton className="h-3 w-1/2 bg-zinc-800" />
+        <Skeleton className="h-3 w-1/3 bg-zinc-800 mt-1" />
+      </Card>
+    ))}
+  </div>
+);
+
+export const GetSupportPageSkeleton = () => (
+  <div className="min-h-screen flex flex-col bg-background animate-pulse">
+    <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+      <div className="relative flex items-center justify-center px-4 pt-5 pb-4 min-h-[64px] max-w-[700px] mx-auto">
+        <Skeleton className="absolute left-4 w-9 h-9 rounded-full bg-zinc-800" />
+        <Skeleton className="h-6 w-24 bg-zinc-800" />
+      </div>
+    </div>
+    <div className="hidden md:flex flex-col items-center justify-center pt-10 pb-6">
+      <Skeleton className="h-8 w-64 bg-zinc-800 mb-3" />
+      <Skeleton className="h-5 w-96 bg-zinc-800" />
+    </div>
+    <div className="flex-1 w-full max-w-[700px] md:max-w-[1000px] mx-auto px-4 md:px-6 pt-[80px] md:pt-0 pb-12 flex flex-col gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-14 w-full rounded-lg bg-zinc-900" />)}
+      </div>
+    </div>
+  </div>
+);
 
 export const GetSupportPage = () => {
   const navigate = useNavigate();
@@ -336,9 +401,7 @@ export const GetSupportPage = () => {
             <div className="flex flex-1 min-h-0">
               <div className="w-[340px] xl:w-[380px] flex-shrink-0 flex flex-col border-r border-border overflow-y-auto scrollbar-hide">
                 {ticketsLoading ? (
-                  <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                  </div>
+                  <SupportTicketsSkeletonDesktop />
                 ) : myTickets.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 gap-4 px-6 text-center">
                     <TicketX className="w-10 h-10 text-muted-foreground/40" />
@@ -444,7 +507,7 @@ export const GetSupportPage = () => {
             </div>
             <h3 className="text-sm font-semibold text-foreground">Top Categories</h3>
             {topicsLoading ? (
-              <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+              <SupportTopicsSkeleton />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredCategories.map((cat) => {
@@ -513,9 +576,7 @@ export const GetSupportPage = () => {
               <h2 className="text-base font-semibold text-secondary">Your Tickets</h2>
             </div>
             {ticketsLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              </div>
+              <SupportTicketsSkeletonMobile />
             ) : myTickets.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
                 <TicketX className="w-12 h-12 text-muted-foreground/40" />

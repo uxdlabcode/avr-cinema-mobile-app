@@ -4,10 +4,10 @@ import Layout from "./layout/Layout";
 import Signin from "@/pages/Auth/Signin";
 import Signup from "@/pages/Auth/Signup";
 import { UserDashboard } from "@/pages/Dashboard/UserDashboard";
-import { ProfilePage } from "@/pages/Profile/ProfilePage";
+import { ProfilePage, ProfilePageSkeleton } from "@/pages/Profile/ProfilePage";
 import { UpgradePlanPage } from "@/pages/Profile/UpgradePlanPage";
 import { UpdateProfilePage } from "@/pages/Profile/UpdateProfilePage";
-import { WatchlistPage } from "@/pages/Profile/WatchlistPage";
+import { WatchlistPage, WatchlistPageSkeleton } from "@/pages/Profile/WatchlistPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import GuestRoute from "@/components/GuestRoute";
 import NotFound from "@/pages/NotFound";
@@ -19,9 +19,9 @@ import TvDetails from "@/pages/tvstreaming/TvDetails";
 import MoviesTab from "@/pages/movies/MoviesTab";
 import Membership from "@/pages/membership/Membership";
 import Episode from "@/pages/tvstreaming/Episode";
-import { GetSupportPage } from "@/pages/GetSupport/GetSupportPage";
-import { NotificationsPage } from "@/pages/Profile/NotificationsPage";
-import { QuizzesPage } from "@/pages/Quizzes/QuizzesPage";
+import { GetSupportPage, GetSupportPageSkeleton } from "@/pages/GetSupport/GetSupportPage";
+import { NotificationsPage, NotificationsPageSkeleton } from "@/pages/Profile/NotificationsPage";
+import { QuizzesPage, QuizzesPageSkeleton } from "@/pages/Quizzes/QuizzesPage";
 import { QuizDetailPage } from "@/pages/Quizzes/QuizDetailPage";
 import { QuizResultPage } from "@/pages/Quizzes/QuizResultPage";
 import Trailer from "@/pages/trailer/Trailer";
@@ -153,7 +153,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "profile",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<ProfilePageSkeleton />}>
             <ProfilePage />
           </ProtectedRoute>
         ),
@@ -161,7 +161,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "profile/watchlist",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<WatchlistPageSkeleton />}>
             <WatchlistPage />
           </ProtectedRoute>
         ),
@@ -169,7 +169,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "update-profile",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<ProfilePageSkeleton />}>
             <UpdateProfilePage />
           </ProtectedRoute>
         ),
@@ -177,7 +177,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "support",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<GetSupportPageSkeleton />}>
             <GetSupportPage />
           </ProtectedRoute>
         ),
@@ -185,7 +185,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "support/ticket/:ticketId",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<GetSupportPageSkeleton />}>
             <GetSupportPage />
           </ProtectedRoute>
         ),
@@ -193,7 +193,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "notifications",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<NotificationsPageSkeleton />}>
             <NotificationsPage />
           </ProtectedRoute>
         ),
@@ -201,7 +201,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: "quiz",
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "user"]}>
+          <ProtectedRoute allowedRoles={["superadmin", "user"]} skeleton={<QuizzesPageSkeleton />}>
             <QuizzesPage />
           </ProtectedRoute>
         ),
