@@ -115,9 +115,19 @@ const MediaCategoryRow = ({
 
   return (
     <div className="space-y-1 text-left relative group/row">
-      <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-        {genreName}
-      </h3>
+      <div className="flex items-center justify-between pr-0">
+        <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
+          {genreName}
+        </h3>
+        {list.length > 15 && (
+          <button
+            onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
+            className="text-xs md:text-sm text-primary/80 hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
+          >
+            View All <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       <div className="relative w-full">
         {/* Left Scroll Button */}
@@ -149,7 +159,7 @@ const MediaCategoryRow = ({
           ref={rowRef}
           className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
         >
-          {list.map((item) => (
+          {list.slice(0, 15).map((item) => (
             <div
               key={item.id}
               tabIndex={0}
@@ -159,6 +169,7 @@ const MediaCategoryRow = ({
               <img
                 src={item.image || "/assets/poster.png"}
                 alt={item.title}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
               />
 
@@ -222,6 +233,19 @@ const MediaCategoryRow = ({
               </div>
             </div>
           ))}
+          {list.length > 15 && (
+            <div
+              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
+              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+            >
+              <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
+                <ChevronRight className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
+                View All
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -520,7 +544,7 @@ export const HomePage = () => {
                         className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm outline-none"
                       >
                         {watchlist.includes(movie.id.toString()) ? (
-                          <Check className="w-4 h-4 mr-1 text-[#DECB94]" />
+                          <Check className="w-4 h-4 mr-1 text-primary" />
                         ) : (
                           <Plus className="w-4 h-4 mr-1 text-primary" />
                         )}

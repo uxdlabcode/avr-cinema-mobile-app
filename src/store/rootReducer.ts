@@ -11,6 +11,8 @@ import trailerReducer from './slices/trailerSlice';
 import quizReducer from './slices/quizSlice';
 import mediaReducer from './slices/mediaSlice';
 import notificationReducer from './slices/notificationSlice';
+import genreReducer from './slices/genreSlice';
+import watchProgressReducer from './slices/watchProgressSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -25,6 +27,8 @@ const rootReducer = combineReducers({
   quiz: quizReducer,
   media: mediaReducer,
   notifications: notificationReducer,
+  genre: genreReducer,
+  watchProgress: watchProgressReducer,
 });
 
 export default rootReducer;

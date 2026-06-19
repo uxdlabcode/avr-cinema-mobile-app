@@ -57,7 +57,7 @@ const TvTabSkeleton = () => (
             {[1, 2, 3, 4, 5].map((i) => (
               <Skeleton
                 key={i}
-                className="w-[140px] sm:w-[170px] md:w-[200px] aspect-[2/3] rounded-md bg-zinc-900 shrink-0"
+                className="w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900 shrink-0"
               />
             ))}
           </div>
@@ -86,7 +86,7 @@ const TVCategoryRow = ({
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
 
-  const displayList = isTrending ? list.slice(0, 10) : list;
+  const displayList = isTrending ? list.slice(0, 10) : list.slice(0, 15);
 
   const updateScrollButtons = () => {
     if (rowRef.current) {
@@ -131,9 +131,19 @@ const TVCategoryRow = ({
 
   return (
     <div className="space-y-1 text-left relative group/row">
-      <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-        {genreName}
-      </h3>
+      <div className="flex items-center justify-between pr-4">
+        <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
+          {genreName}
+        </h3>
+        {list.length > 15 && (
+          <button
+            onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
+            className="text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
+          >
+            View All <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
       <div className="relative w-full">
         {/* Left Scroll Button */}
@@ -198,6 +208,7 @@ const TVCategoryRow = ({
                     <img
                       src={tv.signedThumbnailUrl || "/assets/poster.png"}
                       alt={tv.title}
+                      loading="lazy"
                       className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
                     />
 
@@ -279,6 +290,7 @@ const TVCategoryRow = ({
                 <img
                   src={tv.signedThumbnailUrl || "/assets/poster.png"}
                   alt={tv.title}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
                 />
 
@@ -347,6 +359,19 @@ const TVCategoryRow = ({
               </div>
             );
           })}
+          {list.length > 15 && !isTrending && (
+            <div
+              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
+              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+            >
+              <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
+                <ChevronRight className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
+                View All
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

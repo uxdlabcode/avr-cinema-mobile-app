@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCollectionData, getSignedUrl } from "@/Firebase";
+import { getMatchingData, getSignedUrl } from "@/Firebase";
 import type { MediaItem } from "./homeSlice";
 
 interface EpisodeState {
@@ -15,14 +15,11 @@ const initialState: EpisodeState = {
 };
 
 export const fetchEpisodeMedia = createAsyncThunk("episode/fetchEpisodeMedia", async () => {
-  const docs = await getCollectionData("media");
-
-  const tvShows = (docs || []).filter(
-    (doc: any) => doc.category === "TV Show"
-  );
+  // Fetch only TV Show category items with a limit of 40
+  const docs = await getMatchingData("media", "category", "==", "TV Show", 40);
 
   const enriched = await Promise.all(
-    tvShows.map(async (doc: any) => {
+    docs.map(async (doc: any) => {
       let image = "/assets/poster.png";
       if (doc.thumbnailUrl) {
         try {

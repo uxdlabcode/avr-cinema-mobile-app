@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus, Check } from "lucide-react";
-import { getMatchingData, getSignedUrl } from "@/Firebase";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchMovieMedia } from "@/store/slices/movieSlice";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MovieItem {
   id: string;
@@ -21,42 +24,22 @@ interface TrendNowProps {
 
 const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
   const navigate = useNavigate();
-  const [items, setItems] = useState<MovieItem[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const movieItems = useSelector((state: RootState) => state.movie.items);
+  const movieStatus = useSelector((state: RootState) => state.movie.status);
+
   const rowRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const fetchedMovies = await getMatchingData("media", "category", "==", "Movie");
+    if (movieStatus === "idle") {
+      dispatch(fetchMovieMedia());
+    }
+  }, [movieStatus, dispatch]);
 
-        const signedMovies = await Promise.all(
-          fetchedMovies.map(async (movie) => {
-            let signedThumb = movie.thumbnailUrl || "";
-            if (signedThumb) {
-              try {
-                signedThumb = await getSignedUrl(movie.thumbnailUrl);
-              } catch (err) {
-                console.error("Error signing URL:", err);
-              }
-            }
-            return {
-              ...movie,
-              signedThumbnailUrl: signedThumb
-            } as MovieItem;
-          })
-        );
-
-        // Display first 10 movies for Trending Now
-        setItems(signedMovies.slice(0, 10));
-      } catch (error) {
-        console.error("Error fetching movies for Trending Now:", error);
-      }
-    };
-
-    fetchMovies();
-  }, []);
+  const items = movieItems.slice(0, 10);
+  const isLoading = movieStatus === "loading" || movieStatus === "idle";
 
   const updateScrollButtons = () => {
     if (rowRef.current) {
@@ -92,6 +75,37 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
       });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-1 text-left relative group/row w-full animate-pulse">
+        <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide mb-3">
+          Trending Now
+        </h3>
+        
+        <div className="relative w-full">
+          <div className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20 w-full">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="flex-none relative pt-4">
+                <span
+                  className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none"
+                  style={{
+                    WebkitTextStroke: "2px #27272a",
+                    color: "#18181b",
+                    fontFamily: "Impact, Arial Black, sans-serif",
+                    translate: "-50% 0px",
+                  }}
+                >
+                  {index + 1}
+                </span>
+                <Skeleton className="relative z-20 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) return null;
 

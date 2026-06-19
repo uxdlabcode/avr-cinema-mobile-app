@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCollectionData, getSignedUrl } from "@/Firebase";
+import { getMatchingData, getSignedUrl } from "@/Firebase";
 import type { MediaItem } from "./homeSlice";
 
 interface DocumentaryState {
@@ -15,14 +15,11 @@ const initialState: DocumentaryState = {
 };
 
 export const fetchDocumentaryMedia = createAsyncThunk("documentary/fetchDocumentaryMedia", async () => {
-  const docs = await getCollectionData("media");
-
-  const documentaries = (docs || []).filter(
-    (doc: any) => doc.category === "Documentary"
-  );
+  // Fetch only Documentary category items with a limit of 40
+  const docs = await getMatchingData("media", "category", "==", "Documentary", 40);
 
   const enriched = await Promise.all(
-    documentaries.map(async (doc: any) => {
+    docs.map(async (doc: any) => {
       let image = "/assets/poster.png";
       if (doc.thumbnailUrl) {
         try {

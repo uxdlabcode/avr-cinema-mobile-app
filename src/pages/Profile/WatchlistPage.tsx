@@ -36,10 +36,7 @@ const WatchlistSkeleton = () => (
     <div className="mx-auto w-full px-4 md:px-6 lg:px-10 xl:px-16 pt-24 md:pt-8">
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 md:gap-5">
         {Array.from({ length: 14 }).map((_, i) => (
-          <div key={i} className="flex flex-col gap-2">
-            <Skeleton className="aspect-[2/3] w-full rounded-xl" />
-            <Skeleton className="h-3 md:h-4 w-3/4 rounded mt-1 self-center" />
-          </div>
+          <Skeleton key={i} className="aspect-[2/3] w-full rounded-xl bg-zinc-900" />
         ))}
       </div>
     </div>

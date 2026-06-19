@@ -5,7 +5,7 @@ import { TVSidebar } from "@/components/navbar/TVSidebar";
 import { isTvPlatform } from "@/lib/tvUtils";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where, limit, orderBy } from "firebase/firestore";
 import { db } from "@/Firebase/firebase";
 import { setNotifications, setLoading, setError } from "@/store/slices/notificationSlice";
 
@@ -43,7 +43,7 @@ export default function Layout({ children }: Props) {
         });
 
         const unsubMedia = onSnapshot(
-          collection(db, "media"),
+          query(collection(db, "media"), orderBy("createdAt", "desc"), limit(30)),
           (mediaSnap) => {
             let readIds: string[] = [];
             try {

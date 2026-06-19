@@ -37,7 +37,7 @@ const initialState: HomeState = {
 export const fetchHomeMedia = createAsyncThunk(
   "home/fetchHomeMedia",
   async () => {
-    const docs = await getCollectionData("media");
+    const docs = await getCollectionData("media", 60);
 
     const enriched = await Promise.all(
       (docs || []).map(async (doc: any) => {

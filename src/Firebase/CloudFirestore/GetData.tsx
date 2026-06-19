@@ -15,14 +15,33 @@ interface QueryCondition {
 }
 
 // Get all the data from a collection
-export const getCollectionData = async (collectionName: string): Promise<Document[]> => {
+export const getCollectionData = async (
+  collectionName: string,
+  limitVal?: number,
+  orderByField?: string,
+  order: OrderByDirection = "desc"
+): Promise<Document[]> => {
   const arr: Document[] = [];
   let querySnapshot: QuerySnapshot<DocumentData>;
+
+  const constraints: QueryConstraint[] = [];
+  if (orderByField) {
+    constraints.push(orderBy(orderByField, order));
+  }
+  if (limitVal) {
+    constraints.push(limit(limitVal));
+  }
 
   if (collectionName === "jobs") {
     const dataQuery = query(
       collection(db, collectionName),
       orderBy("submitDate", "desc")
+    );
+    querySnapshot = await getDocs(dataQuery);
+  } else if (constraints.length > 0) {
+    const dataQuery = query(
+      collection(db, collectionName),
+      ...constraints
     );
     querySnapshot = await getDocs(dataQuery);
   } else {
@@ -63,13 +82,24 @@ export const getMatchingData = async (
   collectionName: string,
   key: string,
   operator: WhereFilterOp,
-  value: any
+  value: any,
+  limitVal?: number,
+  orderByField?: string,
+  order: OrderByDirection = "desc"
 ): Promise<Document[]> => {
   const arr: Document[] = [];
+  const constraints: QueryConstraint[] = [where(key, operator, value)];
+
+  if (orderByField) {
+    constraints.push(orderBy(orderByField, order));
+  }
+  if (limitVal) {
+    constraints.push(limit(limitVal));
+  }
 
   const dataQuery = query(
     collection(db, collectionName),
-    where(key, operator, value)
+    ...constraints
   );
 
   const querySnapshot = await getDocs(dataQuery);

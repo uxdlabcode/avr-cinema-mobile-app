@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "@/store";
 import { fetchDocumentaryMedia } from "@/store/slices/documentarySlice";
 import { getSignedUrl } from '@/Firebase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DocItem {
   id: string;
@@ -141,6 +142,50 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
     }
   };
 
+  const isLoading = mediaStatus === "loading" || mediaStatus === "idle";
+
+  if (isLoading) {
+    if (isGrid) {
+      return (
+        <div className="space-y-8 w-full text-left animate-pulse">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Film className="w-4 h-4 text-zinc-700" />
+              <Skeleton className="h-6 w-32 bg-zinc-800" />
+            </div>
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="w-full aspect-[2/3] rounded-md bg-zinc-900"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="text-left w-full space-y-1 animate-pulse">
+        <div className="flex items-center justify-between pr-4 mb-3">
+          <div className="flex items-center gap-2">
+            <Film className="w-4 h-4 text-zinc-700" />
+            <Skeleton className="h-6 w-32 bg-zinc-800" />
+          </div>
+        </div>
+        <div className="flex gap-3 overflow-hidden w-full">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton
+              key={i}
+              className="shrink-0 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (items.length === 0) return null;
 
   if (isGrid) {
@@ -230,11 +275,21 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
 
   return (
     <div className={`text-left relative group/row w-full space-y-1`}>
-      <div className="flex items-center gap-2 mb-3">
-        <Film className="w-4 h-4 text-primary" />
-        <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-          Documentaries
-        </h3>
+      <div className="flex items-center justify-between pr-4 mb-3">
+        <div className="flex items-center gap-2">
+          <Film className="w-4 h-4 text-primary" />
+          <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
+            Documentaries
+          </h3>
+        </div>
+        {items.length > 15 && (
+          <button
+            onClick={() => navigate(`/genre/Documentary`)}
+            className="text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
+          >
+            View All <ChevronRight className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <div className="relative w-full">
@@ -267,7 +322,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
           ref={rowRef}
           className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
         >
-          {items.map((doc) => (
+          {items.slice(0, 15).map((doc) => (
             <div
               key={doc.id}
               tabIndex={0}
@@ -277,6 +332,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
               <img
                 src={doc.signedThumbnailUrl || '/assets/poster.png'}
                 alt={doc.title}
+                loading="lazy"
                 className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
               />
 
@@ -329,6 +385,19 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
               </div>
             </div>
           ))}
+          {items.length > 15 && (
+            <div
+              onClick={() => navigate(`/genre/Documentary`)}
+              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+            >
+              <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
+                <ChevronRight className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
+                View All
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

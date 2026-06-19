@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCollectionData, getSignedUrl } from "@/Firebase";
+import { getMatchingData, getSignedUrl } from "@/Firebase";
 import type { MediaItem } from "./homeSlice";
 
 interface MovieState {
@@ -17,11 +17,8 @@ const initialState: MovieState = {
 export const fetchMovieMedia = createAsyncThunk(
   "movie/fetchMovieMedia",
   async () => {
-    const docs = await getCollectionData("media");
-
-    const movieDocs = (docs || []).filter(
-      (doc: any) => doc.category === "Movie"
-    );
+    // Fetch only Movie category items with a limit of 50
+    const movieDocs = await getMatchingData("media", "category", "==", "Movie", 50);
 
     const enriched = await Promise.all(
       movieDocs.map(async (doc: any) => {

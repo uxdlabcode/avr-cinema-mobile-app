@@ -85,6 +85,10 @@ export function Navbar() {
   };
 
   const activeTab = getActiveTab();
+  const activeIndex = mobileNavItems.findIndex(
+    (item) => activeTab === item.path || (activeTab === "/notifications" && item.path === "/profile")
+  );
+  // console.log("NAVBAR DEBUG:", { pathname: location.pathname, activeTab, activeIndex });
 
   return (
     <>
@@ -154,7 +158,21 @@ export function Navbar() {
       />
       {/* Mobile Bottom Nav */}
       <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 flex justify-center">
-        <Dock className="w-full max-w-sm bg-black/40 border border-zinc-800/50 backdrop-blur-lg px-2 mx-0 shadow-2xl h-14 gap-1">
+        <Dock className="relative w-full max-w-sm bg-black/40 border border-zinc-800/50 backdrop-blur-lg px-2 mx-0 shadow-2xl h-14 gap-1">
+          {activeIndex !== -1 && (
+            <motion.div
+              className="absolute inset-y-1 dark:bg-primary/20 bg-primary/10 rounded-3xl -z-10 pointer-events-none"
+              initial={false}
+              animate={{
+                x: `${activeIndex * 100}%`,
+              }}
+              style={{
+                left: "8px",
+                width: "calc((100% - 16px) / 5)",
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            />
+          )}
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.path || (activeTab === "/notifications" && item.path === "/profile");
@@ -169,16 +187,6 @@ export function Navbar() {
                     : "text-primary/80  hover:text-primary"
                 )}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="active-nav-bg"
-                    className="absolute inset-0 dark:bg-primary/20 bg-primary/10 rounded-3xl -z-10"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  />
-                )}
                 <Icon className={cn("w-4 h-4 transition-transform font-semibold z-10", isActive && "scale-110")} />
                 <span className="text-[10px]  z-10">{item.label}</span>
               </DockIcon>

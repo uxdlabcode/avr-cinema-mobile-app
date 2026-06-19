@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Play, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
-import { compoundQuery, getDocumentData, getSignedUrl } from "@/Firebase";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store";
+import { fetchWatchProgress } from "@/store/slices/watchProgressSlice";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface WatchItem {
@@ -17,80 +17,18 @@ interface WatchItem {
 
 const RecentWatch = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.auth.user);
   const userId = user?.id;
 
-  const [items, setItems] = useState<WatchItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { items, status } = useSelector((state: RootState) => state.watchProgress);
+  const loading = status === "loading" || status === "idle";
 
   useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
+    if (userId) {
+      dispatch(fetchWatchProgress(userId));
     }
-
-    const fetchProgress = async () => {
-      try {
-        // 1. Get all watch_progress docs for this user
-        const docs = await compoundQuery("watch_progress", [
-          { key: "userId", operator: "==", value: userId },
-        ]);
-
-        if (!docs || docs.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        // 2. Sort by updatedAt (latest first) and take top 10
-        const sorted = [...docs]
-          .filter((d) => d.currentTime > 0 && d.duration > 0)
-          .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
-          .slice(0, 10);
-
-        // 3. For each item, fetch the media document to get title + thumbnail
-        const enriched: WatchItem[] = await Promise.all(
-          sorted.map(async (doc) => {
-            try {
-              const media = await getDocumentData("media", doc.movieId);
-              let image = "/assets/episode1.webp";
-              if (media?.thumbnailUrl) {
-                try {
-                  image = await getSignedUrl(media.thumbnailUrl);
-                } catch {
-                  image = media.thumbnailUrl;
-                }
-              }
-              return {
-                id: doc.id,
-                movieId: doc.movieId,
-                title: media?.title || "Unknown",
-                image,
-                currentTime: doc.currentTime,
-                duration: doc.duration,
-              };
-            } catch {
-              return {
-                id: doc.id,
-                movieId: doc.movieId,
-                title: "Unknown",
-                image: "/assets/episode1.webp",
-                currentTime: doc.currentTime,
-                duration: doc.duration,
-              };
-            }
-          })
-        );
-
-        setItems(enriched);
-      } catch (err) {
-        console.error("Error fetching watch progress:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProgress();
-  }, [userId]);
+  }, [userId, dispatch]);
 
   // Don't render if no items
   if (!loading && items.length === 0) return null;

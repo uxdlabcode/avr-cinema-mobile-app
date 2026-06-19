@@ -21,24 +21,30 @@ export const HomePageSkeleton = () => {
 
       {/* Content Rows Skeleton */}
       <section className="relative z-20 px-4 md:px-12 space-y-8 mt-2 w-full">
-        {/* Row 1 */}
+        {/* Row 1: Continue Watching */}
         <div className="w-full">
           <Skeleton className="h-6 w-48 mb-3 bg-zinc-800" />
           <div className="flex gap-4 overflow-hidden w-full">
-            <Skeleton className="shrink-0 w-64 md:w-72 aspect-video rounded-md bg-zinc-900" />
-            <Skeleton className="shrink-0 w-64 md:w-72 aspect-video rounded-md bg-zinc-900" />
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="shrink-0 w-64 md:w-72 aspect-video rounded-md bg-zinc-900" />
+            ))}
           </div>
         </div>
         
-        {/* Row 2 */}
-        <div className="w-full">
-          <Skeleton className="h-6 w-32 mb-3 bg-zinc-800" />
-          <div className="flex gap-4 overflow-hidden w-full">
-            <Skeleton className="shrink-0 w-32 md:w-48 aspect-[2/3] rounded-md bg-zinc-900" />
-            <Skeleton className="shrink-0 w-32 md:w-48 aspect-[2/3] rounded-md bg-zinc-900" />
-            <Skeleton className="shrink-0 w-32 md:w-48 aspect-[2/3] rounded-md bg-zinc-900" />
+        {/* Rows 2 & 3: Portrait Categories */}
+        {[1, 2].map((rowIdx) => (
+          <div key={rowIdx} className="w-full">
+            <Skeleton className="h-6 w-32 mb-3 bg-zinc-800" />
+            <div className="flex gap-4 overflow-hidden w-full">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton
+                  key={i}
+                  className="shrink-0 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900"
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
       </section>
     </div>
   );

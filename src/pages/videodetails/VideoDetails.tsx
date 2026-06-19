@@ -864,7 +864,7 @@ const VideoDetails = () => {
 
   if (movie.category === "TV Show" || movie.category === "Documentary") {
     return (
-      <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative select-none">
+      <div className="min-h-screen bg-black text-white w-full pb-7 md:pb-0 relative select-none">
 
         {/* Top Video/Banner Header Section */}
         <div

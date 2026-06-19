@@ -37,7 +37,7 @@ const initialState: MediaState = {
 export const fetchAllMedia = createAsyncThunk(
   "media/fetchAllMedia",
   async () => {
-    const docs = await getCollectionData("media");
+    const docs = await getCollectionData("media", 100);
 
     const enriched = await Promise.all(
       docs.map(async (doc: any) => {
