@@ -162,10 +162,10 @@
   outline: none !important;
   /* Thick white inner ring + Gold outer glow */
   box-shadow:
-    0 0 0 3px #ffffff,
-    0 0 18px 4px rgba(222, 203, 148, 0.6) !important;
-  /* Cinematic scaling */
-  transform: scale(1.06);
+    0 0 0 2px #ffffff,
+    0 0 12px 2px rgba(222, 203, 148, 0.5) !important;
+  /* Slight scaling */
+  transform: scale(1);
   z-index: 50;
   border-radius: 5px;
   /* respects rounded corners of items */
