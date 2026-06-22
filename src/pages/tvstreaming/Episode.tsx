@@ -199,7 +199,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
               </div>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
                 {genreItems.map((show) => (
-                  <div
+                  <div className="focusable"
                     key={show.id}
                     tabIndex={0}
                     onClick={() => navigate(`/video/${show.id}`)}
@@ -233,14 +233,14 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
                         <span>{show.seasons ? `${show.seasons.length} S` : '1 S'}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <button
+                        <button className="focusable"
                           onClick={(e) => { e.stopPropagation(); navigate(`/video/${show.id}`); }}
                           tabIndex={-1}
                           className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play
                         </button>
-                        <button
+                        <button className="focusable"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (toggleWatchlist) {
@@ -278,7 +278,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
           </h3>
         </div>
         {items.length > 15 && (
-          <button
+          <button className="focusable"
             onClick={() => navigate(`/genre/TV Show`)}
             className="text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
           >
@@ -290,7 +290,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
       <div className="relative w-full">
         {/* Left Scroll */}
         {showLeft && (
-          <button
+          <button className="focusable"
             tabIndex={-1}
             onClick={() => handleScroll('left')}
             className="absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -302,7 +302,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
 
         {/* Right Scroll */}
         {showRight && (
-          <button
+          <button className="focusable"
             tabIndex={-1}
             onClick={() => handleScroll('right')}
             className="absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -318,7 +318,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
           className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
         >
           {items.slice(0, 15).map((show) => (
-            <div
+            <div className="focusable"
               key={show.id}
               tabIndex={0}
               onClick={() => navigate(`/video/${show.id}`)}
@@ -353,14 +353,14 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
                   <span>{show.seasons ? `${show.seasons.length} S` : '1 S'}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button
+                  <button className="focusable"
                     onClick={(e) => { e.stopPropagation(); navigate(`/video/${show.id}`); }}
                     tabIndex={-1}
                     className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                   >
                     Play
                   </button>
-                  <button
+                  <button className="focusable"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (toggleWatchlist) {
@@ -381,7 +381,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
             </div>
           ))}
           {items.length > 15 && (
-            <div
+            <div className="focusable"
               onClick={() => navigate(`/genre/TV Show`)}
               className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >

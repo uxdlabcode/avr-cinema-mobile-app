@@ -64,7 +64,7 @@ export function NavMain({
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild isActive={isSubActive}>
-                            <Link to={subItem.url}>
+                            <Link className="focusable" to={subItem.url}>
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
@@ -82,7 +82,7 @@ export function NavMain({
                 isActive={location.pathname === item.url}
                 tooltip={item.title}
               >
-                <Link to={item.url}>
+                <Link className="focusable" to={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>

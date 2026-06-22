@@ -111,7 +111,7 @@ const MediaCategoryRow = ({
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button
+          <button className="focusable"
             tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -123,7 +123,7 @@ const MediaCategoryRow = ({
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button
+          <button className="focusable"
             tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="absolute right-[-20px] md:right-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -183,7 +183,7 @@ const MediaCategoryRow = ({
 
                 {/* Actions Row */}
                 <div className="flex items-center gap-1 md:gap-1.5">
-                  <button
+                  <button className="focusable"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/video/${item.id}`);
@@ -193,7 +193,7 @@ const MediaCategoryRow = ({
                   >
                     Play Now
                   </button>
-                  <button
+                  <button className="focusable"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (toggleWatchlist) {
@@ -426,9 +426,9 @@ const TvDetails = () => {
       <Header />
 
       {/* Tab Navigation */}
-      <div className="flex gap-6 px-4 py-3 overflow-x-auto scrollbar-hide border-b border-zinc-900">
+      <div className="flex gap-6 px-4 py-3 overflow-x-auto pt-5 scrollbar-hide border-b border-zinc-900">
         {TABS.map((tab) => (
-          <button
+          <button className="focusable"
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`focusable pb-2 text-xs font-semibold  transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 ${activeTab === tab
@@ -687,7 +687,7 @@ const TvDetails = () => {
                               <span>More Info</span>
                             </Button>
 
-                            <button
+                            <button className="focusable"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleWatchlist(slide.id, slide);
@@ -782,7 +782,7 @@ const TvDetails = () => {
                           {/* Detailed Description Panel */}
                           <div className="space-y-4 text-left w-full relative">
                             {/* Close Expanded Info */}
-                            <button
+                            <button className="focusable"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExpandedShowId(null);
@@ -831,7 +831,7 @@ const TvDetails = () => {
                                   ) : (
                                     <p>No description available.</p>
                                   )}
-                                  <button
+                                  <button className="focusable"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setShowFullDescription(false);
@@ -845,7 +845,7 @@ const TvDetails = () => {
                                 <div className="animate-fade-in">
                                   <p className="line-clamp-3 select-all">{slide.description || "No description available."}</p>
                                   {slide.description && slide.description.length > 150 && (
-                                    <button
+                                    <button className="focusable"
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         setShowFullDescription(true);
@@ -874,7 +874,7 @@ const TvDetails = () => {
           <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
             <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
               {featuredShows.map((_, index) => (
-                <button
+                <button className="focusable"
                   key={index}
                   tabIndex={-1}
                   onClick={() => carouselApi?.scrollTo(index)}
@@ -890,7 +890,7 @@ const TvDetails = () => {
 
           {/* Slider Controls (Left, Right arrows) */}
           <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
-            <button
+            <button className="focusable"
               tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();
@@ -902,7 +902,7 @@ const TvDetails = () => {
               <ChevronLeft className="w-5 h-5" />
             </button>
 
-            <button
+            <button className="focusable"
               tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();

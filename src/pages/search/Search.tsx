@@ -242,7 +242,7 @@ const Search = () => {
         return (
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {chips.map((chip) => (
-                    <button
+                    <button className="focusable"
                         key={chip}
                         onClick={() => handleFilterClick(chip)}
                         className={`focusable flex items-center gap-1.5 px-1 py-0.5 rounded-md border text-sm font-medium whitespace-nowrap transition-colors outline-none ${activeFilter === chip
@@ -324,7 +324,7 @@ const Search = () => {
                                     tabIndex={-1}
                                     type="button"
                                     onClick={clearSearchState}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
+                                    className="focusable absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors p-1"
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
@@ -347,7 +347,7 @@ const Search = () => {
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
                                 {history.length > 0 && (
-                                    <button
+                                    <button className="focusable"
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
                                         className="focusable text-xs font-bold text-primary hover:text-primary/80"
                                     >
@@ -379,7 +379,7 @@ const Search = () => {
                                                     <div className="flex justify-end">
                                                         <button
                                                             tabIndex={-1}
-                                                            className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
+                                                            className="focusable p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 dispatch(deleteSearch(item.id));
@@ -489,7 +489,7 @@ const Search = () => {
                             {/* <button
                                 tabIndex={-1}
                                 type="button"
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                                className="focusable absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
                                 title="Voice Search"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -498,7 +498,7 @@ const Search = () => {
                             </button> */}
                         </form>
 
-                        <button
+                        <button className="focusable"
                             onClick={() => {
                                 if (window.history.length > 1) {
                                     navigate(-1);
@@ -516,7 +516,7 @@ const Search = () => {
                     {/* Category Cards - Display when query is empty */}
                     {query.trim().length === 0 && (
                         <div className="grid grid-cols-3 gap-4 w-full max-w-3xl mb-12">
-                            <button
+                            <button className="focusable"
                                 onClick={() => navigate("/tv")}
                                 className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-purple-500/20 bg-gradient-to-br from-pink-650/40 to-purple-900/60 hover:from-pink-650/50 hover:to-purple-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
@@ -524,7 +524,7 @@ const Search = () => {
                                 <span className="relative drop-shadow-md">TV SHOWS</span>
                             </button>
 
-                            <button
+                            <button className="focusable"
                                 onClick={() => navigate("/movies")}
                                 className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
@@ -532,7 +532,7 @@ const Search = () => {
                                 <span className="relative drop-shadow-md">MOVIES</span>
                             </button>
 
-                            <button
+                            <button className="focusable"
                                 onClick={() => navigate("/tv?tab=Documentaries")}
                                 className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
@@ -548,7 +548,7 @@ const Search = () => {
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
                                 {history.length > 0 && (
-                                    <button
+                                    <button className="focusable"
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
                                         className="focusable text-xs font-bold text-primary hover:text-primary/80 cursor-pointer outline-none"
                                     >
@@ -580,7 +580,7 @@ const Search = () => {
                                                     <div className="flex justify-end">
                                                         <button
                                                             tabIndex={-1}
-                                                            className="p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
+                                                            className="focusable p-1 rounded-full bg-black/50 hover:bg-black/80 text-white transition-colors z-10"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 dispatch(deleteSearch(item.id));

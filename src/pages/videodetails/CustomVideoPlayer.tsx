@@ -1044,7 +1044,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
               <div className={`flex w-full justify-center gap-3 pt-1 ${playInline ? "flex-row max-w-xs mx-auto" : "flex-col"
                 }`}>
-                <button
+                <button className="focusable"
                   onClick={() => navigate('/membership')}
                   className={`focusable bg-yellow-500 hover:bg-yellow-450 text-black font-bold rounded-lg transition-all shadow-lg shadow-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
                     }`}
@@ -1053,7 +1053,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   <span>Get Premium</span>
                 </button>
 
-                <button
+                <button className="focusable"
                   onClick={() => {
                     if (document.fullscreenElement) {
                       document.exitFullscreen().catch(() => { });
@@ -1113,7 +1113,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
             {/* Click/Tap cover to show controls when hidden */}
             {!showControls && (
-              <div
+              <div className="focusable"
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowControls(true);
@@ -1163,14 +1163,14 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                       {movie.seasons?.[0]?.episodes?.find((e: any) => e.episodeNumber === currentEpisode?.episodeNumber + 1)?.title || "Upcoming Ep"}
                     </h4>
                   </div>
-                  <button
+                  <button className="focusable"
                     onClick={() => setNextEpisodeCountdown(null)}
                     className="focusable text-zinc-500 hover:text-white text-xs font-bold cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
-                <button
+                <button className="focusable"
                   onClick={() => {
                     playNextEpisode();
                     setNextEpisodeCountdown(null);
@@ -1184,7 +1184,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             )}
 
             {/* Premium Controls Overlay */}
-            <div
+            <div className="focusable"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowControls(false);
@@ -1196,12 +1196,12 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             >
 
               {/* Top Controls Bar */}
-              <div
+              <div className="focusable"
                 onClick={(e) => e.stopPropagation()}
                 className="p-4 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent"
               >
                 <div className="flex items-center gap-3">
-                  <button
+                  <button className="focusable"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (videoRef.current) {
@@ -1237,7 +1237,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                 <div className="flex items-center gap-0 text-white">
 
-                  {/* <button
+                  {/* <button className="focusable"
                     tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1257,7 +1257,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   >
                     <Subtitles className="w-5 h-5" />
                   </button>
-                  <button
+                  <button className="focusable"
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSettingsOverlay(true);
@@ -1279,13 +1279,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Left vertical edge: Brightness slider */}
-              <div
+              <div className="focusable"
                 onClick={(e) => e.stopPropagation()}
                 className="flex flex-col items-center gap-2 absolute left-8 top-1/2 -translate-y-1/2 z-20"
               >
                 <Sun className="w-5 h-5 text-zinc-350" />
                 <div className="h-24 w-6 flex items-center justify-center relative">
-                  <input
+                  <input className="focusable"
                     tabIndex={-1}
                     type="range"
                     min="10"
@@ -1306,11 +1306,11 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Right vertical edge: Volume slider */}
-              <div
+              <div className="focusable"
                 onClick={(e) => e.stopPropagation()}
                 className="flex flex-col items-center gap-2 absolute right-8 top-1/2 -translate-y-1/2 z-20"
               >
-                <button
+                <button className="focusable"
                   onClick={toggleMute}
                   onTouchStart={(e) => {
                     e.preventDefault();
@@ -1327,7 +1327,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
                 <div className="h-24 w-6 flex items-center justify-center relative">
-                  <input
+                  <input className="focusable"
                     tabIndex={-1}
                     type="range"
                     min="0"
@@ -1379,7 +1379,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Bottom Controls Bar */}
-              <div
+              <div className="focusable"
                 onClick={(e) => e.stopPropagation()}
                 className="p-4 bg-gradient-to-t from-black/80 to-transparent space-y-3"
               >
@@ -1393,7 +1393,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     step={0.1}
                     value={currentTime}
                     onChange={handleScrub}
-                    className="flex-1 h-1 rounded-lg cursor-pointer outline-none transition-all hover:h-1.5"
+                    className="focusable flex-1 h-1 rounded-lg cursor-pointer outline-none transition-all hover:h-1.5"
                     style={{
                       background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${(currentTime / (duration || 100)) * 100}%, #4B5563 ${(currentTime / (duration || 100)) * 100}%, #4B5563 100%)`,
                       WebkitAppearance: 'none',
@@ -1420,7 +1420,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     )}
 
                     {/* Speed setting indicator */}
-                    <button
+                    <button className="focusable"
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowSettingsOverlay(true);
@@ -1433,7 +1433,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     </button>
 
                     {/* Rate heart button */}
-                    <button
+                    <button className="focusable"
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsRated(!isRated);
@@ -1454,7 +1454,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         const hasNext = movie.seasons?.[0]?.episodes?.some((e: any) => e.episodeNumber === currentEpNum + 1);
                         if (hasNext) {
                           return (
-                            <button
+                            <button className="focusable"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 playNextEpisode();
@@ -1487,7 +1487,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                 {/* Backdrop to close the dropdown when clicking outside */}
                 <div
                   tabIndex={-1}
-                  className="absolute inset-0 z-30 cursor-default"
+                  className="focusable absolute inset-0 z-30 cursor-default"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowSettingsOverlay(false);
@@ -1496,13 +1496,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                 <div
                   tabIndex={-1}
-                  className="absolute top-3 right-3 sm:top-16 sm:right-4 w-49 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
+                  className="focusable absolute top-3 right-3 sm:top-16 sm:right-4 w-49 xs:w-80 max-w-[calc(100vw-1.5rem)] sm:max-w-none max-h-[calc(100%-1.5rem)] sm:max-h-[calc(100%-5rem)] bg-zinc-950/95 border border-zinc-800 rounded-xl backdrop-blur-md shadow-2xl flex flex-col p-3 z-40 animate-in fade-in slide-in-from-top-3 duration-200 text-left overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {showReportSection ? (
                     <div className="flex flex-col flex-1 min-h-0">
                       <div className="flex items-center gap-2 mb-3 shrink-0">
-                        <button
+                        <button className="focusable"
                           onClick={() => setShowReportSection(false)}
                           className="focusable p-1 hover:bg-zinc-900 rounded-md text-zinc-400 hover:text-white transition-colors outline-none cursor-pointer"
                         >
@@ -1518,7 +1518,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                           { key: 'buffering_connection_issue', label: 'Buffering and Connection Issue' },
                           { key: 'caption_issue', label: 'Caption Issue' }
                         ].map((item) => (
-                          <button
+                          <button className="focusable"
                             key={item.key}
                             onClick={() => handleReportIssue(item.label)}
                             className="focusable text-xs font-semibold cursor-pointer py-2 px-3 rounded hover:bg-white/5 border border-zinc-900 hover:border-zinc-800 text-zinc-300 hover:text-white text-left outline-none transition-all duration-150"
@@ -1531,7 +1531,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   ) : (
                     <>
                       <div className="flex items-center justify-between md:mb-2.5 pb-2 border-b border-zinc-900 shrink-0">
-                        <button
+                        <button className="focusable"
                           onClick={() => setShowReportSection(true)}
                           className="focusable text-[10px] md:text-xs font-semibold text-zinc-450 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 outline-none"
                         >
@@ -1569,7 +1569,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                       key={`${q.height}_${q.id}`}
                                       className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
                                     >
-                                      <button
+                                      <button className="focusable"
                                         onClick={() => {
                                           if (isLocked) {
                                             if (document.fullscreenElement) {
@@ -1590,7 +1590,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                       </button>
 
                                       {isLocked && (
-                                        <button
+                                        <button className="focusable"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             if (document.fullscreenElement) {
@@ -1628,7 +1628,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                         key={opt.id}
                                         className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
                                       >
-                                        <button
+                                        <button className="focusable"
                                           onClick={() => {
                                             if (isLocked) {
                                               if (document.fullscreenElement) {
@@ -1649,7 +1649,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                         </button>
 
                                         {isLocked && (
-                                          <button
+                                          <button className="focusable"
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               if (document.fullscreenElement) {
@@ -1676,7 +1676,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                               {[0.5, 0.75, 1, 1.25, 1.5, 2].map((sp) => {
                                 const isActive = playbackSpeed === sp;
                                 return (
-                                  <button
+                                  <button className="focusable"
                                     key={sp}
                                     onClick={() => {
                                       handleSpeedChange(sp);
@@ -1696,7 +1696,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                           <TabsContent value="subtitles" className="mt-0 outline-none w-full">
                             <div className="flex flex-col gap-1 w-full text-zinc-350">
-                              <button
+                              <button className="focusable"
                                 onClick={() => {
                                   handleSubtitleChange(-1);
                                   setShowSettingsOverlay(false);
@@ -1712,7 +1712,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                               {subtitleTracks.map((track) => {
                                 const isActive = currentSubtitleTrack === track.id;
                                 return (
-                                  <button
+                                  <button className="focusable"
                                     key={track.id}
                                     onClick={() => {
                                       handleSubtitleChange(track.id);

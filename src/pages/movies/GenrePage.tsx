@@ -177,7 +177,7 @@ const GenrePage = () => {
       {/* Header Bar */}
       <header className="sticky top-0 z-50 flex items-center justify-between h-[70px] px-4 md:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50">
         <div className="flex items-center gap-4">
-          <button
+          <button className="focusable"
             onClick={() => navigate(-1)}
             className="p-2 hover:bg-zinc-850 rounded-full transition-colors cursor-pointer border border-zinc-800 text-white flex items-center justify-center outline-none"
             aria-label="Go Back"
@@ -197,7 +197,7 @@ const GenrePage = () => {
         ) : media.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 text-center">
             <p className="text-zinc-400 text-lg">No movies or TV shows found under "{genreName}".</p>
-            <button
+            <button className="focusable"
               onClick={() => navigate(-1)}
               className="mt-4 px-4 py-2 bg-primary text-black font-semibold rounded hover:bg-primary/90 transition-colors"
             >
@@ -208,7 +208,7 @@ const GenrePage = () => {
           <>
             <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
               {media.map((item) => (
-                <div
+                <div className="focusable"
                   key={item.id}
                   tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
@@ -246,7 +246,7 @@ const GenrePage = () => {
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <button
+                      <button className="focusable"
                         tabIndex={-1}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -256,7 +256,7 @@ const GenrePage = () => {
                       >
                         Play
                       </button>
-                      <button
+                      <button className="focusable"
                         tabIndex={-1}
                         onClick={(e) => {
                           e.stopPropagation();

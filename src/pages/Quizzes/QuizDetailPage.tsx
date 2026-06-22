@@ -482,7 +482,7 @@ export const QuizDetailPage = () => {
               base += sel ? "bg-primary/10 border-primary/50 text-primary" : "bg-card border-border text-foreground hover:border-primary/30 hover:bg-foreground/[0.02]";
             }
             return (
-              <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={`focusable ${base}`} disabled={showFeedback}>
+              <button className="focusable" key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={`focusable ${base}`} disabled={showFeedback}>
                 <span className={`shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${showFeedback ? correct ? "border-emerald-400" : sel ? "border-rose-400" : "border-border" : sel ? "border-primary bg-primary" : "border-border"}`}>
                   {showFeedback && correct && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
                   {showFeedback && sel && !correct && <XCircle className="w-3.5 h-3.5 text-rose-400" />}
@@ -567,7 +567,7 @@ export const QuizDetailPage = () => {
                 base += sel ? "bg-primary/8 border-primary/50 text-primary" : "bg-card border-border text-foreground hover:border-primary/30 hover:bg-foreground/[0.02]";
               }
               return (
-                <button key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={`focusable ${base}`} disabled={showFeedback}>
+                <button className="focusable" key={opt.id} id={`option-${opt.id}`} onClick={() => toggleOption(opt.id)} className={`focusable ${base}`} disabled={showFeedback}>
                   <span className={`shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${showFeedback ? correct ? "border-emerald-400" : sel ? "border-rose-400" : "border-border" : sel ? "border-primary bg-primary" : "border-border"}`}>
                     {showFeedback && correct && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
                     {showFeedback && sel && !correct && <XCircle className="w-4 h-4 text-rose-400" />}

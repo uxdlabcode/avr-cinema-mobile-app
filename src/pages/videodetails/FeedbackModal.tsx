@@ -103,7 +103,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
             {[1, 2, 3, 4, 5].map((starValue) => {
               const isHighlighted = (hoveredStar || userRatingSelection) >= starValue;
               return (
-                <button
+                <button className="focusable"
                   key={starValue}
                   type="button"
                   onMouseEnter={() => setHoveredStar(starValue)}

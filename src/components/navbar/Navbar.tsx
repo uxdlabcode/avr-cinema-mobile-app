@@ -95,7 +95,7 @@ export function Navbar() {
       {/* Desktop Top Nav */}
       <header className="hidden md:flex items-center justify-between h-[70px] px-6 lg:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50 sticky top-0 z-50 transition-all relative">
         <div className="flex items-center">
-          <Link to="/dashboard" className="flex items-center gap-2">
+          <Link to="/dashboard" className="focusable flex items-center gap-2">
             <img src="/assets/headerLogo.png" alt="AV Logo" className="h-6 md:h-14 object-contain" />
           </Link>
         </div>
@@ -105,7 +105,7 @@ export function Navbar() {
             <Link
               key={item.label}
               to={item.path}
-              className={`text-sm font-medium hover:text-white transition-colors ${activeTab === item.path ? 'text-white font-semibold' : 'text-gray-400'}`}
+              className={`focusable text-sm font-medium hover:text-white transition-colors ${activeTab === item.path ? 'text-white font-semibold' : 'text-gray-400'}`}
             >
               {item.label}
             </Link>
@@ -121,7 +121,7 @@ export function Navbar() {
             Subscribe
           </Button>
 
-          <button
+          <button className="focusable"
             onClick={() => navigate("/search")}
             className="p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
             aria-label="Search"
@@ -129,7 +129,7 @@ export function Navbar() {
             <Search className="w-5 h-5" />
           </button>
 
-          <button
+          <button className="focusable"
             onClick={() => navigate("/notifications")}
             className="p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
             aria-label="Notifications"
@@ -137,7 +137,7 @@ export function Navbar() {
             <Bell className="w-5 h-5" />
           </button>
 
-          <Link to="/profile">
+          <Link className="focusable" to="/profile">
             <Avatar className="w-8 h-8 ring-2 ring-transparent hover:ring-white transition-all cursor-pointer">
               <AvatarImage src={user?.avatar || ""} />
               <AvatarFallback className="bg-zinc-800 text-sm font-medium text-white">

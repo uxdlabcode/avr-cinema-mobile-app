@@ -91,10 +91,14 @@ function App() {
                       membershipStatus: userData.membershipStatus,
                       membershipStartDate: userData.membershipStartDate?.seconds
                         ? userData.membershipStartDate.seconds * 1000
-                        : userData.membershipStartDate,
+                        : (userData.membershipStartDate instanceof Date 
+                            ? userData.membershipStartDate.getTime() 
+                            : Number(userData.membershipStartDate) || undefined),
                       membershipExpiryDate: userData.membershipExpiryDate?.seconds
                         ? userData.membershipExpiryDate.seconds * 1000
-                        : userData.membershipExpiryDate,
+                        : (userData.membershipExpiryDate instanceof Date 
+                            ? userData.membershipExpiryDate.getTime() 
+                            : Number(userData.membershipExpiryDate) || undefined),
                       lastPaymentId: userData.lastPaymentId,
                     },
                     token,

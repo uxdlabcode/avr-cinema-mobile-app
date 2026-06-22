@@ -160,11 +160,16 @@
 /* Premium glowing gold focus ring for TV D-pad items */
 .platform-tv .focusable:focus {
   outline: none !important;
+  /* Thick white inner ring + Gold outer glow */
   box-shadow:
-    0 0 0 2px var(--primary-foreground) !important;
-  border-color: #DECB94 !important;
-  transform: scale(1.04);
-  z-index: 10;
-  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 0.22s ease-in-out !important;
+    0 0 0 3px #ffffff,
+    0 0 18px 4px rgba(222, 203, 148, 0.6) !important;
+  /* Cinematic scaling */
+  transform: scale(1.06);
+  z-index: 50;
+  border-radius: 5px;
+  /* respects rounded corners of items */
+  transition:
+    transform 0.25s cubic-bezier(0.3, 0.8, 0.2, 1),
+    box-shadow 0.25s ease-out !important;
 }

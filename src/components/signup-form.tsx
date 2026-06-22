@@ -301,7 +301,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 onChange={handlePasswordChange}
                 className="focusable h-10 rounded-md"
               />
-              <button
+              <button className="focusable"
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
                 className="focusable absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-1 cursor-pointer text-primary/60 hover:text-primary focus:bg-zinc-800 rounded"
@@ -328,7 +328,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 onChange={handleConfirmPasswordChange}
                 className="focusable h-10 rounded-md"
               />
-              <button
+              <button className="focusable"
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
                 className="focusable absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-1 cursor-pointer text-primary/60 hover:text-primary focus:bg-zinc-800 rounded"

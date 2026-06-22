@@ -180,14 +180,21 @@ export const SpatialNavigationProvider: React.FC<SpatialNavigationProviderProps>
 
     if (bestCandidate) {
       const el = bestCandidate as HTMLElement;
-      el.focus();
       
-      // Ensure the newly focused element is scrolled into view (useful in long layouts/carousels)
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "nearest",
-      });
+      const isSidebar = el.closest("aside");
+      
+      // Prevent browser's native abrupt scroll jump
+      el.focus({ preventScroll: true });
+      
+      // Only smoothly scroll into view if it's NOT the TV sidebar.
+      // The sidebar is fixed and shouldn't move horizontally or vertically.
+      if (!isSidebar) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "nearest",
+        });
+      }
     }
   };
 

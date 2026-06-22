@@ -421,7 +421,7 @@ export const GetSupportPage = () => {
                     {myTickets.map((ticket) => {
                       const isSelected = selectedTicketId === ticket.id;
                       return (
-                        <button
+                        <button className="focusable"
                           key={ticket.id}
                           onClick={() => {
                             setSelectedTicketId(ticket.id);

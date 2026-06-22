@@ -118,7 +118,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button
+          <button className="focusable"
             tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
@@ -130,7 +130,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button
+          <button className="focusable"
             tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
@@ -209,7 +209,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
                   {/* Actions row */}
                   <div className="flex items-center gap-1 md:gap-1.5">
-                    <button 
+                    <button className="focusable" 
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -219,7 +219,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                     >
                       Play Now
                     </button>
-                    <button 
+                    <button className="focusable" 
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();

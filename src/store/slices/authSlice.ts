@@ -61,7 +61,20 @@ export const loginAsync = createAsyncThunk(
           name: userDoc?.name,
           phone: userDoc?.phone,
           age: userDoc?.age ?? null,
-          avatar: userDoc?.avatar
+          avatar: userDoc?.avatar,
+          membershipPlanId: userDoc?.membershipPlanId,
+          membershipStatus: userDoc?.membershipStatus,
+          membershipStartDate: userDoc?.membershipStartDate?.seconds
+            ? userDoc?.membershipStartDate.seconds * 1000
+            : (userDoc?.membershipStartDate instanceof Date 
+                ? userDoc?.membershipStartDate.getTime() 
+                : Number(userDoc?.membershipStartDate) || undefined),
+          membershipExpiryDate: userDoc?.membershipExpiryDate?.seconds
+            ? userDoc?.membershipExpiryDate.seconds * 1000
+            : (userDoc?.membershipExpiryDate instanceof Date 
+                ? userDoc?.membershipExpiryDate.getTime() 
+                : Number(userDoc?.membershipExpiryDate) || undefined),
+          lastPaymentId: userDoc?.lastPaymentId
         },
         accessToken: token,
       };

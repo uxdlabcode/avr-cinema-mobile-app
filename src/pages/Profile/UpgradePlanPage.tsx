@@ -350,7 +350,7 @@ export const UpgradePlanPage = () => {
                 const savedAmount = currentPlan ? currentPlan.monthlyPrice : 0;
 
                 return (
-                  <div
+                  <div className="focusable"
                     key={plan.id}
                     tabIndex={0}
                     onClick={() => setSelectedPlan(isSelected ? null : plan.id)}

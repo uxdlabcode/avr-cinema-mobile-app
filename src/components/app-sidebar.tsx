@@ -63,7 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild className="hover:bg-transparent active:bg-transparent focus-visible:bg-transparent">
-              <Link to="/dashboard" className="flex items-center justify-start">
+              <Link to="/dashboard" className="focusable flex items-center justify-start">
                 {state === "collapsed" ? (
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
                     <Film className="size-5" />
@@ -92,7 +92,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 isActive={location.pathname === "/profile"}
                 tooltip="My Profile"
               >
-                <Link to="/profile">
+                <Link className="focusable" to="/profile">
                   <User className="size-4" />
                   <span>My Profile</span>
                 </Link>
@@ -104,7 +104,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 isActive={location.pathname === "/signin"}
                 tooltip="Sign In"
               >
-                <Link to="/signin">
+                <Link className="focusable" to="/signin">
                   <LogIn className="size-4" />
                   <span>Sign In</span>
                 </Link>
@@ -116,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 isActive={location.pathname === "/signup"}
                 tooltip="Sign Up"
               >
-                <Link to="/signup">
+                <Link className="focusable" to="/signup">
                   <UserPlus className="size-4" />
                   <span>Sign Up</span>
                 </Link>

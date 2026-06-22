@@ -897,7 +897,7 @@ const VideoDetails = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-[2]" />
 
               <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-20">
-                <button
+                <button className="focusable"
                   onClick={() => navigate(-1)}
                   className="focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 text-white hover:bg-black/85 transition-all cursor-pointer flex items-center justify-center"
                 >
@@ -905,17 +905,17 @@ const VideoDetails = () => {
                 </button>
 
                 <div className="flex items-center gap-3">
-                  {/* <button tabIndex={-1} className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
+                  {/* <button tabIndex={-1} className="focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
                     <Cast className="w-5 h-5 text-white" />
                   </button> */}
-                  {/* <button tabIndex={-1} className="p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
+                  {/* <button tabIndex={-1} className="focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 hover:bg-black/85 text-white transition-all cursor-pointer">
                     <Share2 className="w-5 h-5 text-white" />
                   </button> */}
                 </div>
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center z-[3]">
-                <button
+                <button className="focusable"
                   onClick={() => handleStartPlayback(false)}
                   className="focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-all border-2 border-white/20 cursor-pointer shadow-lg active:scale-95"
                 >
@@ -952,7 +952,7 @@ const VideoDetails = () => {
             <h1 className="text-2xl font-bold text-white tracking-tight leading-tight">{movie.title}</h1>
             <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
-                <span
+                <span className="focusable"
                   tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
                   className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1013,7 +1013,7 @@ const VideoDetails = () => {
             <div className="w-full text-left">
               <div className="flex gap-3 w-full justify-start overflow-x-auto scrollbar-hide mb-4 border-b border-zinc-800 pb-2">
                 {movie.seasons.map((season: any, idx: number) => (
-                  <button
+                  <button className="focusable"
                     key={idx}
                     onClick={() => setSelectedSeason(idx)}
                     className={`focusable flex-1 min-w-[80px] max-w-[150px] py-2.5 text-xs font-bold text-center transition-all cursor-pointer whitespace-nowrap rounded-md ${selectedSeason === idx ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white border border-zinc-800"
@@ -1026,7 +1026,7 @@ const VideoDetails = () => {
 
               <div className="space-y-3">
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
-                  <div
+                  <div className="focusable"
                     key={ep.id}
                     tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
@@ -1087,7 +1087,7 @@ const VideoDetails = () => {
             <p className="text-zinc-400 text-xs leading-relaxed font-normal animate-in fade-in duration-200">
               {isDescExpanded ? movie.description : `${(movie.description || "").slice(0, 150)}${(movie.description || "").length > 150 ? "..." : ""}`}
               {(movie.description || "").length > 150 && (
-                <button
+                <button className="focusable"
                   tabIndex={-1}
                   onClick={() => setIsDescExpanded(!isDescExpanded)}
                   className="text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
@@ -1133,7 +1133,7 @@ const VideoDetails = () => {
 
               <div className="grid grid-cols-2 gap-3 pb-8">
                 {movie.related.map((item: any) => (
-                  <div
+                  <div className="focusable"
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
@@ -1168,11 +1168,11 @@ const VideoDetails = () => {
 
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold select-none">
-            <span tabIndex={-1} className="hover:text-white cursor-pointer" onClick={() => navigate("/")}>Home</span>
+            <span tabIndex={-1} className="focusable hover:text-white cursor-pointer" onClick={() => navigate("/")}>Home</span>
             <span>&gt;</span>
-            <span tabIndex={-1} className="hover:text-white cursor-pointer" onClick={() => navigate("/tv")}>Shows</span>
+            <span tabIndex={-1} className="focusable hover:text-white cursor-pointer" onClick={() => navigate("/tv")}>Shows</span>
             <span>&gt;</span>
-            <span tabIndex={-1} className="hover:text-white cursor-pointer" onClick={() => navigate(`/video/${movie.id}`)}>{movie.title}</span>
+            <span tabIndex={-1} className="focusable hover:text-white cursor-pointer" onClick={() => navigate(`/video/${movie.id}`)}>{movie.title}</span>
             {movie.seasons && movie.seasons.length > 0 && (
               <>
                 <span>&gt;</span>
@@ -1211,7 +1211,7 @@ const VideoDetails = () => {
                 <span>{isInMyList ? "In My List" : "Add to My List"}</span>
               </button>
               {/* 
-              <button tabIndex={-1} className="flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer select-none">
+              <button tabIndex={-1} className="focusable flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer select-none">
                 <Share2 className="w-4 h-4 text-white" />
                 <span>Share</span>
               </button> */}
@@ -1221,7 +1221,7 @@ const VideoDetails = () => {
           {/* Badges tag row */}
           <div className="flex items-center gap-4 text-xs font-bold text-zinc-450 select-none">
             {reviewCount > 0 && averageRating !== null && (
-              <span
+              <span className="focusable"
                 tabIndex={0}
                 onClick={() => setShowFeedbackModal(true)}
                 className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1246,7 +1246,7 @@ const VideoDetails = () => {
                 ) : (
                   <p>No description available.</p>
                 )}
-                <button
+                <button className="focusable"
                   onClick={() => setShowFullDescription(false)}
                   className="focusable text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                 >
@@ -1257,7 +1257,7 @@ const VideoDetails = () => {
               <div className="animate-fade-in">
                 <p className="line-clamp-3 select-all leading-relaxed">{movie.description || "No description available."}</p>
                 {movie.description && movie.description.length > 150 && (
-                  <button
+                  <button className="focusable"
                     onClick={() => setShowFullDescription(true)}
                     className="focusable text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors outline-none"
                   >
@@ -1323,7 +1323,7 @@ const VideoDetails = () => {
               {/* Horizontal Episodes Scroller */}
               <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
-                  <div
+                  <div className="focusable"
                     key={ep.id}
                     tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
@@ -1400,7 +1400,7 @@ const VideoDetails = () => {
               <h3 className="text-lg font-bold text-white mb-4">More Like This</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 md:gap-6">
                 {movie.related.map((item: any) => (
-                  <div
+                  <div className="focusable"
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
@@ -1425,7 +1425,7 @@ const VideoDetails = () => {
                         <span>{item.duration || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <button
+                        <button className="focusable"
                           tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1435,7 +1435,7 @@ const VideoDetails = () => {
                         >
                           Play
                         </button>
-                        <button
+                        <button className="focusable"
                           tabIndex={-1}
                           onClick={(e) => handleToggleRelatedMyList(e, item)}
                           disabled={isListToggling}
@@ -1561,7 +1561,7 @@ const VideoDetails = () => {
 
             {/* Play Button Overlay (Mobile Only, hidden on Web) */}
             <div className="md:hidden absolute inset-0 flex items-center justify-center z-[3]">
-              <button
+              <button className="focusable"
                 onClick={() => handleStartPlayback(false)}
                 disabled={isSigning}
                 className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors border-2 border-white/20 cursor-pointer disabled:opacity-55 shadow-lg active:scale-95"
@@ -1579,7 +1579,7 @@ const VideoDetails = () => {
         {/* Floating Top Header Navigation */}
         {!isPlaying && (
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 md:p-6 z-20">
-            <button
+            <button className="focusable"
               onClick={() => navigate(-1)}
               className="focusable p-2 rounded-full bg-black/50 border border-zinc-900 text-white hover:bg-black/85 hover:border-zinc-700 transition-all cursor-pointer flex items-center justify-center outline-none"
             >
@@ -1620,7 +1620,7 @@ const VideoDetails = () => {
 
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-400">
                 {reviewCount > 0 && averageRating !== null && (
-                  <span
+                  <span className="focusable"
                     tabIndex={0}
                     onClick={() => setShowFeedbackModal(true)}
                     className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1680,7 +1680,7 @@ const VideoDetails = () => {
             {/* Web Metadata info inline (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
-                <span
+                <span className="focusable"
                   tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
                   className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1704,7 +1704,7 @@ const VideoDetails = () => {
                   ? (movie.description || "")
                   : `${(movie.description || "").slice(0, 150)}...`}
                 {(movie.description || "").length > 150 && (
-                  <button
+                  <button className="focusable"
                     tabIndex={-1}
                     onClick={() => setShowFullDescription(!showFullDescription)}
                     className="text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
@@ -1750,7 +1750,7 @@ const VideoDetails = () => {
         <div className="space-y-6" id="episodes-tabs">
           <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-semibold text-zinc-400">
             {movie.category === "TV Show" && (
-              <button
+              <button className="focusable"
                 onClick={() => setActiveTab('episodes')}
                 className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
                   }`}
@@ -1758,14 +1758,14 @@ const VideoDetails = () => {
                 Episodes
               </button>
             )}
-            <button
+            <button className="focusable"
               onClick={() => setActiveTab('related')}
               className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               More Like This
             </button>
-            <button
+            <button className="focusable"
               onClick={() => setActiveTab('details')}
               className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
@@ -1791,7 +1791,7 @@ const VideoDetails = () => {
                 {/* Episodes listing vertically */}
                 <div className="space-y-4 max-w-4xl" id="episodes-section">
                   {movie.seasons[0].episodes.map((ep: any, index: number) => (
-                    <div
+                    <div className="focusable"
                       key={ep.id}
                       tabIndex={0}
                       onClick={() => playEpisode(ep)}
@@ -1847,7 +1847,7 @@ const VideoDetails = () => {
             {activeTab === 'related' && movie.related && movie.related.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-7 lg:h-[80%] gap-4 md:gap-6">
                 {movie.related.map((item: any) => (
-                  <div
+                  <div className="focusable"
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
@@ -1884,7 +1884,7 @@ const VideoDetails = () => {
 
                       {/* Actions row */}
                       <div className="flex items-center gap-1.5 md:gap-2">
-                        <button
+                        <button className="focusable"
                           tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -1894,7 +1894,7 @@ const VideoDetails = () => {
                         >
                           Play Now
                         </button>
-                        <button
+                        <button className="focusable"
                           tabIndex={-1}
                           onClick={(e) => handleToggleRelatedMyList(e, item)}
                           disabled={isListToggling}

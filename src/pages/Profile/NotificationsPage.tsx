@@ -450,7 +450,7 @@ export const NotificationsPage = () => {
 
                         {/* Interactive toggle unread/read indicators */}
                         <div className="shrink-0 self-center flex items-center gap-2">
-                          <button
+                          <button className="focusable"
                             onClick={(e) => handleToggleRead(e, item)}
                             className="focusable w-6 h-6 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-primary transition-colors outline-none"
                             title={item.read ? "Mark as unread" : "Mark as read"}
@@ -510,7 +510,7 @@ export const NotificationsPage = () => {
 
                         {/* Interactive toggle unread/read indicators */}
                         {/* <div className="shrink-0 self-center flex items-center gap-2">
-                          <button
+                          <button className="focusable"
                             onClick={(e) => handleToggleRead(e, item)}
                             className="focusable w-6 h-6 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-primary-foreground transition-colors outline-none"
                             title={item.read ? "Mark as unread" : "Mark as read"}
