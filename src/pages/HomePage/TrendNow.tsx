@@ -118,10 +118,10 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button className="focusable"
+          <button 
             tabIndex={-1}
             onClick={() => handleScroll("left")}
-            className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
+            className="focusable absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -130,10 +130,10 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button className="focusable"
+          <button 
             tabIndex={-1}
             onClick={() => handleScroll("right")}
-            className="absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
+            className="focusable absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-5 h-5" />
@@ -209,17 +209,17 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
                   {/* Actions row */}
                   <div className="flex items-center gap-1 md:gap-1.5">
-                    <button className="focusable" 
+                    <button  
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/video/${movie.id}`);
                       }}
-                      className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                      className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                     >
                       Play Now
                     </button>
-                    <button className="focusable" 
+                    <button  
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -227,7 +227,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                           toggleWatchlist(movie.id, movie);
                         }
                       }}
-                      className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                      className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                     >
                       {watchlist.includes(movie.id.toString()) ? (
                         <Check className="w-3 h-3 text-[#DECB94]" />

@@ -108,7 +108,7 @@ export function TVSidebar() {
         onMouseLeave={() => setIsExpanded(false)}
       >
         {/* App Logo */}
-        <div className="w-full flex items-center mb-10 h-14 !pl-3">
+        <div className="w-64 flex items-center mb-10 h-14 pl-7">
           <img
             src="/assets/logo.jpg"
             alt="AVR Logo"

@@ -101,9 +101,9 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
             </h3>
           </div>
           {trailers.length > 15 && (
-            <button className="focusable"
+            <button 
               onClick={() => navigate(`/genre/Trailer`)}
-              className="text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
+              className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
             >
               View All <ChevronRight className="w-4 h-4" />
             </button>
@@ -113,10 +113,10 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
         <div className="relative w-full">
           {/* Left Scroll */}
           {showLeft && (
-            <button className="focusable"
+            <button 
               tabIndex={-1}
               onClick={() => handleScroll("left")}
-              className="absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+              className="focusable absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
               aria-label="Scroll left"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -125,10 +125,10 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
 
           {/* Right Scroll */}
           {showRight && (
-            <button className="focusable"
+            <button 
               tabIndex={-1}
               onClick={() => handleScroll("right")}
-              className="absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+              className="focusable absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
               aria-label="Scroll right"
             >
               <ChevronRight className="w-5 h-5" />
@@ -151,11 +151,11 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
               const displaySubtitle = `Trailer, ${genresList}`;
 
               return (
-                <div className="focusable"
+                <div 
                   key={item.id}
                   tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
-                  className="focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
+                  className="focusable focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
                 >
                   <img
                     src={item.signedThumbnailUrl || "/assets/poster.png"}
@@ -199,9 +199,9 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
               );
             })}
             {trailers.length > 15 && (
-              <div className="focusable"
+              <div 
                 onClick={() => navigate(`/genre/Trailer`)}
-                className="flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+                className="focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
               >
                 <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
                   <ChevronRight className="w-6 h-6" />
@@ -272,11 +272,11 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
               const displaySubtitle = `Trailer, ${genresList}`;
 
               return (
-                <div className="focusable"
+                <div 
                   key={item.id}
                   tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
-                  className="focusable flex flex-col rounded-lg overflow-hidden cursor-pointer group bg-[#181d24] border border-zinc-900 transition-all hover:scale-[1.02] hover:border-zinc-700 shadow-md text-left outline-none"
+                  className="focusable focusable flex flex-col rounded-lg overflow-hidden cursor-pointer group bg-[#181d24] border border-zinc-900 transition-all hover:scale-[1.02] hover:border-zinc-700 shadow-md text-left outline-none"
                 >
                   {/* Thumbnail / Image container */}
                   <div className="relative w-full aspect-video bg-zinc-950 overflow-hidden">

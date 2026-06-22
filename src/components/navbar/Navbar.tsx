@@ -121,17 +121,17 @@ export function Navbar() {
             Subscribe
           </Button>
 
-          <button className="focusable"
+          <button 
             onClick={() => navigate("/search")}
-            className="p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            className="focusable p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
           </button>
 
-          <button className="focusable"
+          <button 
             onClick={() => navigate("/notifications")}
-            className="p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            className="focusable p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5" />

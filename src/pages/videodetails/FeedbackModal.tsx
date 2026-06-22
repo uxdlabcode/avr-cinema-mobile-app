@@ -103,13 +103,13 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
             {[1, 2, 3, 4, 5].map((starValue) => {
               const isHighlighted = (hoveredStar || userRatingSelection) >= starValue;
               return (
-                <button className="focusable"
+                <button 
                   key={starValue}
                   type="button"
                   onMouseEnter={() => setHoveredStar(starValue)}
                   onMouseLeave={() => setHoveredStar(0)}
                   onClick={() => setUserRatingSelection(starValue)}
-                  className="focusable p-0.5  cursor-pointer transition-transform duration-150 active:scale-90 focus:outline-none"
+                  className="focusable focusable p-0.5  cursor-pointer transition-transform duration-150 active:scale-90 focus:outline-none"
                 >
                   <svg
                     className={`w-7 h-7 sm:w-10 sm:h-10 transition-colors duration-150 ${isHighlighted ? "text-primary-foreground fill-primary-foreground" : "text-zinc-600 hover:text-primary-foreground"

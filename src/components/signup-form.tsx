@@ -301,10 +301,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 onChange={handlePasswordChange}
                 className="focusable h-10 rounded-md"
               />
-              <button className="focusable"
+              <button 
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="focusable absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-1 cursor-pointer text-primary/60 hover:text-primary focus:bg-zinc-800 rounded"
+                className="focusable focusable absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-1 cursor-pointer text-primary/60 hover:text-primary focus:bg-zinc-800 rounded"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -328,10 +328,10 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
                 onChange={handleConfirmPasswordChange}
                 className="focusable h-10 rounded-md"
               />
-              <button className="focusable"
+              <button 
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="focusable absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-1 cursor-pointer text-primary/60 hover:text-primary focus:bg-zinc-800 rounded"
+                className="focusable focusable absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-1 cursor-pointer text-primary/60 hover:text-primary focus:bg-zinc-800 rounded"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

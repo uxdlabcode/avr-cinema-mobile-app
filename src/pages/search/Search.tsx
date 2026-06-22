@@ -242,10 +242,10 @@ const Search = () => {
         return (
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {chips.map((chip) => (
-                    <button className="focusable"
+                    <button 
                         key={chip}
                         onClick={() => handleFilterClick(chip)}
-                        className={`focusable flex items-center gap-1.5 px-1 py-0.5 rounded-md border text-sm font-medium whitespace-nowrap transition-colors outline-none ${activeFilter === chip
+                        className={`focusable focusable flex items-center gap-1.5 px-1 py-0.5 rounded-md border text-sm font-medium whitespace-nowrap transition-colors outline-none ${activeFilter === chip
                             ? 'bg-zinc-800 text-white border-zinc-700'
                             : 'bg-transparent text-zinc-400 border-zinc-800 hover:text-white hover:border-zinc-700'
                             }`}
@@ -347,9 +347,9 @@ const Search = () => {
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
                                 {history.length > 0 && (
-                                    <button className="focusable"
+                                    <button 
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                        className="focusable text-xs font-bold text-primary hover:text-primary/80"
+                                        className="focusable focusable text-xs font-bold text-primary hover:text-primary/80"
                                     >
                                         Clear All
                                     </button>
@@ -498,7 +498,7 @@ const Search = () => {
                             </button> */}
                         </form>
 
-                        <button className="focusable"
+                        <button 
                             onClick={() => {
                                 if (window.history.length > 1) {
                                     navigate(-1);
@@ -506,7 +506,7 @@ const Search = () => {
                                     navigate('/dashboard');
                                 }
                             }}
-                            className="focusable p-2.5 text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center bg-zinc-900/60 hover:bg-zinc-800 rounded-full border border-zinc-800 outline-none"
+                            className="focusable focusable p-2.5 text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center bg-zinc-900/60 hover:bg-zinc-800 rounded-full border border-zinc-800 outline-none"
                             aria-label="Close search"
                         >
                             <X className="w-6 h-6" />
@@ -516,25 +516,25 @@ const Search = () => {
                     {/* Category Cards - Display when query is empty */}
                     {query.trim().length === 0 && (
                         <div className="grid grid-cols-3 gap-4 w-full max-w-3xl mb-12">
-                            <button className="focusable"
+                            <button 
                                 onClick={() => navigate("/tv")}
-                                className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-purple-500/20 bg-gradient-to-br from-pink-650/40 to-purple-900/60 hover:from-pink-650/50 hover:to-purple-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
+                                className="focusable focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-purple-500/20 bg-gradient-to-br from-pink-650/40 to-purple-900/60 hover:from-pink-650/50 hover:to-purple-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast1.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">TV SHOWS</span>
                             </button>
 
-                            <button className="focusable"
+                            <button 
                                 onClick={() => navigate("/movies")}
-                                className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
+                                className="focusable focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-blue-500/20 bg-gradient-to-br from-blue-650/40 to-indigo-900/60 hover:from-blue-650/50 hover:to-indigo-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast2.webp')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">MOVIES</span>
                             </button>
 
-                            <button className="focusable"
+                            <button 
                                 onClick={() => navigate("/tv?tab=Documentaries")}
-                                className="focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
+                                className="focusable focusable relative h-20 rounded-md overflow-hidden group cursor-pointer border border-teal-500/20 bg-gradient-to-br from-teal-650/40 to-emerald-900/60 hover:from-teal-650/50 hover:to-emerald-900/70 transition-all shadow-md flex items-center justify-center font-black tracking-wider text-xs text-white select-none outline-none"
                             >
                                 <div className="absolute inset-0 bg-cover bg-center bg-[url('/assets/cast3.jpg')] opacity-20 mix-blend-overlay group-hover:scale-105 transition-transform duration-300" />
                                 <span className="relative drop-shadow-md">DOCUMENTARIES</span>
@@ -548,9 +548,9 @@ const Search = () => {
                             <div className="flex items-center justify-between">
                                 <h2 className="text-lg font-bold text-white tracking-wide">Recent Searches</h2>
                                 {history.length > 0 && (
-                                    <button className="focusable"
+                                    <button 
                                         onClick={() => user?.id && dispatch(clearHistory(user.id))}
-                                        className="focusable text-xs font-bold text-primary hover:text-primary/80 cursor-pointer outline-none"
+                                        className="focusable focusable text-xs font-bold text-primary hover:text-primary/80 cursor-pointer outline-none"
                                     >
                                         Clear All
                                     </button>

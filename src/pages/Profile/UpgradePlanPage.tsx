@@ -350,12 +350,12 @@ export const UpgradePlanPage = () => {
                 const savedAmount = currentPlan ? currentPlan.monthlyPrice : 0;
 
                 return (
-                  <div className="focusable"
+                  <div 
                     key={plan.id}
                     tabIndex={0}
                     onClick={() => setSelectedPlan(isSelected ? null : plan.id)}
                     id={`plan-card-${plan.id}`}
-                    className={`focusable relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border outline-none ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
+                    className={`focusable focusable relative rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 border outline-none ${isSelected ? "border-[1.5px] border-primary-foreground scale-[1.01] bg-gradient-to-br from-primary-foreground/10 to-primary-foreground/5" : plan.popular ? "border-[1.5px] border-primary-foreground/25 bg-foreground/5" : "border-foreground/10 bg-foreground/5"}`}
                   >
                     {/* Popular Badge */}
                     {plan.popular && (

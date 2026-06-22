@@ -343,14 +343,14 @@ export default function Membership() {
                         <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                         <div className="flex-1">
                             <p className="text-red-300 text-sm">{paymentError}</p>
-                            <button className="focusable"
+                            <button 
                                 onClick={() => setPaymentError(null)}
-                                className="focusable text-red-400 hover:text-red-300 text-xs mt-2 underline focus:bg-zinc-800 rounded px-1"
+                                className="focusable focusable text-red-400 hover:text-red-300 text-xs mt-2 underline focus:bg-zinc-800 rounded px-1"
                             >
                                 Dismiss
                             </button>
                         </div>
-                        <button className="focusable" onClick={() => setPaymentError(null)} className="focusable text-red-400 hover:text-red-300 p-1 focus:bg-zinc-800 rounded-full">
+                        <button  onClick={() => setPaymentError(null)} className="focusable focusable text-red-400 hover:text-red-300 p-1 focus:bg-zinc-800 rounded-full">
                             <X className="w-4 h-4" />
                         </button>
                     </div>
@@ -588,9 +588,9 @@ export default function Membership() {
                 <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6 animate-in fade-in duration-200">
                     <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 flex flex-col items-center gap-6 shadow-2xl relative">
                         {/* Close button */}
-                        <button className="focusable"
+                        <button 
                             onClick={() => setCheckoutPlan(null)}
-                            className="focusable absolute top-4 right-4 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 rounded-full border border-transparent focus:border-zinc-700 outline-none"
+                            className="focusable focusable absolute top-4 right-4 p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 focus:bg-zinc-800 rounded-full border border-transparent focus:border-zinc-700 outline-none"
                             aria-label="Close"
                         >
                             <X className="w-5 h-5" />

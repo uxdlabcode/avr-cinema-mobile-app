@@ -1044,23 +1044,23 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
               <div className={`flex w-full justify-center gap-3 pt-1 ${playInline ? "flex-row max-w-xs mx-auto" : "flex-col"
                 }`}>
-                <button className="focusable"
+                <button 
                   onClick={() => navigate('/membership')}
-                  className={`focusable bg-yellow-500 hover:bg-yellow-450 text-black font-bold rounded-lg transition-all shadow-lg shadow-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
+                  className={`focusable focusable bg-yellow-500 hover:bg-yellow-450 text-black font-bold rounded-lg transition-all shadow-lg shadow-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
                     }`}
                 >
                   <Crown className="w-3.5 h-3.5 fill-current shrink-0" />
                   <span>Get Premium</span>
                 </button>
 
-                <button className="focusable"
+                <button 
                   onClick={() => {
                     if (document.fullscreenElement) {
                       document.exitFullscreen().catch(() => { });
                     }
                     onExit();
                   }}
-                  className={`focusable bg-zinc-800 hover:bg-zinc-750 text-white font-semibold rounded-lg transition-all active:scale-[0.98] cursor-pointer text-center ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
+                  className={`focusable focusable bg-zinc-800 hover:bg-zinc-750 text-white font-semibold rounded-lg transition-all active:scale-[0.98] cursor-pointer text-center ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
                     }`}
                 >
                   Go Back
@@ -1113,13 +1113,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
             {/* Click/Tap cover to show controls when hidden */}
             {!showControls && (
-              <div className="focusable"
+              <div 
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowControls(true);
                   triggerControlsShow();
                 }}
-                className="absolute inset-0 z-[9] bg-transparent cursor-pointer"
+                className="focusable absolute inset-0 z-[9] bg-transparent cursor-pointer"
               />
             )}
 
@@ -1163,19 +1163,19 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                       {movie.seasons?.[0]?.episodes?.find((e: any) => e.episodeNumber === currentEpisode?.episodeNumber + 1)?.title || "Upcoming Ep"}
                     </h4>
                   </div>
-                  <button className="focusable"
+                  <button 
                     onClick={() => setNextEpisodeCountdown(null)}
-                    className="focusable text-zinc-500 hover:text-white text-xs font-bold cursor-pointer"
+                    className="focusable focusable text-zinc-500 hover:text-white text-xs font-bold cursor-pointer"
                   >
                     Cancel
                   </button>
                 </div>
-                <button className="focusable"
+                <button 
                   onClick={() => {
                     playNextEpisode();
                     setNextEpisodeCountdown(null);
                   }}
-                  className="focusable w-full py-2 bg-white text-black text-xs font-bold rounded hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="focusable focusable w-full py-2 bg-white text-black text-xs font-bold rounded hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
                   Play Now ({nextEpisodeCountdown}s)
@@ -1184,7 +1184,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             )}
 
             {/* Premium Controls Overlay */}
-            <div className="focusable"
+            <div 
               onClick={(e) => {
                 e.stopPropagation();
                 setShowControls(false);
@@ -1192,16 +1192,16 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   clearTimeout(controlsTimeoutRef.current);
                 }
               }}
-              className={`absolute inset-0 bg-black/40 flex flex-col justify-between transition-opacity duration-300 z-10 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+              className={`focusable absolute inset-0 bg-black/40 flex flex-col justify-between transition-opacity duration-300 z-10 ${showControls ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             >
 
               {/* Top Controls Bar */}
-              <div className="focusable"
+              <div 
                 onClick={(e) => e.stopPropagation()}
-                className="p-4 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent"
+                className="focusable p-4 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent"
               >
                 <div className="flex items-center gap-3">
-                  <button className="focusable"
+                  <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       if (videoRef.current) {
@@ -1212,7 +1212,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                       }
                       onExit();
                     }}
-                    className="focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white"
+                    className="focusable focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-white"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
@@ -1237,14 +1237,14 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                 <div className="flex items-center gap-0 text-white">
 
-                  {/* <button className="focusable"
+                  {/* <button 
                     tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSettingsOverlay(true);
                       setActiveSettingTab('audio');
                     }}
-                    className="p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+                    className="focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
                     title="Audio & Subtitles"
                   >
                     <MessageSquare className="w-5 h-5" />
@@ -1257,13 +1257,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   >
                     <Subtitles className="w-5 h-5" />
                   </button>
-                  <button className="focusable"
+                  <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowSettingsOverlay(true);
                       setActiveSettingTab('quality');
                     }}
-                    className="focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700"
+                    className="focusable focusable p-2 rounded-full hover:bg-white/10 transition-colors cursor-pointer outline-none border border-transparent focus:border-zinc-700"
                     title="Settings"
                   >
                     <Settings className="w-5 h-5" />
@@ -1279,13 +1279,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Left vertical edge: Brightness slider */}
-              <div className="focusable"
+              <div 
                 onClick={(e) => e.stopPropagation()}
-                className="flex flex-col items-center gap-2 absolute left-8 top-1/2 -translate-y-1/2 z-20"
+                className="focusable flex flex-col items-center gap-2 absolute left-8 top-1/2 -translate-y-1/2 z-20"
               >
                 <Sun className="w-5 h-5 text-zinc-350" />
                 <div className="h-24 w-6 flex items-center justify-center relative">
-                  <input className="focusable"
+                  <input 
                     tabIndex={-1}
                     type="range"
                     min="10"
@@ -1293,7 +1293,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     value={brightness}
                     onChange={(e) => setBrightness(Number(e.target.value))}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
+                    className="focusable w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
                     style={{
                       appearance: 'slider-vertical',
                       WebkitAppearance: 'slider-vertical',
@@ -1306,11 +1306,11 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Right vertical edge: Volume slider */}
-              <div className="focusable"
+              <div 
                 onClick={(e) => e.stopPropagation()}
-                className="flex flex-col items-center gap-2 absolute right-8 top-1/2 -translate-y-1/2 z-20"
+                className="focusable flex flex-col items-center gap-2 absolute right-8 top-1/2 -translate-y-1/2 z-20"
               >
-                <button className="focusable"
+                <button 
                   onClick={toggleMute}
                   onTouchStart={(e) => {
                     e.preventDefault();
@@ -1322,12 +1322,12 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     }
                     triggerControlsShow();
                   }}
-                  className="focusable text-zinc-350 hover:text-white transition-colors cursor-pointer"
+                  className="focusable focusable text-zinc-350 hover:text-white transition-colors cursor-pointer"
                 >
                   {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
                 <div className="h-24 w-6 flex items-center justify-center relative">
-                  <input className="focusable"
+                  <input 
                     tabIndex={-1}
                     type="range"
                     min="0"
@@ -1336,7 +1336,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     value={isMuted ? 0 : volume}
                     onChange={handleVolumeChange}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
+                    className="focusable w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
                     style={{
                       appearance: 'slider-vertical',
                       WebkitAppearance: 'slider-vertical',
@@ -1379,9 +1379,9 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               </div>
 
               {/* Bottom Controls Bar */}
-              <div className="focusable"
+              <div 
                 onClick={(e) => e.stopPropagation()}
-                className="p-4 bg-gradient-to-t from-black/80 to-transparent space-y-3"
+                className="focusable p-4 bg-gradient-to-t from-black/80 to-transparent space-y-3"
               >
                 {/* Progress Bar/Scrubber */}
                 <div className="flex items-center gap-3">
@@ -1420,25 +1420,25 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                     )}
 
                     {/* Speed setting indicator */}
-                    <button className="focusable"
+                    <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowSettingsOverlay(true);
                         setActiveSettingTab('speed');
                       }}
-                      className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
+                      className="focusable focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
                     >
                       <span className="px-1.5 py-0.5 border border-zinc-700 rounded text-[9px] uppercase font-bold text-zinc-400">Speed</span>
                       <span>{playbackSpeed === 1 ? "1x" : `${playbackSpeed}x`}</span>
                     </button>
 
                     {/* Rate heart button */}
-                    <button className="focusable"
+                    <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsRated(!isRated);
                       }}
-                      className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
+                      className="focusable focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300"
                       title="Rate"
                     >
                       <Heart className={`w-4 h-4 transition-colors ${isRated ? "fill-red-500 text-red-500" : ""}`} />
@@ -1454,12 +1454,12 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                         const hasNext = movie.seasons?.[0]?.episodes?.some((e: any) => e.episodeNumber === currentEpNum + 1);
                         if (hasNext) {
                           return (
-                            <button className="focusable"
+                            <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 playNextEpisode();
                               }}
-                              className="focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300 animate-pulse"
+                              className="focusable focusable flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer text-zinc-300 animate-pulse"
                             >
                               <Play className="w-3.5 h-3.5 fill-current" />
                               <span>Next Episode</span>
@@ -1502,9 +1502,9 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   {showReportSection ? (
                     <div className="flex flex-col flex-1 min-h-0">
                       <div className="flex items-center gap-2 mb-3 shrink-0">
-                        <button className="focusable"
+                        <button 
                           onClick={() => setShowReportSection(false)}
-                          className="focusable p-1 hover:bg-zinc-900 rounded-md text-zinc-400 hover:text-white transition-colors outline-none cursor-pointer"
+                          className="focusable focusable p-1 hover:bg-zinc-900 rounded-md text-zinc-400 hover:text-white transition-colors outline-none cursor-pointer"
                         >
                           <ChevronLeft className="w-4 h-4 text-white" />
                         </button>
@@ -1518,10 +1518,10 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                           { key: 'buffering_connection_issue', label: 'Buffering and Connection Issue' },
                           { key: 'caption_issue', label: 'Caption Issue' }
                         ].map((item) => (
-                          <button className="focusable"
+                          <button 
                             key={item.key}
                             onClick={() => handleReportIssue(item.label)}
-                            className="focusable text-xs font-semibold cursor-pointer py-2 px-3 rounded hover:bg-white/5 border border-zinc-900 hover:border-zinc-800 text-zinc-300 hover:text-white text-left outline-none transition-all duration-150"
+                            className="focusable focusable text-xs font-semibold cursor-pointer py-2 px-3 rounded hover:bg-white/5 border border-zinc-900 hover:border-zinc-800 text-zinc-300 hover:text-white text-left outline-none transition-all duration-150"
                           >
                             {item.label}
                           </button>
@@ -1531,9 +1531,9 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   ) : (
                     <>
                       <div className="flex items-center justify-between md:mb-2.5 pb-2 border-b border-zinc-900 shrink-0">
-                        <button className="focusable"
+                        <button 
                           onClick={() => setShowReportSection(true)}
-                          className="focusable text-[10px] md:text-xs font-semibold text-zinc-450 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 outline-none"
+                          className="focusable focusable text-[10px] md:text-xs font-semibold text-zinc-450 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 outline-none"
                         >
                           <AlertCircle className="w-4 h-4 text-primary-foreground" />
                           <span>Report an Issue</span>
@@ -1569,7 +1569,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                       key={`${q.height}_${q.id}`}
                                       className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
                                     >
-                                      <button className="focusable"
+                                      <button 
                                         onClick={() => {
                                           if (isLocked) {
                                             if (document.fullscreenElement) {
@@ -1581,7 +1581,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                           }
                                           setShowSettingsOverlay(false);
                                         }}
-                                        className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
+                                        className="focusable focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
                                       >
                                         <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
                                         <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
@@ -1590,7 +1590,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                       </button>
 
                                       {isLocked && (
-                                        <button className="focusable"
+                                        <button 
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             if (document.fullscreenElement) {
@@ -1599,7 +1599,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                             navigate("/upgrade-plan");
                                             setShowSettingsOverlay(false);
                                           }}
-                                          className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                          className="focusable focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
                                         >
                                           Upgrade
                                         </button>
@@ -1628,7 +1628,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                         key={opt.id}
                                         className="flex items-center justify-between w-full hover:bg-white/5 rounded px-2 py-1"
                                       >
-                                        <button className="focusable"
+                                        <button 
                                           onClick={() => {
                                             if (isLocked) {
                                               if (document.fullscreenElement) {
@@ -1640,7 +1640,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                             }
                                             setShowSettingsOverlay(false);
                                           }}
-                                          className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
+                                          className="focusable focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-0.5 rounded w-full text-left outline-none"
                                         >
                                           <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive && !isLocked ? "opacity-100" : "opacity-0"}`}>✓</span>
                                           <span className={isActive && !isLocked ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
@@ -1649,7 +1649,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                         </button>
 
                                         {isLocked && (
-                                          <button className="focusable"
+                                          <button 
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               if (document.fullscreenElement) {
@@ -1658,7 +1658,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                                               navigate("/upgrade-plan");
                                               setShowSettingsOverlay(false);
                                             }}
-                                            className="focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
+                                            className="focusable focusable bg-primary-foreground text-secondary px-2 py-0.5 rounded text-[10px] font-bold ml-2 shrink-0 cursor-pointer hover:bg-primary-foreground/90 transition-all outline-none"
                                           >
                                             Upgrade
                                           </button>
@@ -1676,13 +1676,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                               {[0.5, 0.75, 1, 1.25, 1.5, 2].map((sp) => {
                                 const isActive = playbackSpeed === sp;
                                 return (
-                                  <button className="focusable"
+                                  <button 
                                     key={sp}
                                     onClick={() => {
                                       handleSpeedChange(sp);
                                       setShowSettingsOverlay(false);
                                     }}
-                                    className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
+                                    className="focusable focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left outline-none"
                                   >
                                     <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
                                     <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>
@@ -1696,12 +1696,12 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
                           <TabsContent value="subtitles" className="mt-0 outline-none w-full">
                             <div className="flex flex-col gap-1 w-full text-zinc-350">
-                              <button className="focusable"
+                              <button 
                                 onClick={() => {
                                   handleSubtitleChange(-1);
                                   setShowSettingsOverlay(false);
                                 }}
-                                className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
+                                className="focusable focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
                               >
                                 <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${currentSubtitleTrack === -1 ? "opacity-100" : "opacity-0"}`}>✓</span>
                                 <span className={currentSubtitleTrack === -1 ? "text-white font-bold" : "hover:text-white text-zinc-400"}>
@@ -1712,13 +1712,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                               {subtitleTracks.map((track) => {
                                 const isActive = currentSubtitleTrack === track.id;
                                 return (
-                                  <button className="focusable"
+                                  <button 
                                     key={track.id}
                                     onClick={() => {
                                       handleSubtitleChange(track.id);
                                       setShowSettingsOverlay(false);
                                     }}
-                                    className="focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
+                                    className="focusable focusable flex items-center gap-2 text-xs font-semibold cursor-pointer py-1.5 px-2 rounded hover:bg-white/5 w-full text-left font-sans text-zinc-300 outline-none"
                                   >
                                     <span className={`text-primary font-bold text-sm w-4 transition-opacity duration-150 ${isActive ? "opacity-100" : "opacity-0"}`}>✓</span>
                                     <span className={isActive ? "text-white font-bold" : "hover:text-white text-zinc-450"}>

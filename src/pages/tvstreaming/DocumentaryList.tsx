@@ -204,11 +204,11 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
               </div>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
                 {genreItems.map((doc) => (
-                  <div className="focusable"
+                  <div 
                     key={doc.id}
                     tabIndex={0}
                     onClick={() => navigate(`/video/${doc.id}`)}
-                    className="focusable relative w-full h-full lg:h-[90%] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
+                    className="focusable focusable relative w-full h-full lg:h-[90%] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
                   >
                     <img
                       src={doc.signedThumbnailUrl || '/assets/poster.png'}
@@ -238,14 +238,14 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                         <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} S` : (doc.duration || 'N/A')}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <button className="focusable"
+                        <button 
                           onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }}
                           tabIndex={-1}
-                          className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                          className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play
                         </button>
-                        <button className="focusable"
+                        <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             if (toggleWatchlist) {
@@ -253,7 +253,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                             }
                           }}
                           tabIndex={-1}
-                          className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                          className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                         >
                           {watchlist.includes(doc.id.toString()) ? (
                             <Check className="w-3 h-3 text-[#DECB94]" />
@@ -283,9 +283,9 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
           </h3>
         </div>
         {items.length > 15 && (
-          <button className="focusable"
+          <button 
             onClick={() => navigate(`/genre/Documentary`)}
-            className="text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
+            className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
           >
             View All <ChevronRight className="w-4 h-4" />
           </button>
@@ -295,10 +295,10 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
       <div className="relative w-full">
         {/* Left Scroll */}
         {showLeft && (
-          <button className="focusable"
+          <button 
             tabIndex={-1}
             onClick={() => handleScroll('left')}
-            className="absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            className="focusable absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -307,10 +307,10 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
 
         {/* Right Scroll */}
         {showRight && (
-          <button className="focusable"
+          <button 
             tabIndex={-1}
             onClick={() => handleScroll('right')}
-            className="absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            className="focusable absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-5 h-5" />
@@ -323,11 +323,11 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
           className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
         >
           {items.slice(0, 15).map((doc) => (
-            <div className="focusable"
+            <div 
               key={doc.id}
               tabIndex={0}
               onClick={() => navigate(`/video/${doc.id}`)}
-              className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
+              className="focusable focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
             >
               <img
                 src={doc.signedThumbnailUrl || '/assets/poster.png'}
@@ -358,14 +358,14 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                   <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} S` : (doc.duration || 'N/A')}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button className="focusable"
+                  <button 
                     onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }}
                     tabIndex={-1}
-                    className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                    className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                   >
                     Play
                   </button>
-                  <button className="focusable"
+                  <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       if (toggleWatchlist) {
@@ -373,7 +373,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                       }
                     }}
                     tabIndex={-1}
-                    className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                    className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
                     {watchlist.includes(doc.id.toString()) ? (
                       <Check className="w-3 h-3 text-[#DECB94]" />
@@ -386,9 +386,9 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
             </div>
           ))}
           {items.length > 15 && (
-            <div className="focusable"
+            <div 
               onClick={() => navigate(`/genre/Documentary`)}
-              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+              className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >
               <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
                 <ChevronRight className="w-6 h-6" />

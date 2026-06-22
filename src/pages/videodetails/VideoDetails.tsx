@@ -897,9 +897,9 @@ const VideoDetails = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-[2]" />
 
               <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-20">
-                <button className="focusable"
+                <button 
                   onClick={() => navigate(-1)}
-                  className="focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 text-white hover:bg-black/85 transition-all cursor-pointer flex items-center justify-center"
+                  className="focusable focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 text-white hover:bg-black/85 transition-all cursor-pointer flex items-center justify-center"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -915,9 +915,9 @@ const VideoDetails = () => {
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center z-[3]">
-                <button className="focusable"
+                <button 
                   onClick={() => handleStartPlayback(false)}
-                  className="focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-all border-2 border-white/20 cursor-pointer shadow-lg active:scale-95"
+                  className="focusable focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-all border-2 border-white/20 cursor-pointer shadow-lg active:scale-95"
                 >
                   {isSigning ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -952,10 +952,10 @@ const VideoDetails = () => {
             <h1 className="text-2xl font-bold text-white tracking-tight leading-tight">{movie.title}</h1>
             <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
-                <span className="focusable"
+                <span 
                   tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
-                  className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                  className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                   title="Click to rate this title"
                 >
                   ⭐ {averageRating.toFixed(1)} ({reviewCount})
@@ -1013,10 +1013,10 @@ const VideoDetails = () => {
             <div className="w-full text-left">
               <div className="flex gap-3 w-full justify-start overflow-x-auto scrollbar-hide mb-4 border-b border-zinc-800 pb-2">
                 {movie.seasons.map((season: any, idx: number) => (
-                  <button className="focusable"
+                  <button 
                     key={idx}
                     onClick={() => setSelectedSeason(idx)}
-                    className={`focusable flex-1 min-w-[80px] max-w-[150px] py-2.5 text-xs font-bold text-center transition-all cursor-pointer whitespace-nowrap rounded-md ${selectedSeason === idx ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white border border-zinc-800"
+                    className={`focusable focusable flex-1 min-w-[80px] max-w-[150px] py-2.5 text-xs font-bold text-center transition-all cursor-pointer whitespace-nowrap rounded-md ${selectedSeason === idx ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white border border-zinc-800"
                       }`}
                   >
                     {season.label || `Season ${idx + 1}`}
@@ -1026,11 +1026,11 @@ const VideoDetails = () => {
 
               <div className="space-y-3">
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
-                  <div className="focusable"
+                  <div 
                     key={ep.id}
                     tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
-                    className="focusable flex gap-4 items-center bg-zinc-900/30 border border-zinc-850 p-3 rounded-lg hover:bg-zinc-900/60 transition-colors cursor-pointer group shadow-sm relative"
+                    className="focusable focusable flex gap-4 items-center bg-zinc-900/30 border border-zinc-850 p-3 rounded-lg hover:bg-zinc-900/60 transition-colors cursor-pointer group shadow-sm relative"
                   >
                     {/* Left: Episode Thumbnail */}
                     <div className="relative w-28 sm:w-36 aspect-video rounded-md overflow-hidden bg-zinc-950 shrink-0 shadow-sm">
@@ -1087,10 +1087,10 @@ const VideoDetails = () => {
             <p className="text-zinc-400 text-xs leading-relaxed font-normal animate-in fade-in duration-200">
               {isDescExpanded ? movie.description : `${(movie.description || "").slice(0, 150)}${(movie.description || "").length > 150 ? "..." : ""}`}
               {(movie.description || "").length > 150 && (
-                <button className="focusable"
+                <button 
                   tabIndex={-1}
                   onClick={() => setIsDescExpanded(!isDescExpanded)}
-                  className="text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
+                  className="focusable text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
                 >
                   {isDescExpanded ? " less" : " more"}
                 </button>
@@ -1133,7 +1133,7 @@ const VideoDetails = () => {
 
               <div className="grid grid-cols-2 gap-3 pb-8">
                 {movie.related.map((item: any) => (
-                  <div className="focusable"
+                  <div 
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
@@ -1142,7 +1142,7 @@ const VideoDetails = () => {
                       navigate(`/video/${item.id}`);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="focusable relative aspect-video rounded-lg overflow-hidden border border-zinc-900 cursor-pointer group shadow-sm bg-zinc-950"
+                    className="focusable focusable relative aspect-video rounded-lg overflow-hidden border border-zinc-900 cursor-pointer group shadow-sm bg-zinc-950"
                   >
                     <img
                       src={item.image || item.signedThumbnailUrl || "/assets/poster.png"}
@@ -1221,10 +1221,10 @@ const VideoDetails = () => {
           {/* Badges tag row */}
           <div className="flex items-center gap-4 text-xs font-bold text-zinc-450 select-none">
             {reviewCount > 0 && averageRating !== null && (
-              <span className="focusable"
+              <span 
                 tabIndex={0}
                 onClick={() => setShowFeedbackModal(true)}
-                className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                 title="Click to rate this title"
               >
                 ⭐ {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
@@ -1246,9 +1246,9 @@ const VideoDetails = () => {
                 ) : (
                   <p>No description available.</p>
                 )}
-                <button className="focusable"
+                <button 
                   onClick={() => setShowFullDescription(false)}
-                  className="focusable text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
+                  className="focusable focusable text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                 >
                   See Less
                 </button>
@@ -1257,9 +1257,9 @@ const VideoDetails = () => {
               <div className="animate-fade-in">
                 <p className="line-clamp-3 select-all leading-relaxed">{movie.description || "No description available."}</p>
                 {movie.description && movie.description.length > 150 && (
-                  <button className="focusable"
+                  <button 
                     onClick={() => setShowFullDescription(true)}
-                    className="focusable text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors outline-none"
+                    className="focusable focusable text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors outline-none"
                   >
                     See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
                   </button>
@@ -1323,11 +1323,11 @@ const VideoDetails = () => {
               {/* Horizontal Episodes Scroller */}
               <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
-                  <div className="focusable"
+                  <div 
                     key={ep.id}
                     tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
-                    className="focusable flex-none w-56 sm:w-64 space-y-2 cursor-pointer group outline-none"
+                    className="focusable focusable flex-none w-56 sm:w-64 space-y-2 cursor-pointer group outline-none"
                   >
                     {/* Header above card */}
                     <div className="bg-zinc-950 border border-zinc-900 px-3 py-2 rounded-t-md text-left transition-colors group-hover:bg-zinc-900/40">
@@ -1400,7 +1400,7 @@ const VideoDetails = () => {
               <h3 className="text-lg font-bold text-white mb-4">More Like This</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 md:gap-6">
                 {movie.related.map((item: any) => (
-                  <div className="focusable"
+                  <div 
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
@@ -1408,7 +1408,7 @@ const VideoDetails = () => {
                       navigate(`/video/${item.id}`);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="focusable relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 outline-none"
+                    className="focusable focusable relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 outline-none"
                   >
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300" />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
@@ -1425,21 +1425,21 @@ const VideoDetails = () => {
                         <span>{item.duration || "N/A"}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <button className="focusable"
+                        <button 
                           tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/video/${item.id}`);
                           }}
-                          className="flex-1 py-1.5 bg-primary text-black font-bold text-[10px] rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                          className="focusable flex-1 py-1.5 bg-primary text-black font-bold text-[10px] rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play
                         </button>
-                        <button className="focusable"
+                        <button 
                           tabIndex={-1}
                           onClick={(e) => handleToggleRelatedMyList(e, item)}
                           disabled={isListToggling}
-                          className="p-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"
+                          className="focusable p-1.5 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"
                         >
                           {myListIds.includes(item.id.toString()) ? (
                             <Check className="w-3.5 h-3.5 text-green-500" />
@@ -1561,10 +1561,10 @@ const VideoDetails = () => {
 
             {/* Play Button Overlay (Mobile Only, hidden on Web) */}
             <div className="md:hidden absolute inset-0 flex items-center justify-center z-[3]">
-              <button className="focusable"
+              <button 
                 onClick={() => handleStartPlayback(false)}
                 disabled={isSigning}
-                className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors border-2 border-white/20 cursor-pointer disabled:opacity-55 shadow-lg active:scale-95"
+                className="focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors border-2 border-white/20 cursor-pointer disabled:opacity-55 shadow-lg active:scale-95"
               >
                 {isSigning ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -1579,9 +1579,9 @@ const VideoDetails = () => {
         {/* Floating Top Header Navigation */}
         {!isPlaying && (
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 md:p-6 z-20">
-            <button className="focusable"
+            <button 
               onClick={() => navigate(-1)}
-              className="focusable p-2 rounded-full bg-black/50 border border-zinc-900 text-white hover:bg-black/85 hover:border-zinc-700 transition-all cursor-pointer flex items-center justify-center outline-none"
+              className="focusable focusable p-2 rounded-full bg-black/50 border border-zinc-900 text-white hover:bg-black/85 hover:border-zinc-700 transition-all cursor-pointer flex items-center justify-center outline-none"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -1620,10 +1620,10 @@ const VideoDetails = () => {
 
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-400">
                 {reviewCount > 0 && averageRating !== null && (
-                  <span className="focusable"
+                  <span 
                     tabIndex={0}
                     onClick={() => setShowFeedbackModal(true)}
-                    className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                    className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                     title="Click to rate this title"
                   >
                     ⭐ {averageRating.toFixed(1)} ({reviewCount})
@@ -1680,10 +1680,10 @@ const VideoDetails = () => {
             {/* Web Metadata info inline (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
-                <span className="focusable"
+                <span 
                   tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
-                  className="focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
+                  className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
                   title="Click to rate this title"
                 >
                   ⭐ {averageRating.toFixed(1)} ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
@@ -1704,10 +1704,10 @@ const VideoDetails = () => {
                   ? (movie.description || "")
                   : `${(movie.description || "").slice(0, 150)}...`}
                 {(movie.description || "").length > 150 && (
-                  <button className="focusable"
+                  <button 
                     tabIndex={-1}
                     onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
+                    className="focusable text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
                   >
                     {showFullDescription ? " Less" : " More"}
                   </button>
@@ -1750,24 +1750,24 @@ const VideoDetails = () => {
         <div className="space-y-6" id="episodes-tabs">
           <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-semibold text-zinc-400">
             {movie.category === "TV Show" && (
-              <button className="focusable"
+              <button 
                 onClick={() => setActiveTab('episodes')}
-                className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
+                className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
                   }`}
               >
                 Episodes
               </button>
             )}
-            <button className="focusable"
+            <button 
               onClick={() => setActiveTab('related')}
-              className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
+              className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               More Like This
             </button>
-            <button className="focusable"
+            <button 
               onClick={() => setActiveTab('details')}
-              className={`focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
+              className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               Details
@@ -1791,11 +1791,11 @@ const VideoDetails = () => {
                 {/* Episodes listing vertically */}
                 <div className="space-y-4 max-w-4xl" id="episodes-section">
                   {movie.seasons[0].episodes.map((ep: any, index: number) => (
-                    <div className="focusable"
+                    <div 
                       key={ep.id}
                       tabIndex={0}
                       onClick={() => playEpisode(ep)}
-                      className="focusable grid grid-cols-12 gap-4 border-b border-zinc-900/60 pb-4 pt-2 hover:bg-zinc-900/40 rounded-lg p-2 transition-all cursor-pointer group"
+                      className="focusable focusable grid grid-cols-12 gap-4 border-b border-zinc-900/60 pb-4 pt-2 hover:bg-zinc-900/40 rounded-lg p-2 transition-all cursor-pointer group"
                     >
                       {/* Left: Thumbnail aspect card */}
                       <div className="col-span-4 md:col-span-3 aspect-video relative rounded-md overflow-hidden bg-zinc-900 shadow-md">
@@ -1847,14 +1847,14 @@ const VideoDetails = () => {
             {activeTab === 'related' && movie.related && movie.related.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-7 lg:h-[80%] gap-4 md:gap-6">
                 {movie.related.map((item: any) => (
-                  <div className="focusable"
+                  <div 
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
                       setIsPlaying(false);
                       navigate(`/video/${item.id}`);
                     }}
-                    className="focusable relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900"
+                    className="focusable focusable relative aspect-[2/3] rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900"
                   >
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300" />
 
@@ -1884,21 +1884,21 @@ const VideoDetails = () => {
 
                       {/* Actions row */}
                       <div className="flex items-center gap-1.5 md:gap-2">
-                        <button className="focusable"
+                        <button 
                           tabIndex={-1}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/video/${item.id}`);
                           }}
-                          className="flex-1 py-1.5 md:py-2 bg-primary text-black font-bold text-[10px] md:text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                          className="focusable flex-1 py-1.5 md:py-2 bg-primary text-black font-bold text-[10px] md:text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                         >
                           Play Now
                         </button>
-                        <button className="focusable"
+                        <button 
                           tabIndex={-1}
                           onClick={(e) => handleToggleRelatedMyList(e, item)}
                           disabled={isListToggling}
-                          className="p-1.5 md:p-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"
+                          className="focusable p-1.5 md:p-2 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow disabled:opacity-55"
                         >
                           {myListIds.includes(item.id.toString()) ? (
                             <Check className="w-3.5 h-3.5 text-green-500" />

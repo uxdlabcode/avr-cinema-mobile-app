@@ -421,13 +421,13 @@ export const GetSupportPage = () => {
                     {myTickets.map((ticket) => {
                       const isSelected = selectedTicketId === ticket.id;
                       return (
-                        <button className="focusable"
+                        <button 
                           key={ticket.id}
                           onClick={() => {
                             setSelectedTicketId(ticket.id);
                             setActiveTicket(null);
                           }}
-                          className={`focusable flex flex-col gap-1.5 px-4 py-4 text-left transition-colors border-l-2 focus:bg-zinc-800 ${isSelected
+                          className={`focusable focusable flex flex-col gap-1.5 px-4 py-4 text-left transition-colors border-l-2 focus:bg-zinc-800 ${isSelected
                             ? "bg-primary/8 border-l-primary"
                             : "hover:bg-muted/40 border-l-transparent"
                             }`}

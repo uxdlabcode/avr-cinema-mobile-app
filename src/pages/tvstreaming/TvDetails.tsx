@@ -111,10 +111,10 @@ const MediaCategoryRow = ({
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button className="focusable"
+          <button 
             tabIndex={-1}
             onClick={() => handleScroll("left")}
-            className="absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            className="focusable absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -123,10 +123,10 @@ const MediaCategoryRow = ({
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button className="focusable"
+          <button 
             tabIndex={-1}
             onClick={() => handleScroll("right")}
-            className="absolute right-[-20px] md:right-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            className="focusable absolute right-[-20px] md:right-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-5 h-5" />
@@ -183,17 +183,17 @@ const MediaCategoryRow = ({
 
                 {/* Actions Row */}
                 <div className="flex items-center gap-1 md:gap-1.5">
-                  <button className="focusable"
+                  <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/video/${item.id}`);
                     }}
                     tabIndex={-1}
-                    className="flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                    className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
                   >
                     Play Now
                   </button>
-                  <button className="focusable"
+                  <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       if (toggleWatchlist) {
@@ -201,7 +201,7 @@ const MediaCategoryRow = ({
                       }
                     }}
                     tabIndex={-1}
-                    className="p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                    className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
                   >
                     {watchlist.includes(item.id.toString()) ? (
                       <Check className="w-3 h-3 text-[#DECB94]" />
@@ -428,10 +428,10 @@ const TvDetails = () => {
       {/* Tab Navigation */}
       <div className="flex gap-6 px-4 py-3 overflow-x-auto pt-5 scrollbar-hide border-b border-zinc-900">
         {TABS.map((tab) => (
-          <button className="focusable"
+          <button 
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`focusable pb-2 text-xs font-semibold  transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 ${activeTab === tab
+            className={`focusable focusable pb-2 text-xs font-semibold  transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 ${activeTab === tab
               ? 'text-primary'
               : 'text-zinc-400 hover:text-white'
               }`}
@@ -687,12 +687,12 @@ const TvDetails = () => {
                               <span>More Info</span>
                             </Button>
 
-                            <button className="focusable"
+                            <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleWatchlist(slide.id, slide);
                               }}
-                              className="focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                              className="focusable focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
                             >
                               <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
                                 {watchlist.includes(slide.id.toString()) ? (
@@ -782,13 +782,13 @@ const TvDetails = () => {
                           {/* Detailed Description Panel */}
                           <div className="space-y-4 text-left w-full relative">
                             {/* Close Expanded Info */}
-                            <button className="focusable"
+                            <button 
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExpandedShowId(null);
                                 setShowFullDescription(false);
                               }}
-                              className="focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                              className="focusable focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
                               title="Close info panel"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -831,12 +831,12 @@ const TvDetails = () => {
                                   ) : (
                                     <p>No description available.</p>
                                   )}
-                                  <button className="focusable"
+                                  <button 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setShowFullDescription(false);
                                     }}
-                                    className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                    className="focusable focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
                                   >
                                     See Less
                                   </button>
@@ -845,12 +845,12 @@ const TvDetails = () => {
                                 <div className="animate-fade-in">
                                   <p className="line-clamp-3 select-all">{slide.description || "No description available."}</p>
                                   {slide.description && slide.description.length > 150 && (
-                                    <button className="focusable"
+                                    <button 
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         setShowFullDescription(true);
                                       }}
-                                      className="focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                      className="focusable focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
                                     >
                                       See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
                                     </button>
@@ -874,11 +874,11 @@ const TvDetails = () => {
           <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
             <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
               {featuredShows.map((_, index) => (
-                <button className="focusable"
+                <button 
                   key={index}
                   tabIndex={-1}
                   onClick={() => carouselApi?.scrollTo(index)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
+                  className={`focusable h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
                     ? "w-6 bg-primary"
                     : "w-1.5 bg-white/50 hover:bg-white"
                     }`}
@@ -890,25 +890,25 @@ const TvDetails = () => {
 
           {/* Slider Controls (Left, Right arrows) */}
           <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
-            <button className="focusable"
+            <button 
               tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();
                 carouselApi?.scrollPrev();
               }}
-              className="w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
+              className="focusable w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
               aria-label="Previous featured banner"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
 
-            <button className="focusable"
+            <button 
               tabIndex={-1}
               onClick={(e) => {
                 e.stopPropagation();
                 carouselApi?.scrollNext();
               }}
-              className="w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
+              className="focusable w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
               aria-label="Next featured banner"
             >
               <ChevronRight className="w-5 h-5" />

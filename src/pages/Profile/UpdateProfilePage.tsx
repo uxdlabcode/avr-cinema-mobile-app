@@ -343,10 +343,10 @@ export const UpdateProfilePage = () => {
 
               {/* Membership Status */}
               <div className="w-full border-t border-border pt-4 mt-2">
-                <button className="focusable"
+                <button 
                   type="button"
                   onClick={() => navigate("/upgrade-plan")}
-                  className="w-full flex flex-row items-center justify-start p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 gap-3 cursor-pointer hover:border-primary/40 hover:from-primary/20 transition-all"
+                  className="focusable w-full flex flex-row items-center justify-start p-4 rounded-xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 gap-3 cursor-pointer hover:border-primary/40 hover:from-primary/20 transition-all"
                 >
                   <div className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-primary/20">
                     <Crown className="w-5 h-5 text-primary" />
