@@ -120,7 +120,7 @@ const MediaCategoryRow = ({
           {genreName}
         </h3>
         {list.length > 15 && (
-          <button 
+          <button
             onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
             className="focusable text-xs md:text-sm text-primary/80 hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
           >
@@ -132,10 +132,10 @@ const MediaCategoryRow = ({
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll("left")}
-            className="focusable absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            className="focusable absolute left-[-20px] md:left-[-15px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -144,7 +144,7 @@ const MediaCategoryRow = ({
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="focusable absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -205,7 +205,7 @@ const MediaCategoryRow = ({
 
                 {/* Actions Row */}
                 <div className="flex items-center gap-1 md:gap-1.5">
-                  <button 
+                  <button
                     tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -215,7 +215,7 @@ const MediaCategoryRow = ({
                   >
                     Play Now
                   </button>
-                  <button 
+                  <button
                     tabIndex={-1}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -234,7 +234,7 @@ const MediaCategoryRow = ({
             </div>
           ))}
           {list.length > 15 && (
-            <div 
+            <div
               onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >
@@ -279,7 +279,7 @@ export const HomePage = () => {
   useEffect(() => {
     if (mediaItems.length > 0) {
       const featured = mediaItems.filter((item) => item.featured === true).slice(0, 7);
-      setFeaturedMovies(filterByUserAge(featured.length > 0 ? featured : fallbackData, user?.age ?? null));
+      setFeaturedMovies(filterByUserAge(featured, user?.age ?? null));
 
       const filteredMedia = filterByUserAge(mediaItems, user?.age ?? null);
       const groups: Record<string, any[]> = {};
@@ -306,7 +306,7 @@ export const HomePage = () => {
       });
       setGroupedMedia(groups);
     } else if (mediaStatus === "failed") {
-      setFeaturedMovies(filterByUserAge(fallbackData, user?.age ?? null));
+      setFeaturedMovies([]);
     }
   }, [mediaItems, mediaStatus, user?.age]);
 
@@ -613,7 +613,7 @@ export const HomePage = () => {
                             <span>More Info</span>
                           </Button>
 
-                          <button 
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleWatchlist(movie.id, movie);
@@ -708,7 +708,7 @@ export const HomePage = () => {
                         {/* Detailed Description Panel */}
                         <div className="space-y-4 text-left w-full relative">
                           {/* Close Expanded Info */}
-                          <button 
+                          <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setExpandedMovieId(null);
@@ -757,7 +757,7 @@ export const HomePage = () => {
                                 ) : (
                                   <p>No description available.</p>
                                 )}
-                                <button 
+                                <button
                                   tabIndex={-1}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -772,7 +772,7 @@ export const HomePage = () => {
                               <div className="animate-fade-in">
                                 <p className="line-clamp-3 select-all">{movie.description || "No description available."}</p>
                                 {movie.description && movie.description.length > 150 && (
-                                  <button 
+                                  <button
                                     tabIndex={-1}
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -802,7 +802,7 @@ export const HomePage = () => {
         <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
           <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
             {featuredMovies.map((_, index) => (
-              <button 
+              <button
                 key={index}
                 tabIndex={-1}
                 onClick={() => api?.scrollTo(index)}
@@ -818,7 +818,7 @@ export const HomePage = () => {
 
         {/* Carousel Slide Controls (Left, Right arrows, Mute button) - Desktop Right Bottom Corner */}
         <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
-          <button 
+          <button
             tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();
@@ -830,7 +830,7 @@ export const HomePage = () => {
             <ChevronLeft className="w-5 h-5" />
           </button>
 
-          <button 
+          <button
             tabIndex={-1}
             onClick={(e) => {
               e.stopPropagation();

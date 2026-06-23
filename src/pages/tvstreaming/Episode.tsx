@@ -6,6 +6,7 @@ import type { RootState, AppDispatch } from "@/store";
 import { fetchEpisodeMedia } from "@/store/slices/episodeSlice";
 import { getSignedUrl } from '@/Firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '@/components/ui/empty';
 
 interface TvShowItem {
   id: string;
@@ -181,7 +182,24 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
     );
   }
 
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    if (isGrid) {
+      return (
+        <Empty className="py-20 border border-dashed border-zinc-805/40 bg-zinc-950/25 rounded-2xl my-4">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="bg-primary/10 text-primary animate-pulse">
+              <Tv className="w-6 h-6 text-primary" />
+            </EmptyMedia>
+            <EmptyTitle className="text-white font-semibold text-lg">No TV Shows added yet</EmptyTitle>
+            <EmptyDescription className="text-zinc-500 max-w-[280px] mx-auto text-xs">
+              There are currently no TV Shows available in this section.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      );
+    }
+    return null;
+  }
 
   if (isGrid) {
     return (

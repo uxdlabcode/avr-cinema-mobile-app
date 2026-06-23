@@ -92,48 +92,48 @@ export const ProfilePageSkeleton = () => (
       </div>
       <div className="flex gap-6 lg:gap-8 w-full">
         {/* Sidebar */}
-      <div className="flex flex-col gap-5 w-[320px] lg:w-[360px] shrink-0 self-start">
-        {/* User Card */}
-        <Card className="p-6 flex flex-col items-center gap-4 rounded-lg">
-          <Skeleton className="w-20 h-20 rounded-full bg-zinc-800" />
-          <div className="flex flex-col items-center gap-2 w-full">
-            <Skeleton className="h-6 w-32 bg-zinc-800" />
-            <Skeleton className="h-4 w-40 bg-zinc-800" />
-          </div>
-          <Skeleton className="h-10 w-32 rounded-xl bg-zinc-800 mt-2" />
-          <div className="w-full border-t border-border pt-4 mt-2 flex justify-between">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-20 bg-zinc-800" />
-              <Skeleton className="h-3 w-16 bg-zinc-800" />
+        <div className="flex flex-col gap-5 w-[320px] lg:w-[360px] shrink-0 self-start">
+          {/* User Card */}
+          <Card className="p-6 flex flex-col items-center gap-4 rounded-lg">
+            <Skeleton className="w-20 h-20 rounded-full bg-zinc-800" />
+            <div className="flex flex-col items-center gap-2 w-full">
+              <Skeleton className="h-6 w-32 bg-zinc-800" />
+              <Skeleton className="h-4 w-40 bg-zinc-800" />
             </div>
-            <Skeleton className="h-8 w-20 rounded-full bg-zinc-800" />
-          </div>
-        </Card>
-        {/* Quick Actions */}
-        <Card className="rounded-lg p-0">
-          <div className="px-5 py-3 border-b border-border"><Skeleton className="h-4 w-24 bg-zinc-800" /></div>
-          <div className="flex flex-col p-2 space-y-2">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="h-12 w-full rounded-md bg-zinc-800" />)}
-          </div>
-        </Card>
-      </div>
+            <Skeleton className="h-10 w-32 rounded-xl bg-zinc-800 mt-2" />
+            <div className="w-full border-t border-border pt-4 mt-2 flex justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-20 bg-zinc-800" />
+                <Skeleton className="h-3 w-16 bg-zinc-800" />
+              </div>
+              <Skeleton className="h-8 w-20 rounded-full bg-zinc-800" />
+            </div>
+          </Card>
+          {/* Quick Actions */}
+          <Card className="rounded-lg p-0">
+            <div className="px-5 py-3 border-b border-border"><Skeleton className="h-4 w-24 bg-zinc-800" /></div>
+            <div className="flex flex-col p-2 space-y-2">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="h-12 w-full rounded-md bg-zinc-800" />)}
+            </div>
+          </Card>
+        </div>
 
-      {/* Content Area */}
-      <div className="flex flex-col gap-6 flex-1 min-w-0">
-        <Card className="rounded-lg p-6 space-y-4">
-          <Skeleton className="h-6 w-32 bg-zinc-800" />
-          <div className="flex gap-4 overflow-hidden"><WatchlistSkeleton /></div>
-        </Card>
-        <Card className="rounded-lg p-6 space-y-4">
-          <Skeleton className="h-6 w-40 bg-zinc-800" />
-          <div className="flex gap-4 overflow-hidden"><ContinueWatchingSkeleton /></div>
-        </Card>
-        <Card className="rounded-lg p-6 space-y-4">
-          <Skeleton className="h-6 w-24 bg-zinc-800" />
-          <div className="grid grid-cols-2 gap-4"><QuizzesSkeletonDesktop /></div>
-        </Card>
+        {/* Content Area */}
+        <div className="flex flex-col gap-6 flex-1 min-w-0">
+          <Card className="rounded-lg p-6 space-y-4">
+            <Skeleton className="h-6 w-32 bg-zinc-800" />
+            <div className="flex gap-4 overflow-hidden"><WatchlistSkeleton /></div>
+          </Card>
+          <Card className="rounded-lg p-6 space-y-4">
+            <Skeleton className="h-6 w-40 bg-zinc-800" />
+            <div className="flex gap-4 overflow-hidden"><ContinueWatchingSkeleton /></div>
+          </Card>
+          <Card className="rounded-lg p-6 space-y-4">
+            <Skeleton className="h-6 w-24 bg-zinc-800" />
+            <div className="grid grid-cols-2 gap-4"><QuizzesSkeletonDesktop /></div>
+          </Card>
+        </div>
       </div>
-    </div>
     </div>
 
     {/* ═══════════ MOBILE LAYOUT ═══════════ */}
@@ -280,15 +280,15 @@ export const ProfilePage = () => {
           .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
         // Enrich with media title + thumbnail
-        const enriched: ContinueItem[] = await Promise.all(
+        const enrichedResults = await Promise.all(
           sorted.map(async (r) => {
-            let title = "Unknown";
-            let poster = "/assets/episode1.webp";
             try {
               const mediaDoc = await getDoc(doc(db, "media", r.movieId));
               if (mediaDoc.exists()) {
                 const data = mediaDoc.data();
-                title = data.title || "Unknown";
+                const title = data.title || "Unknown";
+                if (title === "Unknown") return null;
+                let poster = "/assets/episode1.webp";
                 if (data.thumbnailUrl) {
                   try {
                     poster = await getSignedUrl(data.thumbnailUrl);
@@ -296,16 +296,21 @@ export const ProfilePage = () => {
                     poster = data.thumbnailUrl;
                   }
                 }
+                return {
+                  id: r.id,
+                  movieId: r.movieId,
+                  title,
+                  poster,
+                  progress: Math.round((r.currentTime / r.duration) * 100),
+                };
               }
             } catch {/* ignore */ }
-            return {
-              id: r.id,
-              movieId: r.movieId,
-              title,
-              poster,
-              progress: Math.round((r.currentTime / r.duration) * 100),
-            };
+            return null;
           })
+        );
+
+        const enriched = enrichedResults.filter(
+          (item): item is ContinueItem => item !== null
         );
 
         setContinueWatching(enriched);

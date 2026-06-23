@@ -54,7 +54,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
     if (row) {
       row.addEventListener("scroll", updateScrollButtons);
       window.addEventListener("resize", updateScrollButtons);
-      
+
       const timer = setTimeout(updateScrollButtons, 500);
 
       return () => {
@@ -82,7 +82,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
         <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide mb-3">
           Trending Now
         </h3>
-        
+
         <div className="relative w-full">
           <div className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20 w-full">
             {Array.from({ length: 5 }).map((_, index) => (
@@ -114,11 +114,11 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
       <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide mb-3">
         Trending Now
       </h3>
-      
+
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="focusable absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
@@ -130,7 +130,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="focusable absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex"
@@ -141,9 +141,9 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
         )}
 
         {/* Horizontal Scrollable Row */}
-        <div 
+        <div
           ref={rowRef}
-          className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20"
+          className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-7"
         >
           {items.map((movie, index) => (
             <div
@@ -151,7 +151,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
               className="flex-none relative snap-start group/trending pt-4"
             >
               {/* Giant rank number with thick white border */}
-              <span 
+              <span
                 className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
                 style={{
                   WebkitTextStroke: "2px #fff",
@@ -170,9 +170,9 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                 className="focusable relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
                 onClick={() => navigate(`/video/${movie.id}`)}
               >
-                <img 
-                  src={movie.signedThumbnailUrl || "/assets/poster.png"} 
-                  alt={movie.title} 
+                <img
+                  src={movie.signedThumbnailUrl || "/assets/poster.png"}
+                  alt={movie.title}
                   className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
                 />
 
@@ -182,10 +182,10 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                     {movie.title}
                   </p>
                 </div>
-                
+
                 {/* The theatrical hover details overlay */}
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                  
+
                   {/* Genre/Category Badge */}
                   <div className="flex justify-end mb-1 md:mb-2">
                     <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
@@ -209,7 +209,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
                   {/* Actions row */}
                   <div className="flex items-center gap-1 md:gap-1.5">
-                    <button  
+                    <button
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -219,7 +219,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                     >
                       Play Now
                     </button>
-                    <button  
+                    <button
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();

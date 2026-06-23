@@ -19,6 +19,7 @@ import { fetchTvMedia } from '@/store/slices/tvSlice';
 import Header from '@/components/Header';
 import RecentTVShows from './Episode';
 import DocumentaryList from './DocumentaryList';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '@/components/ui/empty';
 
 interface TvShowItem {
   id: string;
@@ -534,9 +535,27 @@ const TvDetails = () => {
           </div>
         </div>
       )}
+      {/* If loading completed and no media items exist in the TV section */}
+      {!isLoading && mediaItems.length === 0 && (
+        <div className="px-4 py-12">
+          <Empty className="py-20 border border-dashed border-zinc-805/40 bg-zinc-950/25 rounded-2xl">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-primary/10 text-primary animate-pulse">
+                <Tv className="w-6 h-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="text-white font-semibold text-lg">No data added yet</EmptyTitle>
+              <EmptyDescription className="text-zinc-500 max-w-[280px] mx-auto text-xs">
+                We couldn't find any TV shows or documentaries in this section.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
+      )}
 
-      {/* Hero Carousel (FOR YOU tab) */}
-      {activeTab === 'For You' && featuredShows.length > 0 && (
+      {mediaItems.length > 0 && (
+        <>
+          {/* Hero Carousel (FOR YOU tab) */}
+          {activeTab === 'For You' && featuredShows.length > 0 && (
         <Carousel
           setApi={setCarouselApi}
           opts={{
@@ -987,6 +1006,8 @@ const TvDetails = () => {
         <div className="px-4 pt-6">
           <DocumentaryList isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
         </div>
+      )}
+        </>
       )}
 
     </div>

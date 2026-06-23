@@ -30,6 +30,9 @@ const RecentWatch = () => {
     }
   }, [userId, dispatch]);
 
+  // Don't render if guest/not logged in
+  if (!userId) return null;
+
   // Don't render if no items
   if (!loading && items.length === 0) return null;
 
@@ -42,50 +45,50 @@ const RecentWatch = () => {
       <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x">
         {loading
           ? // Skeleton placeholders
-            Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton
-                key={i}
-                className="relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start"
-              />
-            ))
+          Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton
+              key={i}
+              className="relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start"
+            />
+          ))
           : items.map((item) => {
-              const progressPct =
-                item.duration > 0
-                  ? Math.min((item.currentTime / item.duration) * 100, 100)
-                  : 0;
+            const progressPct =
+              item.duration > 0
+                ? Math.min((item.currentTime / item.duration) * 100, 100)
+                : 0;
 
-              return (
-                <div
-                  key={item.id}
-                  tabIndex={0}
-                  className="focusable relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start cursor-pointer group outline-none"
-                  onClick={() => navigate(`/video/${item.movieId}`)}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
+            return (
+              <div
+                key={item.id}
+                tabIndex={0}
+                className="focusable relative shrink-0 w-64 md:w-72 aspect-video rounded-md overflow-hidden snap-start cursor-pointer group outline-none"
+                onClick={() => navigate(`/video/${item.movieId}`)}
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
 
-                  {/* Bottom overlay: play icon + title */}
-                  <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10">
-                    <Play className="w-6 h-6 text-primary drop-shadow-md fill-primary shrink-0" />
-                    <span className="text-xs font-semibold drop-shadow-md text-primary truncate max-w-[70%] text-right">
-                      {item.title}
-                    </span>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-secondary-foreground/30">
-                    <div
-                      className="h-full bg-secondary-foreground transition-all duration-300"
-                      style={{ width: `${progressPct}%` }}
-                    />
-                  </div>
+                {/* Bottom overlay: play icon + title */}
+                <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between z-10">
+                  <Play className="w-6 h-6 text-primary drop-shadow-md fill-primary shrink-0" />
+                  <span className="text-xs font-semibold drop-shadow-md text-primary truncate max-w-[70%] text-right">
+                    {item.title}
+                  </span>
                 </div>
-              );
-            })}
+
+                {/* Progress bar */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-secondary-foreground/30">
+                  <div
+                    className="h-full bg-secondary-foreground transition-all duration-300"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
       </div>
     </div>
   );

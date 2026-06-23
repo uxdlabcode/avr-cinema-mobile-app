@@ -96,7 +96,9 @@ export function TVSidebar() {
         }`}
     >
       <div
-        className="h-full flex flex-col items-start pointer-events-auto w-[250px] shrink-0"
+        className={`h-full flex flex-col items-start pointer-events-auto shrink-0 transition-all duration-300 ease-in-out ${
+          isExpanded ? "w-[250px]" : "w-[80px]"
+        }`}
         onFocus={() => setIsExpanded(true)}
         onBlur={(e) => {
           // Only collapse if the new focus target is not inside the sidebar

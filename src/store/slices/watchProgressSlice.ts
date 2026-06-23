@@ -42,12 +42,13 @@ export const fetchWatchProgress = createAsyncThunk(
       .slice(0, 10);
 
     // 3. For each item, fetch the media document to get title + thumbnail
-    const enriched: WatchItem[] = await Promise.all(
-      sorted.map(async (doc) => {
+    const enrichedResults = await Promise.all(
+      sorted.map(async (doc): Promise<WatchItem | null> => {
         try {
           const media = await getDocumentData("media", doc.movieId);
+          if (!media) return null;
           let image = "/assets/episode1.webp";
-          if (media?.thumbnailUrl) {
+          if (media.thumbnailUrl) {
             try {
               image = await getSignedUrl(media.thumbnailUrl);
             } catch {
@@ -57,24 +58,20 @@ export const fetchWatchProgress = createAsyncThunk(
           return {
             id: doc.id,
             movieId: doc.movieId,
-            title: media?.title || "Unknown",
+            title: media.title || "Unknown",
             image,
             currentTime: doc.currentTime,
             duration: doc.duration,
             updatedAt: doc.updatedAt,
           };
         } catch {
-          return {
-            id: doc.id,
-            movieId: doc.movieId,
-            title: "Unknown",
-            image: "/assets/episode1.webp",
-            currentTime: doc.currentTime,
-            duration: doc.duration,
-            updatedAt: doc.updatedAt,
-          };
+          return null;
         }
       })
+    );
+
+    const enriched = enrichedResults.filter(
+      (item): item is WatchItem => item !== null && item.title !== "Unknown"
     );
 
     return enriched;

@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "@/store";
 import { fetchTrailerMedia } from "@/store/slices/trailerSlice";
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from "@/components/ui/empty";
 
 interface TrailerItem {
   id: string;
@@ -252,10 +253,17 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
           </div>
         ) : trailers.length === 0 ? (
           /* Empty State */
-          <div className="flex flex-col items-center justify-center py-20 text-center border border-zinc-900 rounded-2xl bg-zinc-950/20">
-            <h3 className="text-lg font-bold text-white mb-2">No Trailers Found</h3>
-            <p className="text-zinc-500 text-sm">Check back later for new releases.</p>
-          </div>
+          <Empty className="py-20 border border-dashed border-zinc-805/40 bg-zinc-950/25 rounded-2xl w-full max-w-4xl mx-auto text-center">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-primary/10 text-primary animate-pulse mx-auto">
+                <Play className="w-6 h-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="text-white font-semibold text-lg">No trailers added yet</EmptyTitle>
+              <EmptyDescription className="text-zinc-500 max-w-[280px] mx-auto text-xs">
+                Check back later for new releases and trailers.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           /* Trailers Grid */
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">

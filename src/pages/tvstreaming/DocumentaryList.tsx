@@ -6,6 +6,7 @@ import type { RootState, AppDispatch } from "@/store";
 import { fetchDocumentaryMedia } from "@/store/slices/documentarySlice";
 import { getSignedUrl } from '@/Firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '@/components/ui/empty';
 
 interface DocItem {
   id: string;
@@ -186,7 +187,24 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
     );
   }
 
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    if (isGrid) {
+      return (
+        <Empty className="py-20 border border-dashed border-zinc-805/40 bg-zinc-950/25 rounded-2xl my-4">
+          <EmptyHeader>
+            <EmptyMedia variant="icon" className="bg-primary/10 text-primary animate-pulse">
+              <Film className="w-6 h-6 text-primary" />
+            </EmptyMedia>
+            <EmptyTitle className="text-white font-semibold text-lg">No Documentaries added yet</EmptyTitle>
+            <EmptyDescription className="text-zinc-500 max-w-[280px] mx-auto text-xs">
+              There are currently no Documentaries available in this section.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      );
+    }
+    return null;
+  }
 
   if (isGrid) {
     return (

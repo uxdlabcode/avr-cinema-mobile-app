@@ -3,11 +3,12 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/store';
-import { ChevronLeft, ChevronRight, Bookmark, Share2, Play, Plus, Check, X, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bookmark, Share2, Play, Plus, Check, X, ChevronDown, Film } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { compoundQuery, deleteDocument, createDocument } from '@/Firebase';
 import { fetchMovieMedia } from '@/store/slices/movieSlice';
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyMedia } from '@/components/ui/empty';
 import { filterByUserAge } from '@/lib/ageFilter';
 import {
   Carousel,
@@ -563,6 +564,20 @@ const MoviesTab = () => {
 
       {isLoading ? (
         <MoviesTabSkeleton />
+      ) : movies.length === 0 ? (
+        <div className="px-4 py-12 flex flex-col items-center justify-center">
+          <Empty className="py-20 border border-dashed border-zinc-805/40 bg-zinc-950/25 rounded-2xl w-full max-w-4xl mx-auto">
+            <EmptyHeader>
+              <EmptyMedia variant="icon" className="bg-primary/10 text-primary animate-pulse">
+                <Film className="w-6 h-6 text-primary" />
+              </EmptyMedia>
+              <EmptyTitle className="text-white font-semibold text-lg">No movies added yet</EmptyTitle>
+              <EmptyDescription className="text-zinc-500 max-w-[280px] mx-auto text-xs">
+                We couldn't find any movies in this section. Please check back later.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
       ) : (
         <div className="flex flex-col">
 
