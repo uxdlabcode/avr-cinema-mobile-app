@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Plus, Check, Film } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Check, Film, Play } from 'lucide-react';
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "@/store";
 import { fetchDocumentaryMedia } from "@/store/slices/documentarySlice";
@@ -196,7 +196,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
               <Film className="w-6 h-6 text-primary" />
             </EmptyMedia>
             <EmptyTitle className="text-white font-semibold text-lg">No Documentaries added yet</EmptyTitle>
-            <EmptyDescription className="text-zinc-500 max-w-[280px] mx-auto text-xs">
+            <EmptyDescription className="text-zinc-500 max-w-[340px] mx-auto text-xs">
               There are currently no Documentaries available in this section.
             </EmptyDescription>
           </EmptyHeader>
@@ -220,70 +220,57 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                   {genre}
                 </h3>
               </div>
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-4">
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-40">
                 {genreItems.map((doc) => (
-                  <div 
+                  <div
                     key={doc.id}
-                    tabIndex={0}
-                    onClick={() => navigate(`/video/${doc.id}`)}
-                    className="focusable focusable relative w-full h-full lg:h-[90%] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
+                    className="flex-none w-full relative group/card"
+                    style={{ zIndex: 1 }}
+                    onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+                    onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
                   >
-                    <img
-                      src={doc.signedThumbnailUrl || '/assets/poster.png'}
-                      alt={doc.title}
-                      className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
-                    />
-
-                    {/* Mobile Title */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover/card:opacity-0 transition-opacity duration-300 md:hidden z-10">
-                      <p className="text-xs font-semibold text-white truncate text-center drop-shadow-md">
-                        {doc.title}
-                      </p>
+                    {/* Poster */}
+                    <div
+                      tabIndex={0}
+                      className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
+                      onClick={() => navigate(`/video/${doc.id}`)}
+                    >
+                      <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} loading="lazy" className="w-full h-full object-cover" />
                     </div>
 
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                      <div className="flex justify-end mb-1">
-                        <span className="text-[8px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                          Documentary
-                        </span>
+                    {/* Floating Popup */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50">
+                      <div className="w-full aspect-video overflow-hidden relative">
+                        <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                        <div className="absolute bottom-2 left-3 right-3">
+                          <p className="text-white font-bold text-sm leading-tight truncate drop-shadow-lg">{doc.title}</p>
+                        </div>
                       </div>
-                      <h4 className="text-xs md:text-sm font-bold text-white leading-tight mb-1 truncate drop-shadow-md">
-                        {doc.title}
-                      </h4>
-                      <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-1.5">
-                        <span>{doc.releaseYear || 'N/A'}</span>
-                        <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} S` : (doc.duration || 'N/A')}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }}
-                          tabIndex={-1}
-                          className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
-                        >
-                          Play
-                        </button>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (toggleWatchlist) {
-                              toggleWatchlist(doc.id, doc);
-                            }
-                          }}
-                          tabIndex={-1}
-                          className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
-                        >
-                          {watchlist.includes(doc.id.toString()) ? (
-                            <Check className="w-3 h-3 text-[#DECB94]" />
-                          ) : (
-                            <Plus className="w-3 h-3" />
-                          )}
-                        </button>
+                      <div className="p-3 flex flex-col gap-2.5">
+                        <div className="flex items-center gap-2">
+                          <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }} className="focusable flex-1 py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-xs flex items-center justify-center gap-1.5 shadow cursor-pointer transition-colors">
+                            <Play className="w-3.5 h-3.5 fill-current" /> Watch Now
+                          </button>
+                          <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); if (toggleWatchlist) toggleWatchlist(doc.id, doc); }} className="focusable w-8 h-8 bg-zinc-800 border border-zinc-700 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow">
+                            {watchlist.includes(doc.id.toString()) ? <Check className="w-3.5 h-3.5 text-[#DECB94]" /> : <Plus className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                        <div className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
+                          <span className="text-white">{doc.releaseYear || doc.year || 2026}</span>
+                          <span className="text-zinc-600">•</span>
+                          <span className="px-1 border border-zinc-600 rounded text-[9px] leading-snug py-0.5 text-zinc-300">{doc.ageRating || doc.rating || "U/A"}</span>
+                          <span className="text-zinc-600">•</span>
+                          <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} Seasons` : (doc.duration || "N/A")}</span>
+                          {doc.language && <><span className="text-zinc-600">•</span><span>{doc.language}</span></>}
+                        </div>
+                        <p className="text-[10px] text-zinc-400 line-clamp-4 leading-relaxed">{doc.description || "No description available."}</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+
             </div>
           );
         })}
@@ -338,67 +325,53 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
         {/* Scrollable Row */}
         <div
           ref={rowRef}
-          className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
+          className="flex overflow-x-auto overflow-y-visible pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
+          style={{ overflowY: 'visible' }}
         >
           {items.slice(0, 15).map((doc) => (
             <div 
               key={doc.id}
-              tabIndex={0}
-              onClick={() => navigate(`/video/${doc.id}`)}
-              className="focusable focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
+              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
+              style={{ zIndex: 1 }}
+              onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+              onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
             >
-              <img
-                src={doc.signedThumbnailUrl || '/assets/poster.png'}
-                alt={doc.title}
-                loading="lazy"
-                className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
-              />
-
-              {/* Mobile Title */}
-              <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover/card:opacity-0 transition-opacity duration-300 md:hidden z-10">
-                <p className="text-xs font-semibold text-white truncate text-center drop-shadow-md">
-                  {doc.title}
-                </p>
+              {/* Poster */}
+              <div
+                tabIndex={0}
+                className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
+                onClick={() => navigate(`/video/${doc.id}`)}
+              >
+                <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} loading="lazy" className="w-full h-full object-cover" />
               </div>
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                <div className="flex justify-end mb-1">
-                  <span className="text-[8px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                    Documentary
-                  </span>
+              {/* Floating Popup */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50">
+                <div className="w-full aspect-video overflow-hidden relative">
+                  <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                  <div className="absolute bottom-2 left-3 right-3">
+                    <p className="text-white font-bold text-sm leading-tight truncate drop-shadow-lg">{doc.title}</p>
+                  </div>
                 </div>
-                <h4 className="text-xs md:text-sm font-bold text-white leading-tight mb-1 truncate drop-shadow-md">
-                  {doc.title}
-                </h4>
-                <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-1.5">
-                  <span>{doc.releaseYear || 'N/A'}</span>
-                  <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} S` : (doc.duration || 'N/A')}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }}
-                    tabIndex={-1}
-                    className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
-                  >
-                    Play
-                  </button>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (toggleWatchlist) {
-                        toggleWatchlist(doc.id, doc);
-                      }
-                    }}
-                    tabIndex={-1}
-                    className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
-                  >
-                    {watchlist.includes(doc.id.toString()) ? (
-                      <Check className="w-3 h-3 text-[#DECB94]" />
-                    ) : (
-                      <Plus className="w-3 h-3" />
-                    )}
-                  </button>
+                <div className="p-3 flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); navigate(`/video/${doc.id}`); }} className="focusable flex-1 py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-xs flex items-center justify-center gap-1.5 shadow cursor-pointer transition-colors">
+                      <Play className="w-3.5 h-3.5 fill-current" /> Watch Now
+                    </button>
+                    <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); if (toggleWatchlist) toggleWatchlist(doc.id, doc); }} className="focusable w-8 h-8 bg-zinc-800 border border-zinc-700 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow">
+                      {watchlist.includes(doc.id.toString()) ? <Check className="w-3.5 h-3.5 text-[#DECB94]" /> : <Plus className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                  <div className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
+                    <span className="text-white">{doc.releaseYear || doc.year || 2026}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="px-1 border border-zinc-600 rounded text-[9px] leading-snug py-0.5 text-zinc-300">{doc.ageRating || doc.rating || "U/A"}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span>{doc.seasons && doc.seasons.length > 0 ? `${doc.seasons.length} Seasons` : (doc.duration || "N/A")}</span>
+                    {doc.language && <><span className="text-zinc-600">•</span><span>{doc.language}</span></>}
+                  </div>
+                  <p className="text-[10px] text-zinc-400 line-clamp-4 leading-relaxed">{doc.description || "No description available."}</p>
                 </div>
               </div>
             </div>

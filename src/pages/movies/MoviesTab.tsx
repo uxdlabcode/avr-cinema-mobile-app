@@ -259,60 +259,40 @@ const MovieCategoryRow = ({
               <div
                 key={movie.id}
                 tabIndex={0}
-                className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
+                className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none transition-all duration-300 hover:scale-108 hover:z-30 hover:bg-[#18181b] hover:border-zinc-800"
                 onClick={() => navigate(`/video/${movie.id}`)}
               >
-                <img
-                  src={movie.signedThumbnailUrl || "/assets/poster.png"}
-                  alt={movie.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
-                />
-
-                {/* Mobile Title bar fallback (Visible when not hovered on touch devices) */}
-                <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                  <p className="text-sm font-semibold text-white truncate text-center drop-shadow-md">
-                    {movie.title}
-                  </p>
+                {/* Image Container */}
+                <div className="w-full h-full relative transition-all duration-300 group-hover:h-[40%] sm:group-hover:h-[45%] md:group-hover:h-[48%] group-hover:aspect-video">
+                  <img
+                    src={movie.signedThumbnailUrl || "/assets/poster.png"}
+                    alt={movie.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-all duration-300"
+                  />
+                  {/* Fallback title on mobile when not hovered */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
+                    <p className="text-xs font-semibold text-white truncate text-center">
+                      {movie.title}
+                    </p>
+                  </div>
                 </div>
 
-                {/* The theatrical hover details overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-
-                  {/* Genre/Category Badge */}
-                  <div className="flex justify-end mb-1 md:mb-2">
-                    <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                      {movie.genres && movie.genres.length > 0 ? movie.genres[0] : "Movie"}
-                    </span>
-                  </div>
-
-                  {/* Title */}
-                  <h4 className="text-xs md:text-sm font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
-                    {movie.title}
-                  </h4>
-
-                  {/* Metadata Row */}
-                  <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
-                    <span className="truncate">English (UK)</span>
-                    <div className="flex items-center gap-0.5">
-                      <span className="text-[8px] md:text-[9px] opacity-85">🌐</span>
-                      <span>{movie.duration || "N/A"}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions row */}
-                  <div className="flex items-center gap-1 md:gap-1.5">
-                    <button 
+                {/* Hover Details Panel */}
+                <div className="absolute bottom-0 left-0 right-0 top-[40%] sm:top-[45%] md:top-[48%] p-2 sm:p-3 flex flex-col justify-start text-left gap-1.5 sm:gap-2.5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 bg-[#18181b] overflow-y-auto scrollbar-hide">
+                  {/* Action Buttons Row */}
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <button
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/video/${movie.id}`);
                       }}
-                      className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                      className="focusable flex-1 py-1 sm:py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1 shadow cursor-pointer transition-colors"
                     >
-                      Play Now
+                      <Play className="w-3 h-3 fill-current text-black" /> Watch Now
                     </button>
-                    <button 
+                    <button
                       tabIndex={-1}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -320,7 +300,7 @@ const MovieCategoryRow = ({
                           toggleWatchlist(movie.id, movie);
                         }
                       }}
-                      className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                      className="focusable p-1.5 bg-zinc-800 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
                     >
                       {watchlist.includes(movie.id.toString()) ? (
                         <Check className="w-3 h-3 text-[#DECB94]" />
@@ -329,6 +309,22 @@ const MovieCategoryRow = ({
                       )}
                     </button>
                   </div>
+
+                  {/* Metadata Row */}
+                  <div className="text-[8px] sm:text-[10px] text-zinc-350 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
+                    <span>{movie.releaseYear || movie.year || 2026}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="px-1 border border-zinc-700 rounded-sm text-[7px] sm:text-[9px] leading-none py-0.5">{movie.ageRating || movie.rating || "U/A 13+"}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="truncate">{movie.seasons && movie.seasons.length > 0 ? `${movie.seasons.length} Seasons` : (movie.duration || "N/A")}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="truncate">{movie.language || "Hindi"}</span>
+                  </div>
+
+                  {/* Description Snippet */}
+                  <p className="text-[7px] sm:text-[10px] text-zinc-450 line-clamp-3 sm:line-clamp-4 leading-normal sm:leading-relaxed">
+                    {movie.description || "No description available."}
+                  </p>
                 </div>
               </div>
             );

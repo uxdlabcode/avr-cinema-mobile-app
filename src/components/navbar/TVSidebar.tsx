@@ -96,9 +96,8 @@ export function TVSidebar() {
         }`}
     >
       <div
-        className={`h-full flex flex-col items-start pointer-events-auto shrink-0 transition-all duration-300 ease-in-out ${
-          isExpanded ? "w-[250px]" : "w-[80px]"
-        }`}
+        className={`h-full flex flex-col items-start pointer-events-auto shrink-0 overflow-hidden ${isExpanded ? "w-[250px]" : "w-[80px]"
+          }`}
         onFocus={() => setIsExpanded(true)}
         onBlur={(e) => {
           // Only collapse if the new focus target is not inside the sidebar
@@ -119,7 +118,7 @@ export function TVSidebar() {
         </div>
 
         {/* Nav Items */}
-        <nav className="flex-1 w-full flex flex-col space-y-4 ml-4   ">
+        <nav className="flex-1 w-[calc(100%-32px)] flex flex-col space-y-4 ml-4">
           {tvNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.path || (activeTab === "/notifications" && item.path === "/profile");
@@ -150,7 +149,7 @@ export function TVSidebar() {
         </nav>
 
         {/* Profile/Subscription status at the bottom */}
-        <div className="w-full border-t border-zinc-800/40 pt-6 flex flex-col items-center ml-5">
+        <div className="w-[calc(100%-32px)] border-t border-zinc-800/40 pt-6 flex flex-col items-center ml-4">
           {user?.membershipStatus === "active" ? (
             <Link
               to="/membership"
