@@ -89,7 +89,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     }
   }, [isCurrentlyPlaying, onPlayStateChange]);
   const user = useAppSelector((state) => state.auth.user);
-  const hasActiveMembership = user?.membershipStatus === "active";
+  const hasActiveMembership = true;
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -100,25 +100,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
   const [qualities, setQualities] = useState<{ id: number; name: string; height: number }[]>([]);
   const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
-  const [maxResolutionHeight, setMaxResolutionHeight] = useState<number>(2160);
-
-  useEffect(() => {
-    if (!user?.membershipPlanId) {
-      setMaxResolutionHeight(2160);
-      return;
-    }
-    const fetchPlanResolution = async () => {
-      try {
-        const plan = await getDocumentData("plans", user.membershipPlanId as string);
-        if (plan && plan.resolution) {
-          setMaxResolutionHeight(parseResolutionToHeight(plan.resolution));
-        }
-      } catch (err) {
-        console.error("Error fetching plan resolution:", err);
-      }
-    };
-    fetchPlanResolution();
-  }, [user?.membershipPlanId]);
+  const maxResolutionHeight = 2160;
 
   // Custom Settings overlay states
   const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);

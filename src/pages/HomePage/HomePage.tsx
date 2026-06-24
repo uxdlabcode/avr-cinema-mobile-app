@@ -152,93 +152,113 @@ const MediaCategoryRow = ({
           >
             <ChevronRight className="w-5 h-5" />
           </button>
-        )}
-
-        {/* Horizontal Scrollable Row - overflow-visible so popup can escape */}
+        )}        {/* Horizontal Scrollable Row - with proper spacing for popup */}
         <div
           ref={rowRef}
-          className="flex overflow-x-auto overflow-y-visible pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
-          style={{ overflowY: 'visible' }}
+          className="flex overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
+          style={{
+            overflowY: 'visible',
+            paddingTop: '80px',
+            marginTop: '-80px',
+            paddingBottom: '80px',
+            marginBottom: '-80px'
+          }}
         >
-          {list.slice(0, 15).map((item) => (
-            <div
-              key={item.id}
-              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
-              style={{ zIndex: 1 }}
-              onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
-              onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
-            >
-              {/* Poster Card - always visible */}
-              <div
-                tabIndex={0}
-                className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
-                onClick={() => navigate(`/video/${item.id}`)}
-              >
-                <img
-                  src={item.image || item.signedThumbnailUrl || "/assets/poster.png"}
-                  alt={item.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+          {list.slice(0, 15).map((item, index) => {
+            const isFirst = index === 0;
+            const isLast = index === Math.min(list.length, 15) - 1;
 
-              {/* Floating Popup - appears below the poster on hover */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50">
-                {/* Landscape Thumbnail */}
-                <div className="w-full aspect-video overflow-hidden relative">
+            return (
+              <div
+                key={item.id}
+                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
+                style={{ zIndex: 1 }}
+                onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+                onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
+              >
+                {/* Poster Card - always visible */}
+                <div
+                  tabIndex={0}
+                  className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
+                  onClick={() => navigate(`/video/${item.id}`)}
+                >
                   <img
                     src={item.image || item.signedThumbnailUrl || "/assets/poster.png"}
                     alt={item.title}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
-                  <div className="absolute bottom-2 left-3 right-3">
-                    <p className="text-white font-bold text-sm leading-tight truncate drop-shadow-lg">{item.title}</p>
-                  </div>
                 </div>
 
-                {/* Details Panel */}
-                <div className="p-3 flex flex-col gap-2.5">
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      tabIndex={-1}
-                      onClick={(e) => { e.stopPropagation(); navigate(`/video/${item.id}`); }}
-                      className="focusable flex-1 py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-xs flex items-center justify-center gap-1.5 shadow cursor-pointer transition-colors"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-current" /> Watch Now
-                    </button>
-                    <button
-                      tabIndex={-1}
-                      onClick={(e) => { e.stopPropagation(); toggleWatchlist(item.id, item); }}
-                      className="focusable w-8 h-8 bg-zinc-800 border border-zinc-700 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
-                    >
-                      {watchlist.includes(item.id.toString()) ? (
-                        <Check className="w-3.5 h-3.5 text-[#DECB94]" />
-                      ) : (
-                        <Plus className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </div>
+                {/* Floating Popup - expands equally in all directions from center */}
+                <div
+                  className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${
+                    isFirst
+                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                      : isLast
+                      ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
+                      : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
+                  }`}
+                >
+                  {/* Popup Container with shadow and border */}
+                  <div className="relative rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50">
+                    {/* Landscape Thumbnail - tall & prominent */}
+                    <div className="w-full h-[180px] md:h-[200px] overflow-hidden relative">
+                      <img
+                        src={item.image || item.signedThumbnailUrl || "/assets/poster.png"}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
+                    </div>
 
-                  {/* Metadata */}
-                  <div className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
-                    <span className="text-white">{item.releaseYear || item.year || 2026}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="px-1 border border-zinc-600 rounded text-[9px] leading-snug py-0.5 text-zinc-300">{item.ageRating || item.rating || "U/A"}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span>{item.seasons && item.seasons.length > 0 ? `${item.seasons.length} Seasons` : (item.duration || "N/A")}</span>
-                    {item.language && <><span className="text-zinc-600">•</span><span>{item.language}</span></>}
-                  </div>
+                    {/* Details Panel */}
+                    <div className="px-4 py-3 flex flex-col gap-2.5">
+                      {/* Title */}
+                      <p className="text-white font-bold text-[15px] leading-snug">{item.title}</p>
 
-                  {/* Description */}
-                  <p className="text-[10px] text-zinc-400 line-clamp-4 leading-relaxed">
-                    {item.description || "No description available."}
-                  </p>
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          tabIndex={-1}
+                          onClick={(e) => { e.stopPropagation(); navigate(`/video/${item.id}`); }}
+                          className="focusable flex-1 py-2 bg-white text-black hover:bg-zinc-200 rounded-md font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer transition-colors"
+                        >
+                          <Play className="w-4 h-4 fill-current" /> Watch Now
+                        </button>
+                        <button
+                          tabIndex={-1}
+                          onClick={(e) => { e.stopPropagation(); toggleWatchlist(item.id, item); }}
+                          className="focusable w-9 h-9 bg-zinc-800 border border-zinc-600 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
+                        >
+                          {watchlist.includes(item.id.toString()) ? (
+                            <Check className="w-4 h-4 text-[#DECB94]" />
+                          ) : (
+                            <Plus className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Metadata */}
+                      <div className="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5 flex-wrap leading-tight select-none">
+                        <span className="text-white font-bold">{item.releaseYear || item.year || 2026}</span>
+                        <span className="text-zinc-650">•</span>
+                        <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-300">{item.ageRating || item.rating || "U/A"}</span>
+                        <span className="text-zinc-650">•</span>
+                        <span>{item.seasons && item.seasons.length > 0 ? `${item.seasons.length} Seasons` : (item.duration || "N/A")}</span>
+                        {item.language && <><span className="text-zinc-650">•</span><span>{item.language}</span></>}
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-[11px] text-zinc-400 line-clamp-3 leading-relaxed">
+                        {item.description || "No description available."}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {list.length > 15 && (
             <div
               onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}

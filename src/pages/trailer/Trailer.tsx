@@ -140,6 +140,13 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
           <div
             ref={rowRef}
             className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
+            style={{
+              overflowY: 'visible',
+              paddingTop: '20px',
+              marginTop: '-20px',
+              paddingBottom: '20px',
+              marginBottom: '-20px'
+            }}
           >
             {trailers.slice(0, 15).map((item) => {
               const displayTitle = item.title.toLowerCase().includes("trailer")

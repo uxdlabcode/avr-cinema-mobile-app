@@ -252,79 +252,112 @@ const MovieCategoryRow = ({
         <div
           ref={rowRef}
           className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
+          style={{
+            overflowY: 'visible',
+            paddingTop: '80px',
+            marginTop: '-80px',
+            paddingBottom: '180px',
+            marginBottom: '-180px'
+          }}
         >
-          {displayList.map((movie) => {
-            // Normal Movie Row Item
+          {displayList.map((movie, index) => {
+            const isFirst = index === 0;
+            const isLast = index === displayList.length - 1;
+
+            // Movie Card with Hotstar-style floating popup
             return (
               <div
                 key={movie.id}
-                tabIndex={0}
-                className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none transition-all duration-300 hover:scale-108 hover:z-30 hover:bg-[#18181b] hover:border-zinc-800"
-                onClick={() => navigate(`/video/${movie.id}`)}
+                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
+                style={{ zIndex: 1 }}
+                onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+                onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
               >
-                {/* Image Container */}
-                <div className="w-full h-full relative transition-all duration-300 group-hover:h-[40%] sm:group-hover:h-[45%] md:group-hover:h-[48%] group-hover:aspect-video">
+                {/* Poster Card - always visible */}
+                <div
+                  tabIndex={0}
+                  className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
+                  onClick={() => navigate(`/video/${movie.id}`)}
+                >
                   <img
                     src={movie.signedThumbnailUrl || "/assets/poster.png"}
                     alt={movie.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-all duration-300"
+                    className="w-full h-full object-cover"
                   />
-                  {/* Fallback title on mobile when not hovered */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                    <p className="text-xs font-semibold text-white truncate text-center">
-                      {movie.title}
-                    </p>
-                  </div>
                 </div>
 
-                {/* Hover Details Panel */}
-                <div className="absolute bottom-0 left-0 right-0 top-[40%] sm:top-[45%] md:top-[48%] p-2 sm:p-3 flex flex-col justify-start text-left gap-1.5 sm:gap-2.5 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300 bg-[#18181b] overflow-y-auto scrollbar-hide">
-                  {/* Action Buttons Row */}
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <button
-                      tabIndex={-1}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/video/${movie.id}`);
-                      }}
-                      className="focusable flex-1 py-1 sm:py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-[10px] sm:text-xs flex items-center justify-center gap-1 shadow cursor-pointer transition-colors"
-                    >
-                      <Play className="w-3 h-3 fill-current text-black" /> Watch Now
-                    </button>
-                    <button
-                      tabIndex={-1}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (toggleWatchlist) {
-                          toggleWatchlist(movie.id, movie);
-                        }
-                      }}
-                      className="focusable p-1.5 bg-zinc-800 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
-                    >
-                      {watchlist.includes(movie.id.toString()) ? (
-                        <Check className="w-3 h-3 text-[#DECB94]" />
-                      ) : (
-                        <Plus className="w-3 h-3" />
-                      )}
-                    </button>
+                {/* Floating Popup - centered on card, extends above AND below */}
+                <div
+                  className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${
+                    isFirst
+                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                      : isLast
+                      ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
+                      : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
+                  }`}
+                >
+                  {/* Landscape Thumbnail - tall & prominent */}
+                  <div className="w-full h-[190px] overflow-hidden relative">
+                    <img
+                      src={movie.signedThumbnailUrl || "/assets/poster.png"}
+                      alt={movie.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
                   </div>
 
-                  {/* Metadata Row */}
-                  <div className="text-[8px] sm:text-[10px] text-zinc-350 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
-                    <span>{movie.releaseYear || movie.year || 2026}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="px-1 border border-zinc-700 rounded-sm text-[7px] sm:text-[9px] leading-none py-0.5">{movie.ageRating || movie.rating || "U/A 13+"}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="truncate">{movie.seasons && movie.seasons.length > 0 ? `${movie.seasons.length} Seasons` : (movie.duration || "N/A")}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="truncate">{movie.language || "Hindi"}</span>
-                  </div>
+                  {/* Details Panel */}
+                  <div className="px-4 py-3 flex flex-col gap-2.5">
+                    {/* Title */}
+                    <p className="text-white font-bold text-[15px] leading-snug">{movie.title}</p>
 
-                  {/* Description Snippet */}
-                  <p className="text-[7px] sm:text-[10px] text-zinc-450 line-clamp-3 sm:line-clamp-4 leading-normal sm:leading-relaxed">
-                    {movie.description || "No description available."}
-                  </p>
+                    {/* Action Buttons Row */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        tabIndex={-1}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/video/${movie.id}`);
+                        }}
+                        className="focusable flex-1 py-2 bg-white text-black hover:bg-zinc-200 rounded-md font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer transition-colors"
+                      >
+                        <Play className="w-4 h-4 fill-current text-black" /> Watch Now
+                      </button>
+                      <button
+                        tabIndex={-1}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (toggleWatchlist) {
+                            toggleWatchlist(movie.id, movie);
+                          }
+                        }}
+                        className="focusable w-9 h-9 bg-zinc-800 border border-zinc-600 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
+                      >
+                        {watchlist.includes(movie.id.toString()) ? (
+                          <Check className="w-4 h-4 text-[#DECB94]" />
+                        ) : (
+                          <Plus className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Metadata Row */}
+                    <div className="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5 flex-wrap leading-tight select-none">
+                      <span className="text-white font-bold">{movie.releaseYear || movie.year || 2026}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-300">{movie.ageRating || movie.rating || "U/A 13+"}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span>{movie.seasons && movie.seasons.length > 0 ? `${movie.seasons.length} Seasons` : (movie.duration || "N/A")}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span>{movie.language || "Hindi"}</span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-[11px] text-zinc-400 line-clamp-3 leading-relaxed">
+                      {movie.description || "No description available."}
+                    </p>
+                  </div>
                 </div>
               </div>
             );

@@ -326,27 +326,45 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
         <div
           ref={rowRef}
           className="flex overflow-x-auto overflow-y-visible pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-3"
-          style={{ overflowY: 'visible' }}
+          style={{
+            overflowY: 'visible',
+            paddingTop: '80px',
+            marginTop: '-80px',
+            paddingBottom: '180px',
+            marginBottom: '-180px'
+          }}
         >
-          {items.slice(0, 15).map((doc) => (
-            <div 
-              key={doc.id}
-              className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
-              style={{ zIndex: 1 }}
-              onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
-              onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
-            >
-              {/* Poster */}
-              <div
-                tabIndex={0}
-                className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
-                onClick={() => navigate(`/video/${doc.id}`)}
-              >
-                <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} loading="lazy" className="w-full h-full object-cover" />
-              </div>
+          {items.slice(0, 15).map((doc, index) => {
+            const isFirst = index === 0;
+            const isLast = index === Math.min(items.length, 15) - 1;
 
-              {/* Floating Popup */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50">
+            return (
+              <div 
+                key={doc.id}
+                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
+                style={{ zIndex: 1 }}
+                onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+                onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
+              >
+                {/* Poster */}
+                <div
+                  tabIndex={0}
+                  className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
+                  onClick={() => navigate(`/video/${doc.id}`)}
+                >
+                  <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} loading="lazy" className="w-full h-full object-cover" />
+                </div>
+
+                {/* Floating Popup */}
+                <div
+                  className={`absolute top-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50 ${
+                    isFirst
+                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                      : isLast
+                      ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
+                      : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
+                  }`}
+                >
                 <div className="w-full aspect-video overflow-hidden relative">
                   <img src={doc.signedThumbnailUrl || "/assets/poster.png"} alt={doc.title} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
@@ -375,7 +393,8 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
                 </div>
               </div>
             </div>
-          ))}
+          );
+        })}
           {items.length > 15 && (
             <div 
               onClick={() => navigate(`/genre/Documentary`)}

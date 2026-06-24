@@ -173,19 +173,32 @@ const TVCategoryRow = ({
         {/* Horizontal Scrollable Row */}
         <div
           ref={rowRef}
-          className={`flex overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4 ${isTrending
+          className={`flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4 ${isTrending
             ? "pl-8 sm:pl-12 md:pl-16 lg:pl-20"
-            : "pb-1"
+            : ""
             }`}
+          style={{
+            overflowY: 'visible',
+            paddingTop: '80px',
+            marginTop: '-80px',
+            paddingBottom: '180px',
+            marginBottom: '-180px'
+          }}
         >
           {displayList.map((tv, index) => {
+            const isFirst = index === 0;
+            const isLast = index === displayList.length - 1;
+
             if (isTrending) {
               return (
                 <div
                   key={tv.id}
                   className="flex-none relative snap-start group/trending pt-4"
+                  style={{ zIndex: 1 }}
+                  onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+                  onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
                 >
-                  {/* Giant rank number with thick white border */}
+                  {/* Giant rank number */}
                   <span
                     className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
                     style={{
@@ -202,158 +215,148 @@ const TVCategoryRow = ({
                   {/* TV Card Poster */}
                   <div
                     tabIndex={0}
-                    className="focusable relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 outline-none"
+                    className="focusable relative z-20 flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/trending:scale-105"
                     onClick={() => navigate(`/video/${tv.id}`)}
                   >
                     <img
                       src={tv.signedThumbnailUrl || "/assets/poster.png"}
                       alt={tv.title}
                       loading="lazy"
-                      className="w-full h-full object-cover group-hover/card:scale-[1.03] group-hover/card:brightness-[0.4] transition-all duration-300"
+                      className="w-full h-full object-cover"
                     />
+                  </div>
 
-                    {/* Mobile Title bar fallback */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover/card:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                      <p className="text-sm font-semibold text-white truncate text-center drop-shadow-md">
-                        {tv.title}
-                      </p>
+                  {/* Floating Popup - centered on card, extends above AND below */}
+                  <div
+                    className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/trending:opacity-100 group-hover/trending:scale-100 group-hover/trending:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${
+                      isFirst
+                        ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                        : isLast
+                        ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
+                        : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
+                    }`}
+                  >
+                    <div className="w-full h-[190px] overflow-hidden relative">
+                      <img
+                        src={tv.signedThumbnailUrl || "/assets/poster.png"}
+                        alt={tv.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
                     </div>
-
-                    {/* The theatrical hover details overlay */}
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/card:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                      {/* Genre/Category Badge */}
-                      <div className="flex justify-end mb-1 md:mb-2">
-                        <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                          {tv.genres && tv.genres.length > 0
-                            ? tv.genres[0]
-                            : "TV Show"}
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h4 className="text-xs md:text-sm font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
-                        {tv.title}
-                      </h4>
-
-                      {/* Metadata Row */}
-                      <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
-                        <span className="truncate">English (UK)</span>
-                        <div className="flex items-center gap-0.5">
-                          <span className="text-[8px] md:text-[9px] opacity-85">
-                            🌐
-                          </span>
-                          <span>{tv.duration || "N/A"}</span>
-                        </div>
-                      </div>
-
-                      {/* Actions row */}
-                      <div className="flex items-center gap-1 md:gap-1.5">
-                        <button 
+                    <div className="px-4 py-3 flex flex-col gap-2.5">
+                      <p className="text-white font-bold text-[15px] leading-snug">{tv.title}</p>
+                      <div className="flex items-center gap-2">
+                        <button
                           tabIndex={-1}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/video/${tv.id}`);
-                          }}
-                          className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                          onClick={(e) => { e.stopPropagation(); navigate(`/video/${tv.id}`); }}
+                          className="focusable flex-1 py-2 bg-white text-black hover:bg-zinc-200 rounded-md font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer transition-colors"
                         >
-                          Play Now
+                          <Play className="w-4 h-4 fill-current text-black" /> Watch Now
                         </button>
-                        <button 
+                        <button
                           tabIndex={-1}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleWatchlist(tv.id, tv);
-                          }}
-                          className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                          onClick={(e) => { e.stopPropagation(); toggleWatchlist(tv.id, tv); }}
+                          className="focusable w-9 h-9 bg-zinc-800 border border-zinc-600 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
                         >
                           {watchlist.includes(tv.id.toString()) ? (
-                            <Check className="w-3 h-3 text-[#DECB94]" />
+                            <Check className="w-4 h-4 text-[#DECB94]" />
                           ) : (
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-4 h-4" />
                           )}
                         </button>
                       </div>
+                      <div className="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5 flex-wrap leading-tight select-none">
+                        <span className="text-white font-bold">{tv.releaseYear || tv.year || 2026}</span>
+                        <span className="text-zinc-600">•</span>
+                        <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-300">{tv.ageRating || tv.rating || "U/A"}</span>
+                        <span className="text-zinc-600">•</span>
+                        <span>{tv.seasons && tv.seasons.length > 0 ? `${tv.seasons.length} Seasons` : (tv.duration || "N/A")}</span>
+                        {tv.language && <><span className="text-zinc-600">•</span><span>{tv.language}</span></>}
+                      </div>
+                      <p className="text-[11px] text-zinc-400 line-clamp-3 leading-relaxed">
+                        {tv.description || "No description available."}
+                      </p>
                     </div>
                   </div>
                 </div>
               );
             }
 
-            // Normal TV Row Item
+            // Normal TV Row Item - Hotstar-style floating popup
             return (
               <div
                 key={tv.id}
-                tabIndex={0}
-                className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
-                onClick={() => navigate(`/video/${tv.id}`)}
+                className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
+                style={{ zIndex: 1 }}
+                onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
+                onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
               >
-                <img
-                  src={tv.signedThumbnailUrl || "/assets/poster.png"}
-                  alt={tv.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
-                />
-
-                {/* Mobile Title bar fallback (Visible when not hovered on touch devices) */}
-                <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                  <p className="text-sm font-semibold text-white truncate text-center drop-shadow-md">
-                    {tv.title}
-                  </p>
+                {/* Poster Card - always visible */}
+                <div
+                  tabIndex={0}
+                  className="focusable w-full aspect-[2/3] rounded-md overflow-hidden cursor-pointer shadow-lg border border-zinc-900 bg-zinc-950 outline-none transition-all duration-300 group-hover/card:scale-105"
+                  onClick={() => navigate(`/video/${tv.id}`)}
+                >
+                  <img
+                    src={tv.signedThumbnailUrl || "/assets/poster.png"}
+                    alt={tv.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
-                {/* The theatrical hover details overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-2.5 md:p-4 text-left z-10 border border-zinc-800/80 rounded-md">
-                  {/* Genre/Category Badge */}
-                  <div className="flex justify-end mb-1 md:mb-2">
-                    <span className="text-[8px] md:text-[9px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
-                      {tv.genres && tv.genres.length > 0
-                        ? tv.genres[0]
-                        : "TV Show"}
-                    </span>
+                {/* Floating Popup - centered on card, extends above AND below */}
+                <div
+                  className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${
+                    isFirst
+                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                      : isLast
+                      ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
+                      : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
+                  }`}
+                >
+                  <div className="w-full h-[190px] overflow-hidden relative">
+                    <img
+                      src={tv.signedThumbnailUrl || "/assets/poster.png"}
+                      alt={tv.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-transparent to-transparent" />
                   </div>
-
-                  {/* Title */}
-                  <h4 className="text-xs md:text-sm font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
-                    {tv.title}
-                  </h4>
-
-                  {/* Metadata Row */}
-                  <div className="flex items-center justify-between text-[8px] md:text-[9px] font-semibold text-zinc-400 mb-1.5 md:mb-2.5">
-                    <span className="truncate">English (UK)</span>
-                    <div className="flex items-center gap-0.5">
-                      <span className="text-[8px] md:text-[9px] opacity-85">
-                        🌐
-                      </span>
-                      <span>{tv.duration || "N/A"}</span>
+                  <div className="px-4 py-3 flex flex-col gap-2.5">
+                    <p className="text-white font-bold text-[15px] leading-snug">{tv.title}</p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        tabIndex={-1}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/video/${tv.id}`); }}
+                        className="focusable flex-1 py-2 bg-white text-black hover:bg-zinc-200 rounded-md font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer transition-colors"
+                      >
+                        <Play className="w-4 h-4 fill-current text-black" /> Watch Now
+                      </button>
+                      <button
+                        tabIndex={-1}
+                        onClick={(e) => { e.stopPropagation(); toggleWatchlist(tv.id, tv); }}
+                        className="focusable w-9 h-9 bg-zinc-800 border border-zinc-600 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow"
+                      >
+                        {watchlist.includes(tv.id.toString()) ? (
+                          <Check className="w-4 h-4 text-[#DECB94]" />
+                        ) : (
+                          <Plus className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Actions row */}
-                  <div className="flex items-center gap-1 md:gap-1.5">
-                    <button 
-                      tabIndex={-1}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/video/${tv.id}`);
-                      }}
-                      className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-xs md:text-sm rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
-                    >
-                      Play Now
-                    </button>
-                    <button 
-                      tabIndex={-1}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleWatchlist(tv.id, tv);
-                      }}
-                      className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
-                    >
-                      {watchlist.includes(tv.id.toString()) ? (
-                        <Check className="w-3 h-3 text-[#DECB94]" />
-                      ) : (
-                        <Plus className="w-3 h-3" />
-                      )}
-                    </button>
+                    <div className="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5 flex-wrap leading-tight select-none">
+                      <span className="text-white font-bold">{tv.releaseYear || tv.year || 2026}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-300">{tv.ageRating || tv.rating || "U/A"}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span>{tv.seasons && tv.seasons.length > 0 ? `${tv.seasons.length} Seasons` : (tv.duration || "N/A")}</span>
+                      {tv.language && <><span className="text-zinc-600">•</span><span>{tv.language}</span></>}
+                    </div>
+                    <p className="text-[11px] text-zinc-400 line-clamp-3 leading-relaxed">
+                      {tv.description || "No description available."}
+                    </p>
                   </div>
                 </div>
               </div>
