@@ -14,8 +14,7 @@ type Props = {
 };
 
 export default function Layout({ children }: Props) {
-  const isTV = isTvPlatform();
-  const [isMobileWidth, setIsMobileWidth] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -95,14 +94,13 @@ export default function Layout({ children }: Props) {
 
   useEffect(() => {
     const checkWidth = () => {
-      setIsMobileWidth(window.innerWidth < 768);
+      const isTV = isTvPlatform();
+      setShowSidebar(isTV || window.innerWidth >= 1024);
     };
     checkWidth();
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener("resize", checkWidth);
   }, []);
-
-  const showSidebar = !isMobileWidth;
 
   return (
     <div 

@@ -27,6 +27,7 @@ const MOVIES_DATA: Record<string, {
   cast: { name: string; image: string }[];
   related: { id: string | number; title: string; image: string }[];
   movieUrl?: string;
+  language?: string;
 }> = {
   '1': {
     id: '1',
