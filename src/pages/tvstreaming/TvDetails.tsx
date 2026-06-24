@@ -112,7 +112,7 @@ const MediaCategoryRow = ({
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll("left")}
             className="focusable absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -124,7 +124,7 @@ const MediaCategoryRow = ({
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll("right")}
             className="focusable absolute right-[-20px] md:right-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -428,16 +428,16 @@ const TvDetails = () => {
   const featuredShows = tvShows.slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 pt-16 md:pt-0">
+    <div className="min-h-screen bg-black text-white w-full pb-14 md:pb-0 pt-16 md:pt-0">
       <Header />
 
       {/* Tab Navigation */}
-      <div className="flex gap-6 px-4 py-3 overflow-x-auto pt-5 scrollbar-hide border-b border-zinc-900">
+      <div className="sticky top-14 md:top-0 z-40 bg-black flex gap-6 px-4 md:py-3 overflow-x-auto md:pt-5 md:mt-7 scrollbar-hide border-b border-zinc-900">
         {TABS.map((tab) => (
-          <button 
+          <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`focusable focusable pb-2 text-xs font-semibold  transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 ${activeTab === tab
+            className={`focusable focusable pb-2 text-xs md:text-lg lg:text-sm font-semibold  transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 ${activeTab === tab
               ? 'text-primary'
               : 'text-zinc-400 hover:text-white'
               }`}
@@ -561,457 +561,457 @@ const TvDetails = () => {
         <>
           {/* Hero Carousel (FOR YOU tab) */}
           {activeTab === 'For You' && featuredShows.length > 0 && (
-        <Carousel
-          setApi={setCarouselApi}
-          opts={{
-            align: "start",
-            loop: true,
-            duration: 60,
-          }}
-          className="w-full relative border-b border-zinc-900 overflow-hidden"
-        >
-          <CarouselContent className="ml-0">
-            {featuredShows.map((slide) => {
-              const isExpanded = expandedShowId === slide.id;
-              const titleParts = slide.title.split(":");
-              const mainTitle = titleParts[0]?.trim();
-              const subTitle = titleParts[1]?.trim();
-              const tags = slide.genres && slide.genres.length > 0
-                ? slide.genres
-                : (slide.category ? [slide.category] : ["Featured", "Trending"]);
+            <Carousel
+              setApi={setCarouselApi}
+              opts={{
+                align: "start",
+                loop: true,
+                duration: 60,
+              }}
+              className="w-full relative border-b border-zinc-900 overflow-hidden"
+            >
+              <CarouselContent className="ml-0">
+                {featuredShows.map((slide) => {
+                  const isExpanded = expandedShowId === slide.id;
+                  const titleParts = slide.title.split(":");
+                  const mainTitle = titleParts[0]?.trim();
+                  const subTitle = titleParts[1]?.trim();
+                  const tags = slide.genres && slide.genres.length > 0
+                    ? slide.genres
+                    : (slide.category ? [slide.category] : ["Featured", "Trending"]);
 
-              return (
-                <CarouselItem
-                  key={slide.id}
-                  tabIndex={-1}
-                  className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
-                  onClick={() => navigate(`/video/${slide.id}`)}
-                >
-                  {/* Age Rating Badge */}
-                  {slide.ageRating && (
-                    <div className="absolute md:top-20 top-7 md:top-8 left-6 md:left-16 z-20 px-3 py-1 bg-black/60 border border-primary-foreground/40 rounded text-xs font-bold text-primary-foreground backdrop-blur-sm select-none">
-                      {slide.ageRating}
-                    </div>
-                  )}
-
-                  {/* Background Image */}
-                  <div className="absolute inset-0 w-full h-full pointer-events-none">
-                    <img
-                      src={slide.signedThumbnailUrl || "/assets/poster.png"}
-                      alt={slide.title}
-                      className="w-full h-full object-cover object-top"
-                    />
-                    {/* Bottom Gradient Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black via-black/80 to-transparent z-[1]" />
-                  </div>
-
-                  {/* Hero Content Overlay */}
-                  <div className="relative z-10 w-full px-6 md:px-16 pb-12 md:pb-20 flex flex-col justify-end h-full">
-
-                    {/* MOBILE & TABLET LAYOUT (Centered metadata and play buttons) */}
-                    <div className="md:hidden flex flex-col items-center text-center px-4 w-full">
-                      <h1 className="text-3xl font-bold tracking-tight mb-3 drop-shadow-xl uppercase text-[#ffffff]">
-                        {slide.title}
-                      </h1>
-
-                      <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#DECB94] mb-6 drop-shadow-md">
-                        {tags.map((tag: string, index: number) => (
-                          <div key={tag} className="flex items-center gap-2">
-                            <span>{tag}</span>
-                            {index < tags.length - 1 && (
-                              <span className="w-1 h-1 rounded-full bg-zinc-500" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-3 w-full pb-4 px-2">
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/video/${slide.id}`);
-                          }}
-                          className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
-                        >
-                          <Play className="w-4 h-4 fill-current text-black" />
-                          <span>Play</span>
-                        </Button>
-
-                        <Button
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleWatchlist(slide.id, slide);
-                          }}
-                          className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
-                        >
-                          <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
-                          <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "My List"}</span>
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* DESKTOP WEB LAYOUT */}
-                    <div className="hidden md:block w-full">
-                      {!isExpanded ? (
-                        /* Compact Desktop Layout */
-                        <div className="flex flex-col items-start text-left max-w-2xl animate-fade-in relative z-20">
-                          {/* New Series Badge */}
-                          <span className="text-[10px] font-bold bg-white/10 border border-white/20 text-white px-2.5 py-0.5 rounded uppercase tracking-widest mb-3">
-                            New Series
-                          </span>
-
-                          {/* Title */}
-                          <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-1 drop-shadow-md text-[#ffffff] uppercase leading-tight">
-                            {mainTitle}
-                          </h1>
-                          {subTitle && (
-                            <h2 className="text-xl lg:text-2xl font-bold tracking-wide mb-3 text-white uppercase opacity-90 drop-shadow-sm">
-                              {subTitle}
-                            </h2>
-                          )}
-
-                          {/* Sponsor Brand Logos */}
-                          <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
-                            <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
-                          </div>
-
-                          {/* Genres metadata */}
-                          <div className="flex items-center gap-2 text-sm font-semibold text-zinc-300 mb-6 select-none">
-                            <span>{slide.language || "English"}</span>
-                            <span className="text-zinc-650">|</span>
-                            <span>{slide.genres?.join(", ") || tags.join(", ")}</span>
-                          </div>
-
-                          {/* Buttons Row */}
-                          <div className="flex items-center gap-4">
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/video/${slide.id}`);
-                              }}
-                              className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
-                            >
-                              <Play className="w-4 h-4 fill-current text-black" />
-                              <span>Play</span>
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedShowId(slide.id);
-                              }}
-                              className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
-                            >
-                              <span>More Info</span>
-                            </Button>
-
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleWatchlist(slide.id, slide);
-                              }}
-                              className="focusable focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
-                            >
-                              <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
-                                {watchlist.includes(slide.id.toString()) ? (
-                                  <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                ) : (
-                                  <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                                )}
-                              </div>
-                              <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "Add to My List"}</span>
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        /* Expanded Desktop Layout */
-                        <div className="flex flex-col items-start text-left max-w-2xl animate-fade-in relative z-20 select-text pb-6 md:pb-8">
-                          {/* New Series Badge */}
-                          <span className="text-[10px] font-bold bg-white/10 border border-white/20 text-white px-2.5 py-0.5 rounded uppercase tracking-widest mb-3">
-                            New Series
-                          </span>
-
-                          {/* Title */}
-                          <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-1 drop-shadow-md text-[#ffffff] uppercase leading-tight">
-                            {mainTitle}
-                          </h1>
-                          {subTitle && (
-                            <h2 className="text-xl lg:text-2xl font-bold tracking-wide mb-3 text-white uppercase opacity-90 drop-shadow-sm">
-                              {subTitle}
-                            </h2>
-                          )}
-
-                          {/* Sponsor Brand Logos */}
-                          <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
-                            <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
-                            <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
-                          </div>
-
-                          {/* Metadata Details Row */}
-                          <div className="flex items-center gap-3 text-xs font-bold text-zinc-300 mb-6 select-none">
-                            <span>
-                              {slide.seasons?.length > 0
-                                ? `${slide.seasons.length} Season${slide.seasons.length > 1 ? "s" : ""} ${slide.seasons.reduce((acc: number, s: any) => acc + (s.episodes?.length || 0), 0) || 6} Episodes`
-                                : "1 Season 6 Episodes"}
-                            </span>
-                            <span className="text-zinc-650">|</span>
-                            <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-200">{slide.ageRating || "U/A 13+"}</span>
-                            <span className="text-zinc-650">|</span>
-                            <span>{slide.releaseYear || "2026"}</span>
-                            <span className="text-zinc-650">|</span>
-                            <span>{slide.language || "English"}</span>
-                          </div>
-
-                          {/* Resume / Play & My List Buttons */}
-                          <div className="flex items-center gap-4 mb-6">
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/video/${slide.id}`);
-                              }}
-                              className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
-                            >
-                              <Play className="w-4 h-4 fill-current text-black" />
-                              <span>Play</span>
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleWatchlist(slide.id, slide);
-                              }}
-                              className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
-                            >
-                              <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
-                                {watchlist.includes(slide.id.toString()) ? (
-                                  <Check className="w-3 h-3 stroke-[2.5]" />
-                                ) : (
-                                  <Plus className="w-3 h-3 stroke-[2.5]" />
-                                )}
-                              </div>
-                              <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "Add to My List"}</span>
-                            </Button>
-                          </div>
-
-                          {/* Detailed Description Panel */}
-                          <div className="space-y-4 text-left w-full relative">
-                            {/* Close Expanded Info */}
-                            <button 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedShowId(null);
-                                setShowFullDescription(false);
-                              }}
-                              className="focusable focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
-                              title="Close info panel"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-
-                            <h3 className="text-xl font-extrabold text-white leading-snug">
-                              {slide.title}
-                            </h3>
-
-                            <div className="space-y-1.5 text-xs font-semibold select-none">
-                              <div>
-                                <span className="text-zinc-500 font-bold">Genre</span>{" "}
-                                <span className="text-zinc-200 ml-2">{slide.genres?.join(", ") || tags.join(", ")}</span>
-                              </div>
-                              <div>
-                                <span className="text-zinc-500 font-bold">Content Descriptor</span>{" "}
-                                <span className="text-zinc-200 ml-2">{slide.contentDescriptor || "General Audience"}</span>
-                              </div>
-                              <div>
-                                <span className="text-zinc-500 font-bold">Publisher</span>{" "}
-                                <span className="text-zinc-200 ml-2">{slide.publisher || "Almighty Motion Picture"}</span>
-                              </div>
-                              {slide.cast && slide.cast.length > 0 && (
-                                <div>
-                                  <span className="text-zinc-500 font-bold">Cast</span>{" "}
-                                  <span className="text-zinc-200 ml-2">
-                                    {slide.cast.map((c: any) => typeof c === 'string' ? c : (c.name || '')).filter(Boolean).join(", ")}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
-                            <div className="text-xs md:text-sm text-zinc-350 leading-relaxed font-normal mt-4">
-                              {showFullDescription ? (
-                                <div className="space-y-4 animate-fade-in select-text">
-                                  {slide.description ? (
-                                    slide.description.split("\n").map((p: string, idx: number) => (
-                                      <p key={idx}>{p.trim()}</p>
-                                    ))
-                                  ) : (
-                                    <p>No description available.</p>
-                                  )}
-                                  <button 
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setShowFullDescription(false);
-                                    }}
-                                    className="focusable focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
-                                  >
-                                    See Less
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="animate-fade-in">
-                                  <p className="line-clamp-3 select-all">{slide.description || "No description available."}</p>
-                                  {slide.description && slide.description.length > 150 && (
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowFullDescription(true);
-                                      }}
-                                      className="focusable focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
-                                    >
-                                      See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
-                                    </button>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
+                  return (
+                    <CarouselItem
+                      key={slide.id}
+                      tabIndex={-1}
+                      className="pl-0 relative w-full min-h-[75vh] md:min-h-[88vh] h-auto flex flex-col justify-end cursor-pointer"
+                      onClick={() => navigate(`/video/${slide.id}`)}
+                    >
+                      {/* Age Rating Badge */}
+                      {slide.ageRating && (
+                        <div className="absolute md:top-20 top-7 md:top-8 left-6 md:left-16 z-20 px-3 py-1 bg-black/60 border border-primary-foreground/40 rounded text-xs font-bold text-primary-foreground backdrop-blur-sm select-none">
+                          {slide.ageRating}
                         </div>
                       )}
-                    </div>
 
-                  </div>
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
+                      {/* Background Image */}
+                      <div className="absolute inset-0 w-full h-full pointer-events-none">
+                        <img
+                          src={slide.signedThumbnailUrl || "/assets/poster.png"}
+                          alt={slide.title}
+                          className="w-full h-full object-cover object-top"
+                        />
+                        {/* Bottom Gradient Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-black via-black/80 to-transparent z-[1]" />
+                      </div>
 
-          {/* Slider Dots indicators */}
-          <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
-            <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
-              {featuredShows.map((_, index) => (
-                <button 
-                  key={index}
-                  tabIndex={-1}
-                  onClick={() => carouselApi?.scrollTo(index)}
-                  className={`focusable h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
-                    ? "w-6 bg-primary"
-                    : "w-1.5 bg-white/50 hover:bg-white"
-                    }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
+                      {/* Hero Content Overlay */}
+                      <div className="relative z-10 w-full px-6 md:px-16 pb-12 md:pb-20 flex flex-col justify-end h-full">
 
-          {/* Slider Controls (Left, Right arrows) */}
-          <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
-            <button 
-              tabIndex={-1}
-              onClick={(e) => {
-                e.stopPropagation();
-                carouselApi?.scrollPrev();
-              }}
-              className="focusable w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
-              aria-label="Previous featured banner"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
+                        {/* MOBILE & TABLET LAYOUT (Centered metadata and play buttons) */}
+                        <div className="md:hidden flex flex-col items-center text-center px-4 w-full">
+                          <h1 className="text-3xl font-bold tracking-tight mb-3 drop-shadow-xl uppercase text-[#ffffff]">
+                            {slide.title}
+                          </h1>
 
-            <button 
-              tabIndex={-1}
-              onClick={(e) => {
-                e.stopPropagation();
-                carouselApi?.scrollNext();
-              }}
-              className="focusable w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
-              aria-label="Next featured banner"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </Carousel>
-      )}
+                          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#DECB94] mb-6 drop-shadow-md">
+                            {tags.map((tag: string, index: number) => (
+                              <div key={tag} className="flex items-center gap-2">
+                                <span>{tag}</span>
+                                {index < tags.length - 1 && (
+                                  <span className="w-1 h-1 rounded-full bg-zinc-500" />
+                                )}
+                              </div>
+                            ))}
+                          </div>
 
-      {/* Popular TV Shows */}
-      {activeTab === 'For You' && tvShows.length > 0 && (
-        <section className="px-4 pt-6 space-y-3">
-          <h2
-            tabIndex={-1}
-            className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors"
-            onClick={() => setActiveTab('TV Shows')}
-          >
-            Popular TV Shows <ChevronRight className="w-4 h-4 ml-1" />
-          </h2>
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x">
-            {tvShows.map((show) => (
-              <div
-                key={show.id}
-                tabIndex={0}
-                className="focusable relative shrink-0 w-48 md:w-56 aspect-video rounded-lg overflow-hidden snap-start cursor-pointer group outline-none"
-                onClick={() => navigate(`/video/${show.id}`)}
-              >
-                <img src={show.signedThumbnailUrl || "/assets/poster.png"} alt={show.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 z-10">
-                  <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-[10px] font-semibold text-white truncate">{show.title}</span>
+                          <div className="flex items-center gap-3 w-full pb-4 px-2">
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/video/${slide.id}`);
+                              }}
+                              className="focusable flex-1 bg-[#ffffff] hover:bg-white/90 text-[#000000] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm font-bold shadow-md w-full"
+                            >
+                              <Play className="w-4 h-4 fill-current text-black" />
+                              <span>Play</span>
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleWatchlist(slide.id, slide);
+                              }}
+                              className="focusable flex-1 bg-zinc-900/60 border border-zinc-700 text-[#ffffff] hover:bg-zinc-850 px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-full backdrop-blur-sm"
+                            >
+                              <Plus className="w-4 h-4 mr-1 text-[#DECB94]" />
+                              <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "My List"}</span>
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* DESKTOP WEB LAYOUT */}
+                        <div className="hidden md:block w-full">
+                          {!isExpanded ? (
+                            /* Compact Desktop Layout */
+                            <div className="flex flex-col items-start text-left max-w-2xl animate-fade-in relative z-20">
+                              {/* New Series Badge */}
+                              <span className="text-[10px] font-bold bg-white/10 border border-white/20 text-white px-2.5 py-0.5 rounded uppercase tracking-widest mb-3">
+                                New Series
+                              </span>
+
+                              {/* Title */}
+                              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-1 drop-shadow-md text-[#ffffff] uppercase leading-tight">
+                                {mainTitle}
+                              </h1>
+                              {subTitle && (
+                                <h2 className="text-xl lg:text-2xl font-bold tracking-wide mb-3 text-white uppercase opacity-90 drop-shadow-sm">
+                                  {subTitle}
+                                </h2>
+                              )}
+
+                              {/* Sponsor Brand Logos */}
+                              <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
+                                <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
+                              </div>
+
+                              {/* Genres metadata */}
+                              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-300 mb-6 select-none">
+                                <span>{slide.language || "English"}</span>
+                                <span className="text-zinc-650">|</span>
+                                <span>{slide.genres?.join(", ") || tags.join(", ")}</span>
+                              </div>
+
+                              {/* Buttons Row */}
+                              <div className="flex items-center gap-4">
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/video/${slide.id}`);
+                                  }}
+                                  className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md w-[150px]"
+                                >
+                                  <Play className="w-4 h-4 fill-current text-black" />
+                                  <span>Play</span>
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedShowId(slide.id);
+                                  }}
+                                  className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-white px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow backdrop-blur-sm font-bold w-[150px]"
+                                >
+                                  <span>More Info</span>
+                                </Button>
+
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleWatchlist(slide.id, slide);
+                                  }}
+                                  className="focusable focusable text-white hover:text-white/80 gap-2.5 flex items-center cursor-pointer text-sm font-bold ml-2 transition-colors select-none"
+                                >
+                                  <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
+                                    {watchlist.includes(slide.id.toString()) ? (
+                                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                    ) : (
+                                      <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                                    )}
+                                  </div>
+                                  <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "Add to My List"}</span>
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Expanded Desktop Layout */
+                            <div className="flex flex-col items-start text-left max-w-2xl animate-fade-in relative z-20 select-text pb-6 md:pb-8">
+                              {/* New Series Badge */}
+                              <span className="text-[10px] font-bold bg-white/10 border border-white/20 text-white px-2.5 py-0.5 rounded uppercase tracking-widest mb-3">
+                                New Series
+                              </span>
+
+                              {/* Title */}
+                              <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight mb-1 drop-shadow-md text-[#ffffff] uppercase leading-tight">
+                                {mainTitle}
+                              </h1>
+                              {subTitle && (
+                                <h2 className="text-xl lg:text-2xl font-bold tracking-wide mb-3 text-white uppercase opacity-90 drop-shadow-sm">
+                                  {subTitle}
+                                </h2>
+                              )}
+
+                              {/* Sponsor Brand Logos */}
+                              <div className="flex items-center gap-2 mb-4 text-[10px] tracking-wider text-zinc-400 font-bold select-none">
+                                <span className="opacity-60 text-[9px]">CO-PRESENTED BY:</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">LIVEX</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">NITTO</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">TITAN</span>
+                                <span className="px-2 py-0.5 bg-white/10 border border-white/20 rounded-sm text-white font-extrabold tracking-widest text-[9px]">CAMPUS</span>
+                              </div>
+
+                              {/* Metadata Details Row */}
+                              <div className="flex items-center gap-3 text-xs font-bold text-zinc-300 mb-6 select-none">
+                                <span>
+                                  {slide.seasons?.length > 0
+                                    ? `${slide.seasons.length} Season${slide.seasons.length > 1 ? "s" : ""} ${slide.seasons.reduce((acc: number, s: any) => acc + (s.episodes?.length || 0), 0) || 6} Episodes`
+                                    : "1 Season 6 Episodes"}
+                                </span>
+                                <span className="text-zinc-650">|</span>
+                                <span className="px-1.5 py-0.5 border border-zinc-600 rounded text-[10px] text-zinc-200">{slide.ageRating || "U/A 13+"}</span>
+                                <span className="text-zinc-650">|</span>
+                                <span>{slide.releaseYear || "2026"}</span>
+                                <span className="text-zinc-650">|</span>
+                                <span>{slide.language || "English"}</span>
+                              </div>
+
+                              {/* Resume / Play & My List Buttons */}
+                              <div className="flex items-center gap-4 mb-6">
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/video/${slide.id}`);
+                                  }}
+                                  className="focusable bg-white hover:bg-white/90 text-black font-bold px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2 text-sm shadow-md"
+                                >
+                                  <Play className="w-4 h-4 fill-current text-black" />
+                                  <span>Play</span>
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleWatchlist(slide.id, slide);
+                                  }}
+                                  className="focusable bg-zinc-950/60 hover:bg-zinc-900/80 border border-zinc-800 text-[#ffffff] px-6 py-5 rounded-md cursor-pointer flex items-center justify-center gap-2.5 text-sm shadow backdrop-blur-sm font-bold"
+                                >
+                                  <div className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-white shrink-0">
+                                    {watchlist.includes(slide.id.toString()) ? (
+                                      <Check className="w-3 h-3 stroke-[2.5]" />
+                                    ) : (
+                                      <Plus className="w-3 h-3 stroke-[2.5]" />
+                                    )}
+                                  </div>
+                                  <span>{watchlist.includes(slide.id.toString()) ? "In My List" : "Add to My List"}</span>
+                                </Button>
+                              </div>
+
+                              {/* Detailed Description Panel */}
+                              <div className="space-y-4 text-left w-full relative">
+                                {/* Close Expanded Info */}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedShowId(null);
+                                    setShowFullDescription(false);
+                                  }}
+                                  className="focusable focusable absolute -top-12 right-0 p-1.5 bg-zinc-950/80 hover:bg-zinc-800 rounded-full text-white cursor-pointer border border-zinc-800 transition-colors z-30"
+                                  title="Close info panel"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+
+                                <h3 className="text-xl font-extrabold text-white leading-snug">
+                                  {slide.title}
+                                </h3>
+
+                                <div className="space-y-1.5 text-xs font-semibold select-none">
+                                  <div>
+                                    <span className="text-zinc-500 font-bold">Genre</span>{" "}
+                                    <span className="text-zinc-200 ml-2">{slide.genres?.join(", ") || tags.join(", ")}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-zinc-500 font-bold">Content Descriptor</span>{" "}
+                                    <span className="text-zinc-200 ml-2">{slide.contentDescriptor || "General Audience"}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-zinc-500 font-bold">Publisher</span>{" "}
+                                    <span className="text-zinc-200 ml-2">{slide.publisher || "Almighty Motion Picture"}</span>
+                                  </div>
+                                  {slide.cast && slide.cast.length > 0 && (
+                                    <div>
+                                      <span className="text-zinc-500 font-bold">Cast</span>{" "}
+                                      <span className="text-zinc-200 ml-2">
+                                        {slide.cast.map((c: any) => typeof c === 'string' ? c : (c.name || '')).filter(Boolean).join(", ")}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="text-xs md:text-sm text-zinc-350 leading-relaxed font-normal mt-4">
+                                  {showFullDescription ? (
+                                    <div className="space-y-4 animate-fade-in select-text">
+                                      {slide.description ? (
+                                        slide.description.split("\n").map((p: string, idx: number) => (
+                                          <p key={idx}>{p.trim()}</p>
+                                        ))
+                                      ) : (
+                                        <p>No description available.</p>
+                                      )}
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setShowFullDescription(false);
+                                        }}
+                                        className="focusable focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                      >
+                                        See Less
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="animate-fade-in">
+                                      <p className="line-clamp-3 select-all">{slide.description || "No description available."}</p>
+                                      {slide.description && slide.description.length > 150 && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowFullDescription(true);
+                                          }}
+                                          className="focusable focusable text-white hover:text-white/80 font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors"
+                                        >
+                                          See More <ChevronDown className="w-3.5 h-3.5 inline ml-0.5" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+
+              {/* Slider Dots indicators */}
+              <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
+                <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
+                  {featuredShows.map((_, index) => (
+                    <button
+                      key={index}
+                      tabIndex={-1}
+                      onClick={() => carouselApi?.scrollTo(index)}
+                      className={`focusable h-1.5 rounded-full transition-all duration-300 ${currentSlide === index
+                        ? "w-6 bg-primary"
+                        : "w-1.5 bg-white/50 hover:bg-white"
+                        }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      )}
 
-      {/* Documentaries in FOR YOU tab */}
-      {activeTab === 'For You' && (
-        <div className="px-4 pb-6">
-          <DocumentaryList watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
-        </div>
-      )}
+              {/* Slider Controls (Left, Right arrows) */}
+              <div className="hidden md:flex absolute bottom-6 right-12 z-20 items-center gap-3 select-none">
+                <button
+                  tabIndex={-1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    carouselApi?.scrollPrev();
+                  }}
+                  className="focusable w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
+                  aria-label="Previous featured banner"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
 
-      {/* Dynamic Genre Rows (TV Shows and Documentaries) */}
-      {activeTab === 'For You' && (
-        <div className="px-4 pb-8 space-y-8">
-          {Object.keys(groupedTvAndDocs).map((genreName) => {
-            const list = groupedTvAndDocs[genreName];
-            if (list.length === 0) return null;
+                <button
+                  tabIndex={-1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    carouselApi?.scrollNext();
+                  }}
+                  className="focusable w-10 h-10 rounded-full bg-zinc-950/70 hover:bg-zinc-800 text-white flex items-center justify-center cursor-pointer border border-zinc-850 backdrop-blur-sm transition-colors shadow-md"
+                  aria-label="Next featured banner"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </Carousel>
+          )}
 
-            return (
-              <MediaCategoryRow
-                key={genreName}
-                genreName={genreName}
-                list={list}
-                navigate={navigate}
-                watchlist={watchlist}
-                toggleWatchlist={toggleWatchlist}
-              />
-            );
-          })}
-        </div>
-      )}
+          {/* Popular TV Shows */}
+          {activeTab === 'For You' && tvShows.length > 0 && (
+            <section className="px-4 pt-6 space-y-3">
+              <h2
+                tabIndex={-1}
+                className="text-base font-bold flex items-center text-white cursor-pointer hover:text-primary transition-colors"
+                onClick={() => setActiveTab('TV Shows')}
+              >
+                Popular TV Shows <ChevronRight className="w-4 h-4 ml-1" />
+              </h2>
+              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x">
+                {tvShows.map((show) => (
+                  <div
+                    key={show.id}
+                    tabIndex={0}
+                    className="focusable relative shrink-0 w-48 md:w-56 aspect-video rounded-lg overflow-hidden snap-start cursor-pointer group outline-none"
+                    onClick={() => navigate(`/video/${show.id}`)}
+                  >
+                    <img src={show.signedThumbnailUrl || "/assets/poster.png"} alt={show.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 z-10">
+                      <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                      <span className="text-[10px] font-semibold text-white truncate">{show.title}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-      {/* TV Shows Tab */}
-      {activeTab === 'TV Shows' && (
-        <div className="px-4 pt-6">
-          <RecentTVShows isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
-        </div>
-      )}
+          {/* Documentaries in FOR YOU tab */}
+          {activeTab === 'For You' && (
+            <div className="px-4 pb-6">
+              <DocumentaryList watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
+            </div>
+          )}
 
-      {/* Documentaries Tab */}
-      {activeTab === 'Documentaries' && (
-        <div className="px-4 pt-6">
-          <DocumentaryList isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
-        </div>
-      )}
+          {/* Dynamic Genre Rows (TV Shows and Documentaries) */}
+          {activeTab === 'For You' && (
+            <div className="px-4 pb-8 space-y-8">
+              {Object.keys(groupedTvAndDocs).map((genreName) => {
+                const list = groupedTvAndDocs[genreName];
+                if (list.length === 0) return null;
+
+                return (
+                  <MediaCategoryRow
+                    key={genreName}
+                    genreName={genreName}
+                    list={list}
+                    navigate={navigate}
+                    watchlist={watchlist}
+                    toggleWatchlist={toggleWatchlist}
+                  />
+                );
+              })}
+            </div>
+          )}
+
+          {/* TV Shows Tab */}
+          {activeTab === 'TV Shows' && (
+            <div className="px-4 pt-6">
+              <RecentTVShows isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
+            </div>
+          )}
+
+          {/* Documentaries Tab */}
+          {activeTab === 'Documentaries' && (
+            <div className="px-4 pt-6">
+              <DocumentaryList isGrid={true} watchlist={watchlist} toggleWatchlist={toggleWatchlist} />
+            </div>
+          )}
         </>
       )}
 

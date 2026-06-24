@@ -215,9 +215,9 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
                   {genre}
                 </h3>
               </div>
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 pb-40">
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 ">
                 {genreItems.map((show) => (
-                  <div 
+                  <div
                     key={show.id}
                     className="flex-none w-full relative group/card"
                     style={{ zIndex: 1 }}
@@ -283,7 +283,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
           </h3>
         </div>
         {items.length > 15 && (
-          <button 
+          <button
             onClick={() => navigate(`/genre/TV Show`)}
             className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
           >
@@ -295,7 +295,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
       <div className="relative w-full">
         {/* Left Scroll */}
         {showLeft && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll('left')}
             className="focusable absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -307,7 +307,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
 
         {/* Right Scroll */}
         {showRight && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll('right')}
             className="focusable absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -334,7 +334,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
             const isLast = index === Math.min(items.length, 15) - 1;
 
             return (
-              <div 
+              <div
                 key={show.id}
                 className="flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] snap-start relative group/card"
                 style={{ zIndex: 1 }}
@@ -357,46 +357,45 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
 
                 {/* Floating Popup */}
                 <div
-                  className={`absolute top-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50 ${
-                    isFirst
+                  className={`absolute top-1/2 w-[340px] opacity-0 pointer-events-none group-hover/card:opacity-100 group-hover/card:pointer-events-auto transition-all duration-200 rounded-xl overflow-hidden bg-zinc-900 shadow-2xl shadow-black/80 border border-zinc-700/80 z-50 ${isFirst
                       ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
                       : isLast
-                      ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
-                      : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
-                  }`}
+                        ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
+                        : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
+                    }`}
                 >
-                <div className="w-full aspect-video overflow-hidden relative">
-                  <img src={show.signedThumbnailUrl || "/assets/poster.png"} alt={show.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
-                  <div className="absolute bottom-2 left-3 right-3">
-                    <p className="text-white font-bold text-sm leading-tight truncate drop-shadow-lg">{show.title}</p>
+                  <div className="w-full aspect-video overflow-hidden relative">
+                    <img src={show.signedThumbnailUrl || "/assets/poster.png"} alt={show.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                    <div className="absolute bottom-2 left-3 right-3">
+                      <p className="text-white font-bold text-sm leading-tight truncate drop-shadow-lg">{show.title}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="p-3 flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2">
-                    <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); navigate(`/video/${show.id}`); }} className="focusable flex-1 py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-xs flex items-center justify-center gap-1.5 shadow cursor-pointer transition-colors">
-                      <Play className="w-3.5 h-3.5 fill-current" /> Watch Now
-                    </button>
-                    <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); if (toggleWatchlist) toggleWatchlist(show.id, show); }} className="focusable w-8 h-8 bg-zinc-800 border border-zinc-700 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow">
-                      {watchlist.includes(show.id.toString()) ? <Check className="w-3.5 h-3.5 text-[#DECB94]" /> : <Plus className="w-3.5 h-3.5" />}
-                    </button>
+                  <div className="p-3 flex flex-col gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); navigate(`/video/${show.id}`); }} className="focusable flex-1 py-1.5 bg-white text-black hover:bg-zinc-200 rounded font-bold text-xs flex items-center justify-center gap-1.5 shadow cursor-pointer transition-colors">
+                        <Play className="w-3.5 h-3.5 fill-current" /> Watch Now
+                      </button>
+                      <button tabIndex={-1} onClick={(e) => { e.stopPropagation(); if (toggleWatchlist) toggleWatchlist(show.id, show); }} className="focusable w-8 h-8 bg-zinc-800 border border-zinc-700 text-white rounded-full hover:bg-zinc-700 flex items-center justify-center shrink-0 cursor-pointer transition-colors shadow">
+                        {watchlist.includes(show.id.toString()) ? <Check className="w-3.5 h-3.5 text-[#DECB94]" /> : <Plus className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                    <div className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
+                      <span className="text-white">{show.releaseYear || show.year || 2026}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span className="px-1 border border-zinc-600 rounded text-[9px] leading-snug py-0.5 text-zinc-300">{show.ageRating || show.rating || "U/A"}</span>
+                      <span className="text-zinc-600">•</span>
+                      <span>{show.seasons && show.seasons.length > 0 ? `${show.seasons.length} Seasons` : "1 Season"}</span>
+                      {show.language && <><span className="text-zinc-600">•</span><span>{show.language}</span></>}
+                    </div>
+                    <p className="text-[10px] text-zinc-400 line-clamp-4 leading-relaxed">{show.description || "No description available."}</p>
                   </div>
-                  <div className="text-[10px] text-zinc-400 font-semibold flex items-center gap-1 flex-wrap leading-tight select-none">
-                    <span className="text-white">{show.releaseYear || show.year || 2026}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="px-1 border border-zinc-600 rounded text-[9px] leading-snug py-0.5 text-zinc-300">{show.ageRating || show.rating || "U/A"}</span>
-                    <span className="text-zinc-600">•</span>
-                    <span>{show.seasons && show.seasons.length > 0 ? `${show.seasons.length} Seasons` : "1 Season"}</span>
-                    {show.language && <><span className="text-zinc-600">•</span><span>{show.language}</span></>}
-                  </div>
-                  <p className="text-[10px] text-zinc-400 line-clamp-4 leading-relaxed">{show.description || "No description available."}</p>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
           {items.length > 15 && (
-            <div 
+            <div
               onClick={() => navigate(`/genre/TV Show`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >

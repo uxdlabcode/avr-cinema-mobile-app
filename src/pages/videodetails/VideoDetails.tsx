@@ -913,7 +913,7 @@ const VideoDetails = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent z-[2]" />
 
               <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-20">
-                <button 
+                <button
                   onClick={() => navigate(-1)}
                   className="focusable focusable p-2.5 rounded-full bg-black/55 border border-zinc-900/60 text-white hover:bg-black/85 transition-all cursor-pointer flex items-center justify-center"
                 >
@@ -931,7 +931,7 @@ const VideoDetails = () => {
               </div>
 
               <div className="absolute inset-0 flex items-center justify-center z-[3]">
-                <button 
+                <button
                   onClick={() => handleStartPlayback(false)}
                   className="focusable focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-all border-2 border-white/20 cursor-pointer shadow-lg active:scale-95"
                 >
@@ -968,7 +968,7 @@ const VideoDetails = () => {
             <h1 className="text-2xl font-bold text-white tracking-tight leading-tight">{movie.title}</h1>
             <div className="flex items-center flex-wrap gap-2 text-xs font-bold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
-                <span 
+                <span
                   tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
                   className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1029,7 +1029,7 @@ const VideoDetails = () => {
             <div className="w-full text-left">
               <div className="flex gap-3 w-full justify-start overflow-x-auto scrollbar-hide mb-4 border-b border-zinc-800 pb-2">
                 {movie.seasons.map((season: any, idx: number) => (
-                  <button 
+                  <button
                     key={idx}
                     onClick={() => setSelectedSeason(idx)}
                     className={`focusable focusable flex-1 min-w-[80px] max-w-[150px] py-2.5 text-xs font-bold text-center transition-all cursor-pointer whitespace-nowrap rounded-md ${selectedSeason === idx ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white border border-zinc-800"
@@ -1042,7 +1042,7 @@ const VideoDetails = () => {
 
               <div className="space-y-3">
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
-                  <div 
+                  <div
                     key={ep.id}
                     tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
@@ -1103,7 +1103,7 @@ const VideoDetails = () => {
             <p className="text-zinc-400 text-xs leading-relaxed font-normal animate-in fade-in duration-200">
               {isDescExpanded ? movie.description : `${(movie.description || "").slice(0, 150)}${(movie.description || "").length > 150 ? "..." : ""}`}
               {(movie.description || "").length > 150 && (
-                <button 
+                <button
                   tabIndex={-1}
                   onClick={() => setIsDescExpanded(!isDescExpanded)}
                   className="focusable text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
@@ -1149,7 +1149,7 @@ const VideoDetails = () => {
 
               <div className="grid grid-cols-2 gap-3 pb-8">
                 {movie.related.map((item: any) => (
-                  <div 
+                  <div
                     key={item.id}
                     tabIndex={0}
                     onClick={() => {
@@ -1237,7 +1237,7 @@ const VideoDetails = () => {
           {/* Badges tag row */}
           <div className="flex items-center gap-4 text-xs font-bold text-zinc-450 select-none">
             {reviewCount > 0 && averageRating !== null && (
-              <span 
+              <span
                 tabIndex={0}
                 onClick={() => setShowFeedbackModal(true)}
                 className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1262,7 +1262,7 @@ const VideoDetails = () => {
                 ) : (
                   <p>No description available.</p>
                 )}
-                <button 
+                <button
                   onClick={() => setShowFullDescription(false)}
                   className="focusable focusable text-primary font-bold flex items-center gap-1 mt-2 cursor-pointer transition-colors outline-none"
                 >
@@ -1273,7 +1273,7 @@ const VideoDetails = () => {
               <div className="animate-fade-in">
                 <p className="line-clamp-3 select-all leading-relaxed">{movie.description || "No description available."}</p>
                 {movie.description && movie.description.length > 150 && (
-                  <button 
+                  <button
                     onClick={() => setShowFullDescription(true)}
                     className="focusable focusable text-[#3B82F6] hover:text-[#2563EB] font-bold flex items-center gap-1 mt-1 cursor-pointer transition-colors outline-none"
                   >
@@ -1339,7 +1339,7 @@ const VideoDetails = () => {
               {/* Horizontal Episodes Scroller */}
               <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
                 {(movie.seasons[selectedSeason]?.episodes || []).map((ep: any) => (
-                  <div 
+                  <div
                     key={ep.id}
                     tabIndex={0}
                     onClick={() => playEpisode(ep, false)}
@@ -1421,7 +1421,7 @@ const VideoDetails = () => {
                   const detailedItem = getRelatedItemDetails(item);
 
                   return (
-                    <div 
+                    <div
                       key={item.id}
                       className="relative group/card"
                       style={{ zIndex: 1 }}
@@ -1448,13 +1448,12 @@ const VideoDetails = () => {
 
                       {/* Floating Popup - expands equally in all directions from center */}
                       <div
-                        className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${
-                          isFirst
-                            ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
-                            : isLast
+                        className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${isFirst
+                          ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                          : isLast
                             ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
                             : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
-                        }`}
+                          }`}
                       >
                         {/* Popup Container with shadow and border */}
                         <div className="relative rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50">
@@ -1631,7 +1630,7 @@ const VideoDetails = () => {
 
             {/* Play Button Overlay (Mobile Only, hidden on Web) */}
             <div className="md:hidden absolute inset-0 flex items-center justify-center z-[3]">
-              <button 
+              <button
                 onClick={() => handleStartPlayback(false)}
                 disabled={isSigning}
                 className="focusable w-14 h-14 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors border-2 border-white/20 cursor-pointer disabled:opacity-55 shadow-lg active:scale-95"
@@ -1649,7 +1648,7 @@ const VideoDetails = () => {
         {/* Floating Top Header Navigation */}
         {!isPlaying && (
           <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 md:p-6 z-20">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="focusable focusable p-2 rounded-full bg-black/50 border border-zinc-900 text-white hover:bg-black/85 hover:border-zinc-700 transition-all cursor-pointer flex items-center justify-center outline-none"
             >
@@ -1690,7 +1689,7 @@ const VideoDetails = () => {
 
               <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-400">
                 {reviewCount > 0 && averageRating !== null && (
-                  <span 
+                  <span
                     tabIndex={0}
                     onClick={() => setShowFeedbackModal(true)}
                     className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1750,7 +1749,7 @@ const VideoDetails = () => {
             {/* Web Metadata info inline (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-3 text-sm font-semibold text-zinc-400">
               {reviewCount > 0 && averageRating !== null && (
-                <span 
+                <span
                   tabIndex={0}
                   onClick={() => setShowFeedbackModal(true)}
                   className="focusable focusable text-secondary-foreground font-bold flex items-center gap-0.5 cursor-pointer hover:underline"
@@ -1774,7 +1773,7 @@ const VideoDetails = () => {
                   ? (movie.description || "")
                   : `${(movie.description || "").slice(0, 150)}...`}
                 {(movie.description || "").length > 150 && (
-                  <button 
+                  <button
                     tabIndex={-1}
                     onClick={() => setShowFullDescription(!showFullDescription)}
                     className="focusable text-primary font-semibold ml-1 hover:underline focus:outline-none cursor-pointer"
@@ -1820,7 +1819,7 @@ const VideoDetails = () => {
         <div className="space-y-6" id="episodes-tabs">
           <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-semibold text-zinc-400">
             {movie.category === "TV Show" && (
-              <button 
+              <button
                 onClick={() => setActiveTab('episodes')}
                 className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'episodes' ? "text-white border-b-2 border-primary" : "hover:text-white"
                   }`}
@@ -1828,14 +1827,14 @@ const VideoDetails = () => {
                 Episodes
               </button>
             )}
-            <button 
+            <button
               onClick={() => setActiveTab('related')}
               className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               More Like This
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('details')}
               className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
@@ -1861,7 +1860,7 @@ const VideoDetails = () => {
                 {/* Episodes listing vertically */}
                 <div className="space-y-4 max-w-4xl" id="episodes-section">
                   {movie.seasons[0].episodes.map((ep: any, index: number) => (
-                    <div 
+                    <div
                       key={ep.id}
                       tabIndex={0}
                       onClick={() => playEpisode(ep)}
@@ -1922,7 +1921,7 @@ const VideoDetails = () => {
                   const detailedItem = getRelatedItemDetails(item);
 
                   return (
-                    <div 
+                    <div
                       key={item.id}
                       className="relative group/card"
                       style={{ zIndex: 1 }}
@@ -1949,13 +1948,12 @@ const VideoDetails = () => {
 
                       {/* Floating Popup - expands equally in all directions from center */}
                       <div
-                        className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${
-                          isFirst
-                            ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
-                            : isLast
+                        className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${isFirst
+                          ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                          : isLast
                             ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
                             : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
-                        }`}
+                          }`}
                       >
                         {/* Popup Container with shadow and border */}
                         <div className="relative rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50">

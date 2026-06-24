@@ -82,7 +82,7 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton
                 key={i}
-                className="relative shrink-0 w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video rounded-md bg-zinc-900"
+                className="relative shrink-0 w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-[3/2] rounded-md bg-zinc-900"
               />
             ))}
           </div>
@@ -102,7 +102,7 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
             </h3>
           </div>
           {trailers.length > 15 && (
-            <button 
+            <button
               onClick={() => navigate(`/genre/Trailer`)}
               className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
             >
@@ -114,7 +114,7 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
         <div className="relative w-full">
           {/* Left Scroll */}
           {showLeft && (
-            <button 
+            <button
               tabIndex={-1}
               onClick={() => handleScroll("left")}
               className="focusable absolute left-[-20px] md:left-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -126,7 +126,7 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
 
           {/* Right Scroll */}
           {showRight && (
-            <button 
+            <button
               tabIndex={-1}
               onClick={() => handleScroll("right")}
               className="focusable absolute right-[-20px] md:right-[-35px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -159,11 +159,11 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
               const displaySubtitle = `Trailer, ${genresList}`;
 
               return (
-                <div 
+                <div
                   key={item.id}
                   tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
-                  className="focusable focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
+                  className="focusable focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-[3/2] relative rounded-md overflow-hidden cursor-pointer group/card shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
                 >
                   <img
                     src={item.signedThumbnailUrl || "/assets/poster.png"}
@@ -207,9 +207,9 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
               );
             })}
             {trailers.length > 15 && (
-              <div 
+              <div
                 onClick={() => navigate(`/genre/Trailer`)}
-                className="focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-video relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+                className="focusable flex-none w-[200px] sm:w-[240px] md:w-[280px] lg:w-[320px] aspect-[3/2] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
               >
                 <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
                   <ChevronRight className="w-6 h-6" />
@@ -226,7 +226,7 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white px-4 md:px-12 lg:px-16 pb-24 w-full">
+    <div className="min-h-screen mt-5 bg-black text-white px-4 md:px-12 lg:px-16 pb-24 w-full">
       <div className="mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-1 text-left">
@@ -238,13 +238,13 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
 
         {isLoading ? (
           /* Loading Skeleton Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {Array.from({ length: 10 }).map((_, i) => (
               <div
                 key={i}
                 className="flex flex-col rounded-lg overflow-hidden bg-[#181d24] border border-zinc-900 shadow-md text-left"
               >
-                <div className="w-full aspect-video bg-zinc-950" />
+                <div className="w-full aspect-[3/2] bg-zinc-950" />
                 <div className="p-4 flex-1 flex flex-col justify-between bg-[#12161b] gap-2">
                   <Skeleton className="h-4 w-3/4 bg-zinc-800" />
                   <Skeleton className="h-3 w-1/2 bg-zinc-800 mt-2" />
@@ -273,7 +273,7 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
           </Empty>
         ) : (
           /* Trailers Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {trailers.map((item) => {
               // Format Title: Ensure it ends with Trailer or add "| Banner Trailer"
               const displayTitle = item.title.toLowerCase().includes("trailer")
@@ -287,14 +287,14 @@ const Trailer: React.FC<Props> = ({ isGrid = true }) => {
               const displaySubtitle = `Trailer, ${genresList}`;
 
               return (
-                <div 
+                <div
                   key={item.id}
                   tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
                   className="focusable focusable flex flex-col rounded-lg overflow-hidden cursor-pointer group bg-[#181d24] border border-zinc-900 transition-all hover:scale-[1.02] hover:border-zinc-700 shadow-md text-left outline-none"
                 >
                   {/* Thumbnail / Image container */}
-                  <div className="relative w-full aspect-video bg-zinc-950 overflow-hidden">
+                  <div className="relative w-full aspect-[3/2] bg-zinc-950 overflow-hidden">
                     <img
                       src={item.signedThumbnailUrl || "/assets/poster.png"}
                       alt={item.title}
