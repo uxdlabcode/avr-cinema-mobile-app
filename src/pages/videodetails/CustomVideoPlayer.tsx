@@ -6,6 +6,7 @@ import {
   WifiOff, MessageSquare, ListVideo, Crown, Subtitles, AlertCircle
 } from 'lucide-react';
 import { createDocument, deleteDocument, getDocumentData, addDocument } from '@/Firebase';
+import { auth } from '@/Firebase/firebase';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/store/hooks';
 import { FeedbackModal } from './FeedbackModal';
@@ -89,7 +90,6 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     }
   }, [isCurrentlyPlaying, onPlayStateChange]);
   const user = useAppSelector((state) => state.auth.user);
-  const hasActiveMembership = true;
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
@@ -298,10 +298,6 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
   // Load HLS.js script dynamically and bind to the video element
   useEffect(() => {
-    if (!hasActiveMembership) {
-      setIsVideoLoading(false);
-      return;
-    }
     if (!currentSourceUrl || !videoRef.current) return;
     setIsVideoLoading(true);
     const video = videoRef.current;
@@ -340,7 +336,21 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
 
       const HlsClass = (window as any).Hls;
       if (currentSourceUrl.includes(".m3u8") && HlsClass && HlsClass.isSupported()) {
-        hlsInstance = new HlsClass();
+        let token: string | null = null;
+        try {
+          token = await auth.currentUser?.getIdToken() || null;
+        } catch (err) {
+          console.error("Error fetching auth token for HLS decryption:", err);
+        }
+
+        hlsInstance = new HlsClass({
+          xhrSetup: (xhr: any, url: string) => {
+            if (url.includes("/getVideoKey") && token) {
+              const delimiter = url.includes("?") ? "&" : "?";
+              xhr.open("GET", `${url}${delimiter}token=${token}`, true);
+            }
+          }
+        });
         hlsInstance.loadSource(currentSourceUrl);
         hlsInstance.attachMedia(video);
         hlsRef.current = hlsInstance;
@@ -504,7 +514,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         }
       };
     }
-  }, [currentSourceUrl, hasActiveMembership, isPlayingTrailer]);
+  }, [currentSourceUrl, isPlayingTrailer]);
 
   // Handle controls auto-hide
   const triggerControlsShow = () => {
@@ -1004,54 +1014,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
           zIndex: 9999
         } : undefined}
       >
-        {!hasActiveMembership ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-zinc-950 p-4 z-50">
-            <div className={`max-w-md w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300 ${playInline ? "p-4 space-y-3" : "p-8 space-y-6"
-              }`}>
-              <div className="flex justify-center">
-                <div className={`rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/25 ${playInline ? "w-10 h-10" : "w-16 h-16"
-                  }`}>
-                  <Crown className={`text-yellow-500 animate-pulse ${playInline ? "w-5 h-5" : "w-8 h-8"
-                    }`} />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <h3 className={`font-bold text-white tracking-tight text-center ${playInline ? "text-sm md:text-base" : "text-xl"
-                  }`}>Premium Membership Required</h3>
-                <p className="text-zinc-400 text-xs md:text-sm leading-relaxed max-w-sm mx-auto text-center">
-                  Streaming of <span className="text-white font-semibold">{movie?.title || "exclusive content"}</span> requires an active premium membership.
-                </p>
-              </div>
-
-              <div className={`flex w-full justify-center gap-3 pt-1 ${playInline ? "flex-row max-w-xs mx-auto" : "flex-col"
-                }`}>
-                <button 
-                  onClick={() => navigate('/membership')}
-                  className={`focusable focusable bg-yellow-500 hover:bg-yellow-450 text-black font-bold rounded-lg transition-all shadow-lg shadow-yellow-500/10 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-1.5 ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
-                    }`}
-                >
-                  <Crown className="w-3.5 h-3.5 fill-current shrink-0" />
-                  <span>Get Premium</span>
-                </button>
-
-                <button 
-                  onClick={() => {
-                    if (document.fullscreenElement) {
-                      document.exitFullscreen().catch(() => { });
-                    }
-                    onExit();
-                  }}
-                  className={`focusable focusable bg-zinc-800 hover:bg-zinc-750 text-white font-semibold rounded-lg transition-all active:scale-[0.98] cursor-pointer text-center ${playInline ? "flex-1 py-1.5 text-[11px] md:text-xs" : "w-full py-3 text-sm"
-                    }`}
-                >
-                  Go Back
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
+        <>
             <video
               ref={videoRef}
               tabIndex={-1}
@@ -1746,7 +1709,6 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
               userId={userId}
             />
           </>
-        )}
       </div >
     </div >
   );

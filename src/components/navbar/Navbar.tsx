@@ -93,37 +93,49 @@ export function Navbar() {
   return (
     <>
       {/* Desktop Top Nav */}
-      <header className="hidden md:flex items-center justify-between h-[70px] px-6 lg:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50 sticky top-0 z-50 transition-all relative">
-        <div className="flex items-center">
+      <header className="hidden md:flex items-center justify-between h-[70px] px-4 lg:px-8 xl:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50 sticky top-0 z-50 transition-all relative">
+        <div className="flex-1 flex justify-start min-w-[120px]">
           <Link to="/dashboard" className="focusable flex items-center gap-2">
             <img src="/assets/headerLogo.png" alt="AV Logo" className="h-6 md:h-14 object-contain" />
           </Link>
         </div>
 
-        <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 lg:gap-6">
-          {desktopNavItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`focusable text-sm font-medium hover:text-white transition-colors ${activeTab === item.path ? 'text-white font-semibold' : 'text-gray-400'}`}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="flex-initial flex items-center justify-center gap-3 lg:gap-5 xl:gap-6 overflow-hidden">
+          {desktopNavItems.map((item) => {
+            let visibilityClass = "inline-block";
+            if (item.label === "Notifications") {
+              visibilityClass = "hidden xl:inline-block";
+            } else if (item.label === "Quiz" || item.label === "Trailers") {
+              visibilityClass = "hidden lg:inline-block";
+            }
+
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`focusable text-sm font-medium hover:text-white transition-colors whitespace-nowrap ${visibilityClass} ${
+                  activeTab === item.path ? "text-white font-semibold" : "text-gray-400"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="flex items-center gap-4 lg:gap-6">
-          <Button
+        <div className="flex-1 flex justify-end items-center gap-3 lg:gap-5 xl:gap-6 min-w-[150px]">
+          {/* Subscribe Button hidden for now */}
+          {/* <Button
             onClick={() => navigate("/upgrade-plan")}
-            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 gap-2 text-sm font-semibold rounded-md h-9 px-3 lg:px-4 cursor-pointer"
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 gap-2 text-sm font-semibold rounded-md h-9 px-3 lg:px-4 cursor-pointer shrink-0"
           >
             <Crown className="w-4 h-4 text-white" />
             Subscribe
-          </Button>
+          </Button> */}
 
           <button 
             onClick={() => navigate("/search")}
-            className="focusable p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            className="focusable p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center shrink-0"
             aria-label="Search"
           >
             <Search className="w-5 h-5" />
@@ -131,13 +143,13 @@ export function Navbar() {
 
           <button 
             onClick={() => navigate("/notifications")}
-            className="focusable p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+            className="focusable p-2 hover:bg-zinc-800/60 rounded-full text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center justify-center shrink-0"
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5" />
           </button>
 
-          <Link className="focusable" to="/profile">
+          <Link className="focusable shrink-0" to="/profile">
             <Avatar className="w-8 h-8 ring-2 ring-transparent hover:ring-white transition-all cursor-pointer">
               <AvatarImage src={user?.avatar || ""} />
               <AvatarFallback className="bg-zinc-800 text-sm font-medium text-white">
