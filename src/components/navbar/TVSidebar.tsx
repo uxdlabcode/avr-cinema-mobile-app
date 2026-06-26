@@ -46,7 +46,7 @@ export function TVSidebar() {
     { label: "TV Shows", path: "/tv", icon: Tv },
     { label: "Movies", path: "/movies", icon: Film },
     { label: "Trailers", path: "/trailers", icon: PlayCircle },
-    { label: "Quizzes", path: "/quiz", icon: Trophy },
+    // { label: "Quizzes", path: "/quiz", icon: Trophy },
     { label: "Search", path: "/search", icon: Search },
     // { label: "Profile", path: "/profile", icon: User },
   ];
@@ -150,7 +150,7 @@ export function TVSidebar() {
 
         {/* Profile/Subscription status at the bottom */}
         <div className="w-[calc(100%-32px)] border-t border-zinc-800/40 pt-6 flex flex-col items-center ml-4">
-          {user?.membershipStatus === "active" ? (
+          {/* {user?.membershipStatus === "active" ? (
             <Link
               to="/membership"
               className="focusable mb-4 py-2 flex items-center gap-4 text-primary w-full  pl-5"
@@ -171,7 +171,7 @@ export function TVSidebar() {
             >
               {currentPlanName}
             </div>
-          )}
+          )} */}
           <Link
             to="/profile"
             className="focusable flex items-center w-full  py-2 rounded-lg gap-4 transition-colors duration-200 outline-none border border-transparent focus:border-zinc-700 hover:bg-zinc-800/35 cursor-pointer pl-3"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store';
@@ -191,14 +191,47 @@ const VideoDetails = () => {
   const [currentEpisode, setCurrentEpisode] = useState<any>(null);
   const [forceFullscreen, setForceFullscreen] = useState(false);
 
-  // Navigation tabs selection state
-  const [activeTab, setActiveTab] = useState<'episodes' | 'related' | 'details'>('episodes');
+  // Navigation tabs & season selection state using search params for reload persistence
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const activeTab = useMemo(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'episodes' || tab === 'related' || tab === 'details') {
+      return tab;
+    }
+    if (!movie) return 'episodes';
+    return (movie.category === "TV Show" || movie.category === "Documentary") && movie.seasons && movie.seasons.length > 0
+      ? 'episodes'
+      : 'related';
+  }, [searchParams, movie]);
+
+  const setActiveTab = (tab: 'episodes' | 'related' | 'details') => {
+    setSearchParams((prev) => {
+      prev.set('tab', tab);
+      return prev;
+    }, { replace: true });
+  };
+
+  const selectedSeason = useMemo(() => {
+    const seasonParam = searchParams.get('season');
+    if (seasonParam) {
+      const parsed = parseInt(seasonParam, 10);
+      if (!isNaN(parsed) && parsed >= 0) {
+        return parsed;
+      }
+    }
+    return 0;
+  }, [searchParams]);
+
+  const setSelectedSeason = (idx: number) => {
+    setSearchParams((prev) => {
+      prev.set('season', idx.toString());
+      return prev;
+    }, { replace: true });
+  };
 
   // Backdrop image loading state
   const [isImageLoading, setIsImageLoading] = useState(true);
-
-  // TV Show Specific States
-  const [selectedSeason, setSelectedSeason] = useState(0);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
@@ -722,22 +755,17 @@ const VideoDetails = () => {
           }
 
           setMovie(mappedMovie);
-          setActiveTab((mappedMovie.category === "TV Show" || mappedMovie.category === "Documentary") && mappedMovie.seasons && mappedMovie.seasons.length > 0 ? "episodes" : "related");
         } else if (MOVIES_DATA[id]) {
           setMovie(MOVIES_DATA[id]);
-          setActiveTab((MOVIES_DATA[id].category === "TV Show" || MOVIES_DATA[id].category === "Documentary") && MOVIES_DATA[id].seasons && MOVIES_DATA[id].seasons.length > 0 ? "episodes" : "related");
         } else {
           setMovie(DEFAULT_MOVIE);
-          setActiveTab((DEFAULT_MOVIE.category === "TV Show" || DEFAULT_MOVIE.category === "Documentary") && DEFAULT_MOVIE.seasons && DEFAULT_MOVIE.seasons.length > 0 ? "episodes" : "related");
         }
       } catch (err) {
         console.error("Error loading movie data:", err);
         if (MOVIES_DATA[id]) {
           setMovie(MOVIES_DATA[id]);
-          setActiveTab((MOVIES_DATA[id].category === "TV Show" || MOVIES_DATA[id].category === "Documentary") && MOVIES_DATA[id].seasons && MOVIES_DATA[id].seasons.length > 0 ? "episodes" : "related");
         } else {
           setMovie(DEFAULT_MOVIE);
-          setActiveTab((DEFAULT_MOVIE.category === "TV Show" || DEFAULT_MOVIE.category === "Documentary") && DEFAULT_MOVIE.seasons && DEFAULT_MOVIE.seasons.length > 0 ? "episodes" : "related");
         }
       } finally {
         setIsLoading(false);
@@ -884,7 +912,7 @@ const VideoDetails = () => {
 
         {/* Top Video/Banner Header Section */}
         <div
-          className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden border-b border-zinc-900"}
+          className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video md:max-h-[50vh] lg:max-h-[65vh] bg-black overflow-hidden border-b border-zinc-900"}
         >
           {isPlaying && videoUrlToPlay ? (
             <CustomVideoPlayer
@@ -1180,7 +1208,7 @@ const VideoDetails = () => {
         </div>
 
         {/* WEB VIEW (hidden md:block) */}
-        <div className="hidden md:block px-12 lg:px-16 py-6 space-y-6 text-left   mx-auto pb-16">
+        <div className="hidden md:block px-5 lg:px-10 py-6 space-y-6 text-left   mx-auto pb-16">
 
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold select-none">
@@ -1414,7 +1442,7 @@ const VideoDetails = () => {
           {movie.related && movie.related.length > 0 && (
             <div className="pt-8 border-t border-zinc-900/60 text-left">
               <h3 className="text-lg font-bold text-white mb-4">More Like This</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 md:gap-6" style={{ overflow: 'visible' }}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-7 gap-4 md:gap-6" style={{ overflow: 'visible' }}>
                 {movie.related.map((item: any, index: number) => {
                   const isFirst = index === 0;
                   const isLast = index === movie.related.length - 1;
@@ -1536,7 +1564,7 @@ const VideoDetails = () => {
 
       {/* Netflix Fullscreen / Aspect box Video container */}
       <div
-        className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video md:h-[50vh] lg:h-[65vh] bg-black overflow-hidden group select-none border-b border-zinc-900"}
+        className={(isPlaying && forceFullscreen) ? "fixed inset-0 z-[100] bg-black flex items-center justify-center animate-fade-in" : "relative w-full aspect-video md:max-h-[50vh] lg:max-h-[65vh] bg-black overflow-hidden group select-none border-b border-zinc-900"}
       >
         {isPlaying && videoUrlToPlay ? (
           <CustomVideoPlayer
@@ -1675,7 +1703,7 @@ const VideoDetails = () => {
       </div>
 
       {/* Grid Content wrapper */}
-      <div className="px-4 md:px-12 lg:px-16  mx-auto pt-6 space-y-8 pb-16">
+      <div className="px-4 md:px-12 lg:px-6  mx-auto pt-6 space-y-8 pb-16">
 
         {/* Main responsive splits: summary on left, detailed metadata/cast on right */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
@@ -1817,7 +1845,7 @@ const VideoDetails = () => {
 
         {/* Navigation Tabs (Episodes | More Like This | Details) */}
         <div className="space-y-6" id="episodes-tabs">
-          <div className="flex items-center gap-8 border-b border-zinc-900 pb-3 text-sm md:text-base font-semibold text-zinc-400">
+          <div className="flex items-center gap-8 border-b border-zinc-900 pb-2 text-sm md:text-xl font-semibold text-zinc-400">
             {movie.category === "TV Show" && (
               <button
                 onClick={() => setActiveTab('episodes')}
@@ -1829,14 +1857,14 @@ const VideoDetails = () => {
             )}
             <button
               onClick={() => setActiveTab('related')}
-              className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
+              className={`focusable focusable relative pb-2 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'related' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               More Like This
             </button>
             <button
               onClick={() => setActiveTab('details')}
-              className={`focusable focusable relative pb-3 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
+              className={`focusable focusable relative pb-2 -mb-[14px] cursor-pointer transition-colors ${activeTab === 'details' ? "text-white border-b-2 border-primary" : "hover:text-white"
                 }`}
             >
               Details
@@ -1914,7 +1942,7 @@ const VideoDetails = () => {
 
             {/* Related/More Like This Panel */}
             {activeTab === 'related' && movie.related && movie.related.length > 0 && (
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-7 lg:h-[80%] gap-4 md:gap-6" style={{ overflow: 'visible' }}>
+              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 lg:h-[50%] gap-4 md:gap-6" style={{ overflow: 'visible' }}>
                 {movie.related.map((item: any, index: number) => {
                   const isFirst = index === 0;
                   const isLast = index === movie.related.length - 1;
@@ -2028,18 +2056,18 @@ const VideoDetails = () => {
               <div className="space-y-6 text-left animate-in fade-in duration-200">
                 {movie.cast && movie.cast.length > 0 ? (
                   <div className="space-y-4">
-                    <h3 className="text-sm font-extrabold text-zinc-400">Cast Members</h3>
+                    <h3 className="text-base font-extrabold text-zinc-400">Cast Members</h3>
                     <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
                       {movie.cast.map((person: any, idx: number) => (
                         <div key={idx} className="flex flex-col items-center gap-1.5 shrink-0 select-none">
                           <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-900 border border-zinc-800/80 hover:scale-105 transition-transform duration-200 shadow">
                             <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
                           </div>
-                          <span className="text-[10px] font-bold text-zinc-450 text-center w-16 truncate">
+                          <span className="text-xs md:text-sm font-bold text-zinc-450 text-center w-20 truncate">
                             {person.name}
                           </span>
                           {person.role && (
-                            <span className="text-[8px] text-zinc-650 text-center w-16 truncate -mt-1 font-semibold">
+                            <span className="text-[10px] md:text-xs text-zinc-650 text-center w-20 truncate -mt-1 font-semibold">
                               {person.role}
                             </span>
                           )}
@@ -2048,10 +2076,10 @@ const VideoDetails = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-zinc-550 text-sm">No cast metadata available.</div>
+                  <div className="text-zinc-550 text-base md:text-lg">No cast metadata available.</div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4 border-t border-zinc-900/60 text-xs sm:text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4 border-t border-zinc-900/60 text-sm md:text-base">
                   <div className="space-y-1">
                     <span className="text-zinc-550 font-bold block">Genres</span>
                     <span className="text-zinc-300 font-semibold">{movie.category === "TV Show" ? "TV Action & Adventure, Sci-Fi & Fantasy, Crime Shows" : "Action & Adventure, Crime Thrillers, Dramas"}</span>
@@ -2059,8 +2087,8 @@ const VideoDetails = () => {
                   <div className="space-y-1">
                     <span className="text-zinc-550 font-bold block">Maturity Rating</span>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-zinc-350 font-bold px-2 py-0.5 border border-zinc-700 bg-zinc-950 rounded uppercase text-[10px]">{movie.rating}</span>
-                      <span className="text-amber-500 font-semibold text-xs">
+                      <span className="text-zinc-350 font-bold px-2 py-0.5 border border-zinc-700 bg-zinc-950 rounded uppercase text-[12px] md:text-xs">{movie.rating}</span>
+                      <span className="text-amber-500 font-semibold text-sm md:text-base">
                         Recommended for ages {movie.rating.includes('18') || movie.rating.includes('A') ? '18' : '13'} and up
                       </span>
                     </div>

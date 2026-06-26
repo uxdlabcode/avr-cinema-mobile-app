@@ -406,7 +406,7 @@ export const ProfilePage = () => {
         </div>
 
         {/* Membership Badge */}
-        <div className="w-full border-t border-border pt-4 flex items-center justify-between">
+        {/* <div className="w-full border-t border-border pt-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
               <Crown className="w-4 h-4 text-primary" />
@@ -425,7 +425,7 @@ export const ProfilePage = () => {
           >
             Upgrade
           </Button>
-        </div>
+        </div> */}
       </Card>
 
       {/* Quick Actions */}
@@ -468,7 +468,7 @@ export const ProfilePage = () => {
               </p>
             </div>
             {unreadCount > 0 && (
-              <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary-foreground text-background text-[10px] font-bold mr-2 shadow-[0_0_8px_rgba(222,203,148,0.5)] animate-pulse">
+              <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-primary-foreground text-background text-[10px] font-bold mr-2 shadow-[0_0_8px_rgba(222,203,148,0.5)] ">
                 {unreadCount}
               </span>
             )}
@@ -523,7 +523,7 @@ export const ProfilePage = () => {
           )}
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {loadingWatchlist ? (
               <WatchlistSkeleton />
             ) : watchlist.length > 0 ? (
@@ -581,7 +581,7 @@ export const ProfilePage = () => {
           )}
         </div>
         <div className="p-6">
-          <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {loadingContinue ? (
               <ContinueWatchingSkeleton />
             ) : continueWatching.length === 0 ? (
@@ -622,7 +622,7 @@ export const ProfilePage = () => {
       </Card>
 
       {/* Quizzes Card */}
-      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
+      {/* <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -681,7 +681,7 @@ export const ProfilePage = () => {
             )}
           </div>
         </div>
-      </Card>
+      </Card> */}
 
       {/* Account Section - Desktop */}
       <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
