@@ -432,7 +432,7 @@ const TvDetails = () => {
       <Header />
 
       {/* Tab Navigation */}
-      <div className="sticky top-14 md:top-0 z-40 bg-black flex gap-6 px-4 md:py-3 overflow-x-auto md:pt-5 md:mt-7 scrollbar-hide border-b border-zinc-900">
+      <div className="sticky top-14 md:top-0 z-40 bg-black flex gap-6 px-4 md:py-3 overflow-x-auto md:pt-5 lg:mt-7 scrollbar-hide border-b border-zinc-900">
         {TABS.map((tab) => (
           <button
             key={tab}

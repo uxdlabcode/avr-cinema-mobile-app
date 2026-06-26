@@ -1,15 +1,19 @@
-import { useEffect } from "react";
-import { useRoutes, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useRoutes, useLocation, useNavigate } from "react-router-dom";
 import { appRoutes } from "./router";
 import { useAppDispatch } from "@/store/hooks";
 import { setAuthUser, logout } from "@/store/slices/authSlice";
 import { onIdTokenChanged } from "firebase/auth";
-import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
+import { onSnapshot, doc } from "firebase/firestore";
 import { auth, db } from "@/Firebase/firebase";
+import { getOrCreateDeviceId, getDeviceName, getDeviceLocation, recordDeviceLogin } from "@/lib/deviceUtils";
+import { toast } from "sonner";
 
 function App() {
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
+  const deviceRecordedRef = useRef(false);
 
   // Scroll to top on route change (triggered)
   useEffect(() => {
@@ -31,6 +35,25 @@ function App() {
           // Get the actual JWT which automatically handles refresh tokens
           const token = await firebaseUser.getIdToken();
 
+          // ─── Record device login (once per session) ───
+          if (!deviceRecordedRef.current) {
+            deviceRecordedRef.current = true;
+            const deviceId = getOrCreateDeviceId();
+            const deviceName = getDeviceName();
+            console.log("[DeviceTracking] Recording device login...", { userId: firebaseUser.uid, deviceId, deviceName });
+            getDeviceLocation().then((loc) => {
+              console.log("[DeviceTracking] Location fetched:", loc);
+              recordDeviceLogin({
+                userId: firebaseUser.uid,
+                deviceId,
+                deviceName,
+                location: loc,
+              })
+                .then((res) => console.log("[DeviceTracking] ✅ Device recorded successfully:", res?.data))
+                .catch((err) => console.error("[DeviceTracking] ❌ recordDeviceLogin FAILED:", err));
+            });
+          }
+
           const userDocRef = doc(db, "users", firebaseUser.uid);
           
           unsubscribeDoc = onSnapshot(
@@ -39,6 +62,19 @@ function App() {
               if (docSnapshot.exists()) {
                 const userData = docSnapshot.data();
                 const role = (userData.role || "user").toLowerCase();
+
+                // ─── Remote device revocation check ───
+                const loginDevices: string[] = userData.loginDevices || [];
+                const currentDeviceId = getOrCreateDeviceId();
+                if (loginDevices.length > 0 && !loginDevices.includes(currentDeviceId)) {
+                  // This device has been revoked remotely
+                  toast.error("You have been logged out from another device.");
+                  auth.signOut().then(() => {
+                    localStorage.removeItem("userInfo");
+                    navigate("/signin?revoked=true");
+                  });
+                  return;
+                }
 
                 const expiryTime = userData.membershipExpiryDate?.seconds
                   ? userData.membershipExpiryDate.seconds * 1000
@@ -131,6 +167,7 @@ function App() {
           dispatch(logout());
         }
       } else {
+        deviceRecordedRef.current = false;
         dispatch(logout());
       }
     });
@@ -141,7 +178,7 @@ function App() {
         unsubscribeDoc();
       }
     };
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 
   return useRoutes(appRoutes);
 }

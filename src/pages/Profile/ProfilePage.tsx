@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import { LogOut, Trash2, Pencil, ChevronDown, ChevronRight, Trophy, HelpCircle, Clock, Crown, Bell, Bookmark, Play, Shield, HeadphonesIcon, Phone, CalendarDays } from "lucide-react";
+import { LogOut, Trash2, Pencil, ChevronDown, ChevronRight, Trophy, HelpCircle, Clock, Crown, Bell, Bookmark, Play, Shield, HeadphonesIcon, Phone, CalendarDays, Monitor, Smartphone, MapPin, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLogout } from "@/Firebase/FirebaseAuth/UserLogOut";
 import { deleteUserData } from "@/Firebase/FirebaseAuth/DeleteUser";
@@ -15,6 +15,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getOrCreateDeviceId, revokeDeviceSession } from "@/lib/deviceUtils";
+import { toast } from "sonner";
 
 interface ContinueItem {
   id: string;
@@ -206,6 +208,19 @@ export const ProfilePage = () => {
   const [currentPlanName, setCurrentPlanName] = useState("Free Plan");
   const unreadCount = useSelector((state: RootState) => state.notifications.unreadCount);
 
+  // ─── Device Management State ───
+  interface DeviceRecord {
+    deviceId: string;
+    deviceName: string;
+    location: { city?: string; region?: string; country?: string; ip?: string };
+    lastActiveAt?: any;
+    loggedInAt?: any;
+  }
+  const [devices, setDevices] = useState<DeviceRecord[]>([]);
+  const [loadingDevices, setLoadingDevices] = useState(true);
+  const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
+  const currentDeviceId = getOrCreateDeviceId();
+
   useEffect(() => {
     if (!user?.membershipPlanId) {
       setCurrentPlanName("Free Plan");
@@ -339,6 +354,45 @@ export const ProfilePage = () => {
     };
     fetchQuizzes();
   }, []);
+
+  // Fetch Logged-in Devices
+  useEffect(() => {
+    if (!user?.id) {
+      setLoadingDevices(false);
+      return;
+    }
+    setLoadingDevices(true);
+    const docRef = doc(db, "deviceLocations", user.id);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      let devs: DeviceRecord[] = [];
+      if (docSnap.exists()) {
+        devs = (docSnap.data()?.devices || []) as DeviceRecord[];
+      }
+      // Sort so current device is first
+      devs.sort((a, b) => {
+        if (a.deviceId === currentDeviceId) return -1;
+        if (b.deviceId === currentDeviceId) return 1;
+        return 0;
+      });
+      setDevices(devs);
+      setLoadingDevices(false);
+    }, () => setLoadingDevices(false));
+    return () => unsubscribe();
+  }, [user?.id, currentDeviceId]);
+
+  const handleRevokeDevice = async (deviceId: string) => {
+    if (!user?.id) return;
+    setRevokingDeviceId(deviceId);
+    try {
+      await revokeDeviceSession(user.id, deviceId);
+      toast.success("Device logged out successfully");
+    } catch (err) {
+      console.error("Failed to revoke device:", err);
+      toast.error("Failed to log out device");
+    } finally {
+      setRevokingDeviceId(null);
+    }
+  };
 
   const name = user?.name || "Super Admin";
   const initials = name
@@ -683,6 +737,98 @@ export const ProfilePage = () => {
         </div>
       </Card> */}
 
+      {/* Logged-in Devices Card - Desktop */}
+      <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center">
+              <Monitor className="w-4 h-4 text-blue-400" />
+            </div>
+            <h3 className="text-foreground font-bold text-base">Logged-in Devices</h3>
+            {devices.length > 0 && (
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                {devices.length} active
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="flex flex-col gap-3">
+            {loadingDevices ? (
+              Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 border border-border rounded-xl bg-muted/10">
+                  <Skeleton className="shrink-0 w-10 h-10 rounded-xl bg-zinc-800" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/2 rounded bg-zinc-800" />
+                    <Skeleton className="h-3 w-1/3 rounded bg-zinc-800" />
+                  </div>
+                </div>
+              ))
+            ) : devices.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-32 text-muted-foreground gap-2">
+                <Monitor className="w-8 h-8 opacity-40" />
+                <p className="text-sm">No active devices</p>
+              </div>
+            ) : (
+              devices.map((device) => {
+                const isCurrentDevice = device.deviceId === currentDeviceId;
+                const locationStr = [device.location?.city, device.location?.region, device.location?.country]
+                  .filter(Boolean)
+                  .join(", ") || "Unknown location";
+                const isMobile = device.deviceName?.toLowerCase().includes("android") || device.deviceName?.toLowerCase().includes("ios");
+                return (
+                  <div
+                    key={device.deviceId}
+                    className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${
+                      isCurrentDevice
+                        ? "border-primary/30 bg-primary/5"
+                        : "border-border bg-muted/10 hover:border-border/80"
+                    }`}
+                  >
+                    <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border ${
+                      isCurrentDevice ? "bg-primary/10 border-primary/20" : "bg-muted border-border"
+                    }`}>
+                      {isMobile
+                        ? <Smartphone className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                        : <Monitor className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-foreground font-semibold text-sm truncate">{device.deviceName || "Unknown Device"}</h4>
+                        {isCurrentDevice && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary bg-primary/10 shrink-0">
+                            This Device
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
+                        <MapPin className="w-3 h-3 shrink-0" />
+                        {locationStr}
+                      </p>
+                    </div>
+                    {!isCurrentDevice && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={revokingDeviceId === device.deviceId}
+                        onClick={() => handleRevokeDevice(device.deviceId)}
+                        className="focusable shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive h-8 px-3 text-xs outline-none"
+                      >
+                        {revokingDeviceId === device.deviceId
+                          ? <Loader2 className="w-3 h-3 animate-spin" />
+                          : <><LogOut className="w-3 h-3 mr-1" /> Log Out</>
+                        }
+                      </Button>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </Card>
+
       {/* Account Section - Desktop */}
       <Card tabIndex={-1} className="rounded-lg overflow-hidden p-0 gap-0">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
@@ -934,7 +1080,7 @@ export const ProfilePage = () => {
           </div>
 
           {/* Quizzes Section */}
-          <div className="flex flex-col gap-3">
+          {/* <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h3 className="text-foreground font-bold text-base">Quiz</h3>
             </div>
@@ -974,6 +1120,88 @@ export const ProfilePage = () => {
                           {qCount} Qs
                         </span>
                       </div>
+                    </Card>
+                  );
+                })
+              )}
+            </div>
+          </div> */}
+
+          {/* Logged-in Devices Section - Mobile */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-foreground font-bold text-base">Logged-in Devices</h3>
+              {devices.length > 0 && (
+                <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                  {devices.length} active
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              {loadingDevices ? (
+                Array.from({ length: 2 }).map((_, i) => (
+                  <Card key={i} className="flex items-center gap-3 p-3 rounded-xl">
+                    <Skeleton className="shrink-0 w-9 h-9 rounded-lg bg-zinc-800" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3.5 w-2/3 rounded bg-zinc-800" />
+                      <Skeleton className="h-3 w-1/2 rounded bg-zinc-800" />
+                    </div>
+                  </Card>
+                ))
+              ) : devices.length === 0 ? (
+                <Card className="flex items-center justify-center h-20 rounded-xl">
+                  <p className="text-sm text-muted-foreground">No active devices</p>
+                </Card>
+              ) : (
+                devices.map((device) => {
+                  const isCurrentDevice = device.deviceId === currentDeviceId;
+                  const locationStr = [device.location?.city, device.location?.region, device.location?.country]
+                    .filter(Boolean)
+                    .join(", ") || "Unknown location";
+                  const isMobile = device.deviceName?.toLowerCase().includes("android") || device.deviceName?.toLowerCase().includes("ios");
+                  return (
+                    <Card
+                      key={device.deviceId}
+                      className={`flex items-center gap-3 p-3 rounded-xl ${
+                        isCurrentDevice ? "border-primary/30 bg-primary/5" : ""
+                      }`}
+                    >
+                      <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
+                        isCurrentDevice ? "bg-primary/10" : "bg-muted"
+                      }`}>
+                        {isMobile
+                          ? <Smartphone className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                          : <Monitor className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                        }
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-foreground font-semibold text-xs truncate">{device.deviceName || "Unknown Device"}</h4>
+                          {isCurrentDevice && (
+                            <Badge variant="outline" className="text-[8px] px-1 py-0 border-primary/40 text-primary bg-primary/10 shrink-0">
+                              This
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
+                          <MapPin className="w-2.5 h-2.5 shrink-0" />
+                          {locationStr}
+                        </p>
+                      </div>
+                      {!isCurrentDevice && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={revokingDeviceId === device.deviceId}
+                          onClick={() => handleRevokeDevice(device.deviceId)}
+                          className="focusable shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10 h-7 px-2 text-[10px] outline-none"
+                        >
+                          {revokingDeviceId === device.deviceId
+                            ? <Loader2 className="w-3 h-3 animate-spin" />
+                            : <><LogOut className="w-3 h-3 mr-0.5" /> Log Out</>
+                          }
+                        </Button>
+                      )}
                     </Card>
                   );
                 })

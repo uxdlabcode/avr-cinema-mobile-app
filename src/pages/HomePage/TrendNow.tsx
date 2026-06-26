@@ -84,23 +84,44 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
         </h3>
 
         <div className="relative w-full">
-          <div className="flex overflow-x-auto pb-2.5 md:pb-6 scrollbar-hide gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20 w-full">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="flex-none relative pt-4">
-                <span
-                  className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none"
+          <div
+            className="flex overflow-x-auto scrollbar-hide gap-8 sm:gap-12 md:gap-11 w-full"
+            style={{
+              overflowY: 'visible',
+              paddingTop: '80px',
+              marginTop: '-80px',
+              paddingBottom: '180px',
+              marginBottom: '-180px',
+              paddingLeft: '48px', // pl-12
+              paddingRight: '48px',
+            }}
+          >
+            {Array.from({ length: 5 }).map((_, index) => {
+              const isFirst = index === 0;
+              return (
+                <div
+                  key={index}
+                  className="flex-none relative pt-4"
                   style={{
-                    WebkitTextStroke: "2px #27272a",
-                    color: "#18181b",
-                    fontFamily: "Impact, Arial Black, sans-serif",
-                    translate: "-50% 0px",
+                    paddingLeft: isFirst ? '20px' : '0px',
                   }}
                 >
-                  {index + 1}
-                </span>
-                <Skeleton className="relative z-20 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900" />
-              </div>
-            ))}
+                  <span
+                    className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black leading-none select-none z-30 pointer-events-none"
+                    style={{
+                      WebkitTextStroke: "2px #27272a",
+                      color: "transparent",
+                      fontFamily: '"Oswald", "Arial Narrow", sans-serif',
+                      transform: isFirst ? 'translateX(-25%)' : 'translateX(-45%)',
+                      fontSize: isFirst ? 'clamp(2.5rem, 8vw, 6rem)' : undefined,
+                    }}
+                  >
+                    {index + 1}
+                  </span>
+                  <Skeleton className="relative z-20 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900" />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -140,16 +161,18 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
           </button>
         )}
 
-        {/* Horizontal Scrollable Row */}
+        {/* Horizontal Scrollable Row - FIXED */}
         <div
           ref={rowRef}
-          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-7"
+          className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth gap-8 sm:gap-12 md:gap-11"
           style={{
             overflowY: 'visible',
             paddingTop: '80px',
             marginTop: '-80px',
             paddingBottom: '180px',
-            marginBottom: '-180px'
+            marginBottom: '-180px',
+            paddingLeft: '48px', // pl-12
+            paddingRight: '48px', // added right padding for last item
           }}
         >
           {items.map((movie, index) => {
@@ -160,19 +183,28 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
               <div
                 key={movie.id}
                 className="flex-none relative snap-start group/trending pt-4"
-                style={{ zIndex: 1 }}
+                style={{
+                  zIndex: 1,
+                  // Add extra left padding for first item to show number fully
+                  paddingLeft: isFirst ? '20px' : '0px',
+                  // Add extra right padding for last item
+                  paddingRight: isLast ? '20px' : '0px',
+                }}
                 onMouseEnter={(e) => (e.currentTarget.style.zIndex = '50')}
                 onMouseLeave={(e) => (e.currentTarget.style.zIndex = '1')}
               >
-                {/* Giant rank number */}
+                {/* Giant rank number - FIXED positioning */}
                 <span
-                  className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
+                  className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black leading-none select-none z-30 pointer-events-none transition-transform duration-300 group-hover/trending:scale-105"
                   style={{
-                    WebkitTextStroke: "2px #fff",
-                    color: "#262626",
-                    fontFamily: "Impact, Arial Black, sans-serif",
-                    filter: "drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.8))",
-                    translate: "-50% 0px",
+                    background: "linear-gradient(180deg, #ffffff 40%, #71717a 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontFamily: '"Oswald", "Arial Narrow", sans-serif',
+                    // FIX: Adjust position so number doesn't get cut off
+                    transform: isFirst ? 'translateX(-25%)' : 'translateX(-45%)',
+                    // Make number slightly smaller for first item to ensure it fits
+                    fontSize: isFirst ? 'clamp(2.5rem, 8vw, 6rem)' : undefined,
                   }}
                 >
                   {index + 1}
@@ -192,17 +224,16 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                   />
                 </div>
 
-                {/* Floating Popup - centered on card, extends above AND below */}
+                {/* Floating Popup */}
                 <div
-                  className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/trending:opacity-100 group-hover/trending:scale-100 group-hover/trending:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${
-                    isFirst
-                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
-                      : isLast
+                  className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/trending:opacity-100 group-hover/trending:scale-100 group-hover/trending:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${isFirst
+                    ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                    : isLast
                       ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
                       : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
-                  }`}
+                    }`}
                 >
-                  {/* Landscape Thumbnail - tall & prominent */}
+                  {/* Landscape Thumbnail */}
                   <div className="w-full h-[190px] overflow-hidden relative">
                     <img
                       src={movie.signedThumbnailUrl || "/assets/poster.png"}
@@ -214,10 +245,8 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
                   {/* Details Panel */}
                   <div className="px-4 py-3 flex flex-col gap-2.5">
-                    {/* Title */}
                     <p className="text-white font-bold text-[15px] leading-snug">{movie.title}</p>
 
-                    {/* Action Buttons */}
                     <div className="flex items-center gap-2">
                       <button
                         tabIndex={-1}
@@ -239,7 +268,6 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                       </button>
                     </div>
 
-                    {/* Metadata */}
                     <div className="text-[11px] text-zinc-400 font-semibold flex items-center gap-1.5 flex-wrap leading-tight select-none">
                       <span className="text-white font-bold">{movie.releaseYear || movie.year || 2026}</span>
                       <span className="text-zinc-600">•</span>
@@ -249,7 +277,6 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
                       {movie.language && <><span className="text-zinc-600">•</span><span>{movie.language}</span></>}
                     </div>
 
-                    {/* Description */}
                     <p className="text-[11px] text-zinc-400 line-clamp-3 leading-relaxed">
                       {movie.description || "No description available."}
                     </p>

@@ -59,24 +59,45 @@ export const HomePageSkeleton = () => {
         {/* Row 2: Trending Now — portrait cards with large rank number offset */}
         <div className="w-full space-y-1">
           <Skeleton className="h-8 w-44 bg-zinc-800 rounded" />
-          <div className="flex gap-8 sm:gap-12 md:gap-14 pl-8 sm:pl-12 md:pl-16 lg:pl-20 overflow-hidden w-full pt-4 pb-3 md:pb-6">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="flex-none relative pt-4">
-                {/* Rank number placeholder */}
-                <span
-                  className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] font-black leading-none select-none z-10 pointer-events-none"
+          <div
+            className="flex overflow-hidden gap-8 sm:gap-12 md:gap-11 w-full"
+            style={{
+              overflowY: 'visible',
+              paddingTop: '80px',
+              marginTop: '-80px',
+              paddingBottom: '180px',
+              marginBottom: '-180px',
+              paddingLeft: '48px', // pl-12
+              paddingRight: '48px',
+            }}
+          >
+            {Array.from({ length: 5 }).map((_, index) => {
+              const isFirst = index === 0;
+              return (
+                <div
+                  key={index}
+                  className="flex-none relative pt-4"
                   style={{
-                    WebkitTextStroke: "2px #27272a",
-                    color: "#18181b",
-                    fontFamily: "Impact, Arial Black, sans-serif",
-                    translate: "-50% 0px",
+                    paddingLeft: isFirst ? '20px' : '0px',
                   }}
                 >
-                  {i + 1}
-                </span>
-                <Skeleton className="relative z-20 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900" />
-              </div>
-            ))}
+                  {/* Rank number placeholder */}
+                  <span
+                    className="absolute left-0 bottom-[-2px] md:bottom-[-8px] text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black leading-none select-none z-10 pointer-events-none"
+                    style={{
+                      WebkitTextStroke: "2px #27272a",
+                      color: "transparent",
+                      fontFamily: '"Oswald", "Arial Narrow", sans-serif',
+                      transform: isFirst ? 'translateX(-25%)' : 'translateX(-45%)',
+                      fontSize: isFirst ? 'clamp(2.5rem, 8vw, 6rem)' : undefined,
+                    }}
+                  >
+                    {index + 1}
+                  </span>
+                  <Skeleton className="relative z-20 w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] rounded-md bg-zinc-900" />
+                </div>
+              );
+            })}
           </div>
         </div>
 

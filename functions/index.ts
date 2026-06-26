@@ -199,3 +199,130 @@ export const deleteUser = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('internal', error.message || 'Failed to delete user.');
   }
 });
+
+// ─── Device Session Management ───
+// Schema: deviceLocations/{userId} → { userId, devices: [...] }
+// Max 2 devices per user. Oldest gets evicted on 3rd login.
+
+const MAX_DEVICES = 2;
+
+export const recordDeviceLogin = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'Must be authenticated.');
+    }
+
+    const { userId, deviceId, deviceName, location } = data;
+
+    if (!userId || !deviceId || !deviceName) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing required fields: userId, deviceId, deviceName');
+    }
+
+    const db = admin.firestore();
+    const deviceDocRef = db.collection('deviceLocations').doc(userId);
+    const userDocRef = db.collection('users').doc(userId);
+
+    await db.runTransaction(async (transaction) => {
+      const deviceDoc = await transaction.get(deviceDocRef);
+      let devices: any[] = [];
+
+      if (deviceDoc.exists) {
+        devices = deviceDoc.data()?.devices || [];
+      }
+
+      const now = admin.firestore.Timestamp.now();
+
+      // Check if this device already exists → update it
+      const existingIndex = devices.findIndex((d: any) => d.deviceId === deviceId);
+
+      if (existingIndex >= 0) {
+        devices[existingIndex] = {
+          ...devices[existingIndex],
+          deviceName,
+          location: location || {},
+          lastActiveAt: now,
+        };
+      } else {
+        // New device — enforce max limit
+        if (devices.length >= MAX_DEVICES) {
+          // Sort by loggedInAt ascending (oldest first) and remove oldest
+          devices.sort((a: any, b: any) => {
+            const aTime = a.loggedInAt?.toMillis?.() || a.loggedInAt?.seconds * 1000 || 0;
+            const bTime = b.loggedInAt?.toMillis?.() || b.loggedInAt?.seconds * 1000 || 0;
+            return aTime - bTime;
+          });
+          devices.shift(); // remove oldest device
+        }
+
+        devices.push({
+          deviceId,
+          deviceName,
+          location: location || {},
+          loggedInAt: now,
+          lastActiveAt: now,
+        });
+      }
+
+      // Write the devices array to the single doc
+      transaction.set(deviceDocRef, { userId, devices }, { merge: true });
+
+      // Sync user's loginDevices array to match current devices
+      const loginDeviceIds = devices.map((d: any) => d.deviceId);
+      transaction.set(userDocRef, { loginDevices: loginDeviceIds }, { merge: true });
+    });
+
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("recordDeviceLogin error:", error);
+    if (error instanceof functions.https.HttpsError) throw error;
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to record device login.');
+  }
+});
+
+export const revokeDeviceSession = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'Must be authenticated.');
+    }
+
+    const { userId, deviceId } = data;
+
+    if (!userId || !deviceId) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing required fields: userId, deviceId');
+    }
+
+    const db = admin.firestore();
+    const deviceDocRef = db.collection('deviceLocations').doc(userId);
+    const userDocRef = db.collection('users').doc(userId);
+
+    await db.runTransaction(async (transaction) => {
+      const deviceDoc = await transaction.get(deviceDocRef);
+
+      if (deviceDoc.exists) {
+        let devices: any[] = deviceDoc.data()?.devices || [];
+        // Remove the target device from the array
+        devices = devices.filter((d: any) => d.deviceId !== deviceId);
+
+        // Update the doc with remaining devices
+        transaction.set(deviceDocRef, { userId, devices }, { merge: true });
+
+        // Sync user's loginDevices array
+        const loginDeviceIds = devices.map((d: any) => d.deviceId);
+        transaction.set(userDocRef, { loginDevices: loginDeviceIds }, { merge: true });
+      } else {
+        // No device doc, just remove from user's loginDevices
+        transaction.set(userDocRef, {
+          loginDevices: admin.firestore.FieldValue.arrayRemove(deviceId),
+        }, { merge: true });
+      }
+    });
+
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("revokeDeviceSession error:", error);
+    if (error instanceof functions.https.HttpsError) throw error;
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to revoke device session.');
+  }
+});
