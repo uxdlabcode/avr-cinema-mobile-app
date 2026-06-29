@@ -3,6 +3,8 @@ import { Outlet, type RouteObject, Navigate } from "react-router-dom";
 import Layout from "./layout/Layout";
 import Signin from "@/pages/Auth/Signin";
 import Signup from "@/pages/Auth/Signup";
+import ForgotPasswordPage from "@/pages/Auth/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/Auth/ResetPasswordPage";
 import { UserDashboard } from "@/pages/Dashboard/UserDashboard";
 import { ProfilePage, ProfilePageSkeleton } from "@/pages/Profile/ProfilePage";
 import { UpgradePlanPage } from "@/pages/Profile/UpgradePlanPage";
@@ -67,6 +69,22 @@ export const appRoutes: RouteObject[] = [
     element: (
       <GuestRoute>
         <Signup />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: "forgot-password",
+    element: (
+      <GuestRoute>
+        <ForgotPasswordPage />
+      </GuestRoute>
+    ),
+  },
+  {
+    path: "reset-password",
+    element: (
+      <GuestRoute>
+        <ResetPasswordPage />
       </GuestRoute>
     ),
   },

@@ -2,6 +2,8 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import * as nodemailer from 'nodemailer';
+import * as jwt from 'jsonwebtoken';
 
 admin.initializeApp();
 
@@ -416,5 +418,198 @@ export const deleteDeviceDocument = functions.https.onCall(async (data, context)
     console.error("deleteDeviceDocument error:", error);
     if (error instanceof functions.https.HttpsError) throw error;
     throw new functions.https.HttpsError('internal', error.message || 'Failed to delete device document.');
+  }
+});
+
+// ─── Forgot/Reset Password Management ─────────────────────────────────────────
+
+const JWT_SECRET = 'avr_cinema_reset_secret_key_2026';
+
+/**
+ * sendForgotPasswordEmail
+ * Validates if the user is present in the Firestore 'users' collection.
+ * Generates a short-lived JWT reset token and sends a styled SMTP email.
+ */
+export const sendForgotPasswordEmail = functions.https.onCall(async (data, context) => {
+  try {
+    const { email } = data;
+
+    if (!email) {
+      throw new functions.https.HttpsError('invalid-argument', 'Email is required.');
+    }
+
+    const emailNormalized = email.trim().toLowerCase();
+
+    // 1. Verify if user is present in Firestore 'users' collection
+    const db = admin.firestore();
+    const usersSnap = await db.collection('users')
+      .where('email', '==', emailNormalized)
+      .limit(1)
+      .get();
+
+    if (usersSnap.empty) {
+      throw new functions.https.HttpsError('not-found', 'Invalid user.');
+    }
+
+    // 2. Generate a secure, short-lived reset token (expires in 15 minutes)
+    const token = jwt.sign({ email: emailNormalized }, JWT_SECRET, { expiresIn: '15m' });
+
+    // 3. Build the reset link — always use the live production URL
+    const resetLink = `https://avr-cinema-mobile-app.pages.dev/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(emailNormalized)}`;
+
+    // 4. Configure nodemailer with Google App Password credentials
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'ashishkumaruxdlab@gmail.com',
+        pass: 'skbo pgvj acad onss',
+      },
+    });
+
+    // 5. Send HTML email with AVR Logo
+    const logoUrl = 'https://avr-cinema-mobile-app.pages.dev/assets/headerLogo.png';
+    const mailOptions = {
+      from: '"AVR Cinema Support" <ashishkumaruxdlab@gmail.com>',
+      to: emailNormalized,
+      subject: 'Reset Your AVR Cinema Password',
+      html: `
+        <div style="font-family: Arial, sans-serif; background-color: #141414; color: #ffffff; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto; border: 1px solid #2a2a2a;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="${logoUrl}" alt="AVR Cinema" style="height: 36px; max-width: 160px; object-fit: contain;" />
+          </div>
+          <div style="background-color: #1a1a1a; padding: 25px; border-radius: 8px; border: 1px solid #333333;">
+            <h2 style="color: #ffffff; margin-top: 0; font-size: 18px; text-align: center;">Password Reset Request</h2>
+            <p style="color: #cccccc; font-size: 14px; line-height: 1.5;">Hello,</p>
+            <p style="color: #cccccc; font-size: 14px; line-height: 1.5;">We received a request to reset the password for your AVR Cinema account associated with <strong>${emailNormalized}</strong>.</p>
+            <p style="color: #cccccc; font-size: 14px; line-height: 1.5; margin-bottom: 25px;">Please click the button below to choose a new password. This link is valid for 15 minutes.</p>
+            <div style="text-align: center; margin-bottom: 25px;">
+              <a href="${resetLink}" style="background-color: #ffffff; color: #000000; text-decoration: none; padding: 12px 24px; font-weight: bold; border-radius: 6px; font-size: 14px; display: inline-block;">Reset Password</a>
+            </div>
+            <p style="color: #888888; font-size: 11px; line-height: 1.4; border-top: 1px solid #222222; padding-top: 15px; margin-top: 20px;">
+              If you didn't request a password reset, you can safely ignore this email. Your password won't change until you create a new one.
+            </p>
+          </div>
+          <p style="text-align: center; color: #666666; font-size: 11px; margin-top: 20px;">&copy; 2026 AVR Cinema. All Rights Reserved.</p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Password reset email successfully sent to: ${emailNormalized}`);
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("sendForgotPasswordEmail error:", error);
+    if (error instanceof functions.https.HttpsError) throw error;
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to send forgot password email.');
+  }
+});
+
+/**
+ * resetPasswordWithToken
+ * Decodes the JWT token, fetches user's auth record, and updates password in Firebase Auth.
+ */
+export const resetPasswordWithToken = functions.https.onCall(async (data, context) => {
+  try {
+    const { token, newPassword } = data;
+
+    if (!token || !newPassword) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing token or new password.');
+    }
+
+    if (newPassword.length < 6) {
+      throw new functions.https.HttpsError('invalid-argument', 'Password must be at least 6 characters.');
+    }
+
+    // 1. Verify and decode reset token
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err: any) {
+      console.warn("Token verification failed:", err);
+      throw new functions.https.HttpsError('unauthenticated', 'The reset link is invalid or has expired.');
+    }
+
+    const email = decoded.email;
+    if (!email) {
+      throw new functions.https.HttpsError('invalid-argument', 'Invalid token payload.');
+    }
+
+    // 2. Fetch user auth record from Firebase Auth
+    let userRecord: admin.auth.UserRecord;
+    try {
+      userRecord = await admin.auth().getUserByEmail(email);
+    } catch (err: any) {
+      console.error("User not found in Firebase Auth:", err);
+      throw new functions.https.HttpsError('not-found', 'User account does not exist.');
+    }
+
+    // 3. Update the password in Firebase Auth
+    await admin.auth().updateUser(userRecord.uid, {
+      password: newPassword,
+    });
+
+    console.log(`Password successfully updated for user UID: ${userRecord.uid} (${email})`);
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("resetPasswordWithToken error:", error);
+    if (error instanceof functions.https.HttpsError) throw error;
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to reset password.');
+  }
+});
+
+/**
+ * resetPasswordDirect
+ * Verifies user exists in Firestore 'users' collection then directly updates Firebase Auth password.
+ * Used by the single-page forgot password flow.
+ */
+export const resetPasswordDirect = functions.https.onCall(async (data, context) => {
+  try {
+    const { email, newPassword } = data;
+
+    if (!email || !newPassword) {
+      throw new functions.https.HttpsError('invalid-argument', 'Email and new password are required.');
+    }
+
+    if (newPassword.length < 6) {
+      throw new functions.https.HttpsError('invalid-argument', 'Password must be at least 6 characters.');
+    }
+
+    const emailNormalized = email.trim().toLowerCase();
+
+    // 1. Verify user is present in Firestore 'users' collection
+    const db = admin.firestore();
+    const usersSnap = await db.collection('users')
+      .where('email', '==', emailNormalized)
+      .limit(1)
+      .get();
+
+    if (usersSnap.empty) {
+      throw new functions.https.HttpsError('not-found', 'Invalid user.');
+    }
+
+    // 2. Fetch user auth record
+    let userRecord: admin.auth.UserRecord;
+    try {
+      userRecord = await admin.auth().getUserByEmail(emailNormalized);
+    } catch (err: any) {
+      throw new functions.https.HttpsError('not-found', 'User account does not exist.');
+    }
+
+    // 3. Update the password in Firebase Auth
+    await admin.auth().updateUser(userRecord.uid, {
+      password: newPassword,
+    });
+
+    console.log(`Password directly reset for UID: ${userRecord.uid} (${emailNormalized})`);
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("resetPasswordDirect error:", error);
+    if (error instanceof functions.https.HttpsError) throw error;
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to reset password.');
   }
 });

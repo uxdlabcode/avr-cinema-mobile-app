@@ -298,9 +298,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                 Remember me
               </label>
             </div>
-            <a href="#" className="focusable text-sm font-bold text-primary hover:underline px-2 py-1 focus:bg-zinc-800 rounded">
+            <Link to="/forgot-password" className="focusable text-sm font-bold text-primary hover:underline px-2 py-1 focus:bg-zinc-800 rounded">
               Forgot Password?
-            </a>
+            </Link>
           </div>
 
           <Field className="mt-2">
