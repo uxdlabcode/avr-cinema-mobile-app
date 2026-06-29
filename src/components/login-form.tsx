@@ -30,8 +30,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
   const [loading, setLoading] = useState(false);
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
-  // Captured UID so we can call revokeDevice without re-auth
-  const [pendingUid, setPendingUid] = useState<string | null>(null);
+  const pendingUid = useAppSelector((s) => s.auth.pendingUid);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value.toLowerCase());
@@ -48,7 +47,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
     // Clear previous device-limit state
     dispatch(clearBlockedDevices());
-    setPendingUid(null);
 
     setEmailError("");
     setPasswordError("");
@@ -90,12 +88,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       } else {
         const payload = resultAction.payload as any;
         if (payload?.type === "DEVICE_LIMIT") {
-          // Capture UID from the error so the logout buttons can call revokeDevice.
-          // We need to fetch UID from Firebase auth (it was signed out, but the UID
-          // was saved inside deviceManager payload).  We extract it by fetching the
-          // deviceLocations doc via email — instead, we embed it in the error.
-          // The uid is passed back by loginAsync via payload.uid.
-          setPendingUid(payload.uid ?? null);
           toast.error("Device limit reached. Logout from an active device to proceed.");
         } else {
           toast.error(
@@ -118,15 +110,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       return;
     }
     setRevokingId(device.deviceId);
+    sessionStorage.setItem("avr_login_pending", "true");
     try {
       await revokeDevice(pendingUid, device.deviceId);
       toast.success(`Logged out from ${device.deviceName}`);
       dispatch(clearBlockedDevices());
-      setPendingUid(null);
+      sessionStorage.removeItem("device_limit_blocked");
+
       // Automatically re-attempt login
       const emailVal = email.trim().toLowerCase();
       if (emailVal && password) {
-        sessionStorage.setItem("avr_login_pending", "true");
         const result = await dispatch(loginAsync({ email: emailVal, password }));
         if (loginAsync.fulfilled.match(result)) {
           toast.success("Login successful");
@@ -228,9 +221,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           id="device-limit-back-btn"
           variant="outline"
           className="focusable w-full h-10 font-semibold"
-          onClick={() => {
+          onClick={async () => {
             dispatch(clearBlockedDevices());
-            setPendingUid(null);
+            sessionStorage.removeItem("device_limit_blocked");
+
+            // Sign out of Firebase Auth to ensure unauthenticated state is restored
+            const { auth } = await import("@/Firebase/firebase");
+            await auth.signOut();
           }}
         >
           Back to Login

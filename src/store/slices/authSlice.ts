@@ -32,6 +32,7 @@ interface AuthState {
   error: string | null;
   // When login is blocked, hold the existing device list for the UI
   blockedDevices: import("@/lib/deviceManager").DeviceEntry[] | null;
+  pendingUid: string | null;
 }
 
 const initialState: AuthState = {
@@ -41,6 +42,7 @@ const initialState: AuthState = {
   loading: true,
   error: null,
   blockedDevices: null,
+  pendingUid: null,
 };
 
 // ─── Login Thunk ─────────────────────────────────────────────────────────────
@@ -83,9 +85,9 @@ export const loginAsync = createAsyncThunk(
       });
 
       if (!deviceResult.allowed) {
-        // Sign out the user immediately — device limit reached
-        const { auth } = await import("@/Firebase/firebase");
-        await auth.signOut();
+        // Keep the user authenticated in Firebase Auth temporarily so they can perform
+        // device revocation, but set a session storage flag to block App.tsx from force-logging out.
+        sessionStorage.setItem("device_limit_blocked", "true");
         return rejectWithValue({
           type: "DEVICE_LIMIT",
           uid,
@@ -242,6 +244,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.loading = false;
       state.blockedDevices = null;
+      state.pendingUid = null;
     },
     setAuthUser(state, action: PayloadAction<{ user: User; token: string }>) {
       state.user = action.payload.user;
@@ -263,6 +266,7 @@ const authSlice = createSlice({
     },
     clearBlockedDevices(state) {
       state.blockedDevices = null;
+      state.pendingUid = null;
       state.error = null;
     },
   },
@@ -287,9 +291,11 @@ const authSlice = createSlice({
       if (payload?.type === "DEVICE_LIMIT") {
         state.error = payload.message;
         state.blockedDevices = payload.devices;
+        state.pendingUid = payload.uid || null;
       } else {
         state.error = (payload as string) || "Login failed";
         state.blockedDevices = null;
+        state.pendingUid = null;
       }
     });
 

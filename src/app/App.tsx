@@ -53,6 +53,7 @@ function App() {
             auth.signOut().then(() => {
               sessionStorage.removeItem("device_session_active");
               sessionStorage.removeItem("avr_session_device_id");
+              sessionStorage.removeItem("device_limit_blocked");
               localStorage.removeItem("userInfo");
               navigate("/signin?revoked=true");
             });
@@ -181,6 +182,10 @@ function App() {
                   // Device is NOT in the active devices list.
                   // If we are currently logging in, wait for the login thunk to finish.
                   if (sessionStorage.getItem("avr_login_pending") === "true") return;
+
+                  // If we are currently blocked by device limit, don't force log out!
+                  // This keeps the user authenticated temporarily so they can perform revocation.
+                  if (sessionStorage.getItem("device_limit_blocked") === "true") return;
 
                   // If we had active listener flag set, this is a remote revocation.
                   // If not, it means the login check rejected us, so log out immediately.
