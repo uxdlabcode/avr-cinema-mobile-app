@@ -200,75 +200,122 @@ export const deleteUser = functions.https.onCall(async (data, context) => {
   }
 });
 
-// ─── Device Session Management ───
-// Schema: deviceLocations/{userId} → { userId, devices: [...] }
-// Max 2 devices per user. Oldest gets evicted on 3rd login.
+// ─── Device Session Management ────────────────────────────────────────────────
+// Collection: deviceLocations/{userId}
+// Schema:
+//   {
+//     uid: string,
+//     email: string,
+//     devices: [{
+//       deviceId, deviceName, browser, platform, os,
+//       ip, city, country, latitude, longitude,
+//       loginTime, lastActive
+//     }],
+//     createdAt, updatedAt
+//   }
+//
+// Max 2 devices per user (enforced client-side + here as backup).
+// This function is a SERVER-SIDE backup for device recording.
+// The primary enforcement is done client-side in deviceManager.ts.
+// ─────────────────────────────────────────────────────────────────────────────
 
 const MAX_DEVICES = 2;
 
+/**
+ * recordDeviceLogin (Cloud Function backup)
+ * Called as a server-side backup to record/update a device in deviceLocations.
+ * Primary enforcement happens client-side. This function is an additional
+ * server-side safety net and is used for server-triggered scenarios.
+ */
 export const recordDeviceLogin = functions.https.onCall(async (data, context) => {
   try {
     if (!context.auth) {
       throw new functions.https.HttpsError('unauthenticated', 'Must be authenticated.');
     }
 
-    const { userId, deviceId, deviceName, location } = data;
+    const { userId, deviceId, deviceName, browser, platform, os, ip, city, country, latitude, longitude } = data;
 
     if (!userId || !deviceId || !deviceName) {
       throw new functions.https.HttpsError('invalid-argument', 'Missing required fields: userId, deviceId, deviceName');
     }
 
+    // Security check: Verify that the caller matches the target userId
+    if (context.auth.uid !== userId) {
+      throw new functions.https.HttpsError('permission-denied', 'Cannot modify another user\'s devices.');
+    }
+
     const db = admin.firestore();
-    const deviceDocRef = db.collection('deviceLocations').doc(userId);
-    const userDocRef = db.collection('users').doc(userId);
+    const docRef = db.collection('deviceLocations').doc(userId);
 
     await db.runTransaction(async (transaction) => {
-      const deviceDoc = await transaction.get(deviceDocRef);
-      let devices: any[] = [];
-
-      if (deviceDoc.exists) {
-        devices = deviceDoc.data()?.devices || [];
-      }
-
+      const snap = await transaction.get(docRef);
       const now = admin.firestore.Timestamp.now();
 
-      // Check if this device already exists → update it
-      const existingIndex = devices.findIndex((d: any) => d.deviceId === deviceId);
+      let devices: any[] = [];
+      let createdAt = now;
 
-      if (existingIndex >= 0) {
-        devices[existingIndex] = {
-          ...devices[existingIndex],
+      if (snap.exists) {
+        const existing = snap.data()!;
+        devices = existing.devices || [];
+        createdAt = existing.createdAt || now;
+      }
+
+      // ─── Filter Stale Devices (older than 30 days) ───
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+      const thresholdMillis = now.toMillis() - thirtyDaysMs;
+      devices = devices.filter((d: any) => {
+        const lastActiveTime = d.lastActive?.toMillis?.() || d.lastActive?.seconds * 1000 || 0;
+        return lastActiveTime > thresholdMillis;
+      });
+
+      const idx = devices.findIndex((d: any) => d.deviceId === deviceId);
+
+      if (idx >= 0) {
+        // Update existing device
+        devices[idx] = {
+          ...devices[idx],
           deviceName,
-          location: location || {},
-          lastActiveAt: now,
+          browser: browser || devices[idx].browser,
+          platform: platform || devices[idx].platform,
+          os: os || devices[idx].os,
+          ip: ip || devices[idx].ip,
+          city: city || devices[idx].city,
+          country: country || devices[idx].country,
+          latitude: latitude ?? devices[idx].latitude,
+          longitude: longitude ?? devices[idx].longitude,
+          lastActive: now,
         };
       } else {
-        // New device — enforce max limit
+        // New device — enforce MAX_DEVICES
         if (devices.length >= MAX_DEVICES) {
-          // Sort by loggedInAt ascending (oldest first) and remove oldest
-          devices.sort((a: any, b: any) => {
-            const aTime = a.loggedInAt?.toMillis?.() || a.loggedInAt?.seconds * 1000 || 0;
-            const bTime = b.loggedInAt?.toMillis?.() || b.loggedInAt?.seconds * 1000 || 0;
-            return aTime - bTime;
-          });
-          devices.shift(); // remove oldest device
+          throw new functions.https.HttpsError(
+            'resource-exhausted',
+            'Maximum device limit reached. Please logout from another device first.'
+          );
         }
-
         devices.push({
           deviceId,
           deviceName,
-          location: location || {},
-          loggedInAt: now,
-          lastActiveAt: now,
+          browser: browser || '',
+          platform: platform || 'Desktop',
+          os: os || '',
+          ip: ip || null,
+          city: city || null,
+          country: country || null,
+          latitude: latitude ?? null,
+          longitude: longitude ?? null,
+          loginTime: now,
+          lastActive: now,
         });
       }
 
-      // Write the devices array to the single doc
-      transaction.set(deviceDocRef, { userId, devices }, { merge: true });
-
-      // Sync user's loginDevices array to match current devices
-      const loginDeviceIds = devices.map((d: any) => d.deviceId);
-      transaction.set(userDocRef, { loginDevices: loginDeviceIds }, { merge: true });
+      transaction.set(docRef, {
+        uid: userId,
+        email: data.email || '',
+        devices,
+        createdAt,
+        updatedAt: now,
+      }, { merge: true });
     });
 
     return { success: true };
@@ -280,6 +327,11 @@ export const recordDeviceLogin = functions.https.onCall(async (data, context) =>
   }
 });
 
+/**
+ * revokeDeviceSession
+ * Removes a specific device from deviceLocations/{userId}.
+ * Called from the Profile page "Log Out" button for other devices.
+ */
 export const revokeDeviceSession = functions.https.onCall(async (data, context) => {
   try {
     if (!context.auth) {
@@ -293,27 +345,28 @@ export const revokeDeviceSession = functions.https.onCall(async (data, context) 
     }
 
     const db = admin.firestore();
-    const deviceDocRef = db.collection('deviceLocations').doc(userId);
-    const userDocRef = db.collection('users').doc(userId);
+
+    // Security check: Only the account owner or an admin/superadmin can revoke
+    if (context.auth.uid !== userId) {
+      const callerSnap = await db.collection('users').doc(context.auth.uid).get();
+      const role = callerSnap.data()?.role;
+      if (role !== 'admin' && role !== 'superadmin') {
+        throw new functions.https.HttpsError('permission-denied', 'Not authorized to revoke this session.');
+      }
+    }
+
+    const docRef = db.collection('deviceLocations').doc(userId);
 
     await db.runTransaction(async (transaction) => {
-      const deviceDoc = await transaction.get(deviceDocRef);
+      const snap = await transaction.get(docRef);
 
-      if (deviceDoc.exists) {
-        let devices: any[] = deviceDoc.data()?.devices || [];
-        // Remove the target device from the array
+      if (snap.exists) {
+        let devices: any[] = snap.data()?.devices || [];
         devices = devices.filter((d: any) => d.deviceId !== deviceId);
 
-        // Update the doc with remaining devices
-        transaction.set(deviceDocRef, { userId, devices }, { merge: true });
-
-        // Sync user's loginDevices array
-        const loginDeviceIds = devices.map((d: any) => d.deviceId);
-        transaction.set(userDocRef, { loginDevices: loginDeviceIds }, { merge: true });
-      } else {
-        // No device doc, just remove from user's loginDevices
-        transaction.set(userDocRef, {
-          loginDevices: admin.firestore.FieldValue.arrayRemove(deviceId),
+        transaction.set(docRef, {
+          devices,
+          updatedAt: admin.firestore.Timestamp.now(),
         }, { merge: true });
       }
     });
@@ -324,5 +377,44 @@ export const revokeDeviceSession = functions.https.onCall(async (data, context) 
     console.error("revokeDeviceSession error:", error);
     if (error instanceof functions.https.HttpsError) throw error;
     throw new functions.https.HttpsError('internal', error.message || 'Failed to revoke device session.');
+  }
+});
+
+/**
+ * deleteDeviceDocument
+ * Deletes the entire deviceLocations/{userId} document.
+ * Called during account deletion.
+ */
+export const deleteDeviceDocument = functions.https.onCall(async (data, context) => {
+  try {
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'Must be authenticated.');
+    }
+
+    const { userId } = data;
+
+    if (!userId) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing required field: userId');
+    }
+
+    // Security: only the user themselves (or admin) can delete
+    if (context.auth.uid !== userId) {
+      const db = admin.firestore();
+      const callerSnap = await db.collection('users').doc(context.auth.uid).get();
+      const role = callerSnap.data()?.role;
+      if (role !== 'admin' && role !== 'superadmin') {
+        throw new functions.https.HttpsError('permission-denied', 'Not authorized.');
+      }
+    }
+
+    const db = admin.firestore();
+    await db.collection('deviceLocations').doc(userId).delete();
+
+    return { success: true };
+
+  } catch (error: any) {
+    console.error("deleteDeviceDocument error:", error);
+    if (error instanceof functions.https.HttpsError) throw error;
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to delete device document.');
   }
 });

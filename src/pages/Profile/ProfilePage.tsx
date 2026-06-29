@@ -15,7 +15,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getOrCreateDeviceId, revokeDeviceSession } from "@/lib/deviceUtils";
+import { getDeviceId, revokeDevice, type DeviceEntry } from "@/lib/deviceManager";
 import { toast } from "sonner";
 
 interface ContinueItem {
@@ -209,17 +209,10 @@ export const ProfilePage = () => {
   const unreadCount = useSelector((state: RootState) => state.notifications.unreadCount);
 
   // ─── Device Management State ───
-  interface DeviceRecord {
-    deviceId: string;
-    deviceName: string;
-    location: { city?: string; region?: string; country?: string; ip?: string };
-    lastActiveAt?: any;
-    loggedInAt?: any;
-  }
-  const [devices, setDevices] = useState<DeviceRecord[]>([]);
+  const [devices, setDevices] = useState<DeviceEntry[]>([]);
   const [loadingDevices, setLoadingDevices] = useState(true);
   const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
-  const currentDeviceId = getOrCreateDeviceId();
+  const currentDeviceId = getDeviceId();
 
   useEffect(() => {
     if (!user?.membershipPlanId) {
@@ -355,7 +348,7 @@ export const ProfilePage = () => {
     fetchQuizzes();
   }, []);
 
-  // Fetch Logged-in Devices
+  // Fetch Logged-in Devices — real-time via onSnapshot on deviceLocations collection
   useEffect(() => {
     if (!user?.id) {
       setLoadingDevices(false);
@@ -363,20 +356,26 @@ export const ProfilePage = () => {
     }
     setLoadingDevices(true);
     const docRef = doc(db, "deviceLocations", user.id);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      let devs: DeviceRecord[] = [];
-      if (docSnap.exists()) {
-        devs = (docSnap.data()?.devices || []) as DeviceRecord[];
-      }
-      // Sort so current device is first
-      devs.sort((a, b) => {
-        if (a.deviceId === currentDeviceId) return -1;
-        if (b.deviceId === currentDeviceId) return 1;
-        return 0;
-      });
-      setDevices(devs);
-      setLoadingDevices(false);
-    }, () => setLoadingDevices(false));
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        let devs: DeviceEntry[] = [];
+        if (docSnap.exists()) {
+          devs = (docSnap.data()?.devices || []) as DeviceEntry[];
+        }
+        // Sort: current device first, then by lastActive descending
+        devs.sort((a, b) => {
+          if (a.deviceId === currentDeviceId) return -1;
+          if (b.deviceId === currentDeviceId) return 1;
+          const aTime = a.lastActive?.seconds ? a.lastActive.seconds * 1000 : (a.lastActive instanceof Date ? a.lastActive.getTime() : 0);
+          const bTime = b.lastActive?.seconds ? b.lastActive.seconds * 1000 : (b.lastActive instanceof Date ? b.lastActive.getTime() : 0);
+          return bTime - aTime;
+        });
+        setDevices(devs);
+        setLoadingDevices(false);
+      },
+      () => setLoadingDevices(false)
+    );
     return () => unsubscribe();
   }, [user?.id, currentDeviceId]);
 
@@ -384,7 +383,7 @@ export const ProfilePage = () => {
     if (!user?.id) return;
     setRevokingDeviceId(deviceId);
     try {
-      await revokeDeviceSession(user.id, deviceId);
+      await revokeDevice(user.id, deviceId);
       toast.success("Device logged out successfully");
     } catch (err) {
       console.error("Failed to revoke device:", err);
@@ -772,10 +771,12 @@ export const ProfilePage = () => {
             ) : (
               devices.map((device) => {
                 const isCurrentDevice = device.deviceId === currentDeviceId;
-                const locationStr = [device.location?.city, device.location?.region, device.location?.country]
+                const locationStr = [device.city, device.country]
                   .filter(Boolean)
                   .join(", ") || "Unknown location";
-                const isMobile = device.deviceName?.toLowerCase().includes("android") || device.deviceName?.toLowerCase().includes("ios");
+                const isMobile = device.platform === "Mobile" || device.platform === "Tablet" ||
+                  device.deviceName?.toLowerCase().includes("android") ||
+                  device.deviceName?.toLowerCase().includes("ios");
                 return (
                   <div
                     key={device.deviceId}
@@ -1155,10 +1156,12 @@ export const ProfilePage = () => {
               ) : (
                 devices.map((device) => {
                   const isCurrentDevice = device.deviceId === currentDeviceId;
-                  const locationStr = [device.location?.city, device.location?.region, device.location?.country]
+                  const locationStr = [device.city, device.country]
                     .filter(Boolean)
                     .join(", ") || "Unknown location";
-                  const isMobile = device.deviceName?.toLowerCase().includes("android") || device.deviceName?.toLowerCase().includes("ios");
+                  const isMobile = device.platform === "Mobile" || device.platform === "Tablet" ||
+                    device.deviceName?.toLowerCase().includes("android") ||
+                    device.deviceName?.toLowerCase().includes("ios");
                   return (
                     <Card
                       key={device.deviceId}

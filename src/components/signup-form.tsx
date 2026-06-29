@@ -185,6 +185,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
 
     setLoading(true);
     try {
+      sessionStorage.setItem("avr_login_pending", "true");
       const ageNum = age !== "" ? parseInt(age, 10) : null;
       const resultAction = await dispatch(signupAsync({ name, email: emailVal, password, phone: phone || undefined, age: ageNum }));
 
@@ -201,6 +202,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
     } catch (err) {
       toast.error("An unexpected error occurred");
     } finally {
+      sessionStorage.removeItem("avr_login_pending");
       setLoading(false);
     }
   };
