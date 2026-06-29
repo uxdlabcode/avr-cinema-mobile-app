@@ -13,7 +13,7 @@ function App() {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const deviceRecordedRef = useRef(false);
+  const deviceRecordStatusRef = useRef<'idle' | 'recording' | 'recorded' | 'failed'>('idle');
 
   // Scroll to top on route change (triggered)
   useEffect(() => {
@@ -36,8 +36,8 @@ function App() {
           const token = await firebaseUser.getIdToken();
 
           // ─── Record device login (once per session) ───
-          if (!deviceRecordedRef.current) {
-            deviceRecordedRef.current = true;
+          if (deviceRecordStatusRef.current === 'idle') {
+            deviceRecordStatusRef.current = 'recording';
             const deviceId = getOrCreateDeviceId();
             const deviceName = getDeviceName();
             console.log("[DeviceTracking] Recording device login...", { userId: firebaseUser.uid, deviceId, deviceName });
@@ -49,8 +49,14 @@ function App() {
                 deviceName,
                 location: loc,
               })
-                .then((res) => console.log("[DeviceTracking] ✅ Device recorded successfully:", res?.data))
-                .catch((err) => console.error("[DeviceTracking] ❌ recordDeviceLogin FAILED:", err));
+                .then((res) => {
+                  console.log("[DeviceTracking] ✅ Device recorded successfully:", res?.data);
+                  deviceRecordStatusRef.current = 'recorded';
+                })
+                .catch((err) => {
+                  console.error("[DeviceTracking] ❌ recordDeviceLogin FAILED:", err);
+                  deviceRecordStatusRef.current = 'failed';
+                });
             });
           }
 
@@ -66,7 +72,8 @@ function App() {
                 // ─── Remote device revocation check ───
                 const loginDevices: string[] = userData.loginDevices || [];
                 const currentDeviceId = getOrCreateDeviceId();
-                if (loginDevices.length > 0 && !loginDevices.includes(currentDeviceId)) {
+                const hasBeenRecorded = deviceRecordStatusRef.current === 'recorded' || loginDevices.includes(currentDeviceId);
+                if (hasBeenRecorded && loginDevices.length > 0 && !loginDevices.includes(currentDeviceId)) {
                   // This device has been revoked remotely
                   toast.error("You have been logged out from another device.");
                   auth.signOut().then(() => {
@@ -167,7 +174,7 @@ function App() {
           dispatch(logout());
         }
       } else {
-        deviceRecordedRef.current = false;
+        deviceRecordStatusRef.current = 'idle';
         dispatch(logout());
       }
     });
