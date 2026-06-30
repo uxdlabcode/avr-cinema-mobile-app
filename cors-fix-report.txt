@@ -1,0 +1,61 @@
+
+=== AVR Cinema – CloudFront CORS Diagnostic & Fix Script ===
+Timestamp : 2026-06-30T13:00:34.325Z
+Root      : C:\Users\ashis\OneDrive\Documents\github\avr-cinema-mobile-app
+
+----------------------------------------------------------------
+
+IDENTIFIED ISSUES:
+
+1. [CRITICAL] HLS video stream CORS-blocked by CloudFront
+     URL   : https://d2bqjjgpbetcsa.cloudfront.net/videos/**/*.m3u8
+     Via   : HLS.js XHR (not fetch)
+
+2. [CRITICAL] Caption VTT files CORS-blocked
+     URL   : https://d2bqjjgpbetcsa.cloudfront.net/captions/*.vtt
+     Via   : fetch() + <track src>
+
+3. [ROOT CAUSE] CloudFront allows avr-cinema-mobile-app.pages.dev only.
+   localhost is rejected with Access-Control-Allow-Origin error.
+
+FIX: Expand Vite proxy to cover ALL CloudFront paths,
+     then rewrite every CloudFront URL in dev mode.
+
+
+----------------------------------------------------------------
+
+PATCHING vite.config.ts ...
+  [OK] vite.config.ts rewritten – proxy covers ALL CloudFront paths
+
+----------------------------------------------------------------
+
+PATCHING CustomVideoPlayer.tsx ...
+
+  [PATCH] add getDevSafeUrl() helper
+  [SKIP] "HLS loadSource() – use proxy URL" – marker not found (already patched?)
+  [SKIP] "xhrSetup – proxy ALL CloudFront XHRs" – marker not found (already patched?)
+  [PATCH] non-HLS video.src – proxy URL
+  [SKIP] "caption fetch – use getDevSafeUrl()" – marker not found (already patched?)
+  [SKIP] "<track> src – use getDevSafeUrl()" – marker not found (already patched?)
+
+  [OK] CustomVideoPlayer.tsx patched
+
+----------------------------------------------------------------
+
+VERIFICATION:
+  [OK]   getDevSafeUrl() defined
+  [FAIL] HLS loadSource uses proxy
+  [FAIL] xhrSetup uses getDevSafeUrl()
+  [OK]   video.src uses proxy
+  [FAIL] caption fetch uses proxy
+  [FAIL] <track> src uses proxy
+  [OK]   Vite proxy target = CloudFront
+  [OK]   Vite proxy path = /__cf__
+
+----------------------------------------------------------------
+
+DONE. Next steps:
+  1. Kill the running dev server (Ctrl+C)
+  2. Run:  npm run dev
+  3. Navigate to localhost:5173 and play a video.
+  4. The console should be free of CORS / ERR_FAILED errors.

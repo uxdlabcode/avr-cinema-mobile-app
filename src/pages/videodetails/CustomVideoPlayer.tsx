@@ -15,6 +15,19 @@ import { isTvPlatform } from '@/lib/tvUtils';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
+// Rewrites any CloudFront URL to go through the Vite proxy in development,
+// preventing cross-origin requests (and CORS errors) on localhost.
+// In production the URL is returned unchanged.
+const _CF_ORIGIN = 'https://d2bqjjgpbetcsa.cloudfront.net';
+const _CF_PROXY  = '/__cf__';
+function getDevSafeUrl(url: string): string {
+  if (!url) return url;
+  if (typeof import.meta !== 'undefined' && import.meta.env?.DEV && url.startsWith(_CF_ORIGIN)) {
+    return url.replace(_CF_ORIGIN, _CF_PROXY);
+  }
+  return url;
+}
+
 interface VTTCue {
   start: number;
   end: number;
@@ -442,16 +455,25 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         } catch (err) {
           console.error("Error fetching auth token for HLS decryption:", err);
         }
-
         hlsInstance = new HlsClass({
           xhrSetup: (xhr: any, url: string) => {
-            if (url.includes("/getVideoKey") && token) {
-              const delimiter = url.includes("?") ? "&" : "?";
-              xhr.open("GET", `${url}${delimiter}token=${token}`, true);
+            // In development, route every CloudFront XHR (segments, keys, playlists)
+            // through the Vite proxy so the browser never makes a cross-origin request.
+            let finalUrl = getDevSafeUrl(url);
+
+            // Append auth token for video-decryption-key requests.
+            if (finalUrl.includes("/getVideoKey") && token) {
+              const delimiter = finalUrl.includes("?") ? "&" : "?";
+              finalUrl = `${finalUrl}${delimiter}token=${token}`;
+            }
+
+            // Only call xhr.open() when the URL actually changed.
+            if (finalUrl !== url) {
+              xhr.open("GET", finalUrl, true);
             }
           }
         });
-        hlsInstance.loadSource(currentSourceUrl);
+        hlsInstance.loadSource(getDevSafeUrl(currentSourceUrl));
         hlsInstance.attachMedia(video);
         hlsRef.current = hlsInstance;
 
@@ -572,7 +594,7 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             .catch(e => console.log("Play error:", e));
         });
       } else {
-        video.src = currentSourceUrl;
+        video.src = getDevSafeUrl(currentSourceUrl);
         video.playbackRate = playbackSpeed;
 
         const onCanPlay = () => {
@@ -1093,9 +1115,11 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
       return;
     }
 
-    fetch(url)
+    const fetchUrl = getDevSafeUrl(url);
+
+    fetch(fetchUrl, { mode: 'cors', credentials: 'omit' })
       .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch subtitle track");
+        if (!res.ok) throw new Error(`Failed to fetch subtitle track (${res.status})`);
         return res.text();
       })
       .then((text) => {
@@ -1103,7 +1127,8 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
         setCues(parsed);
       })
       .catch((err) => {
-        console.error("Error loading subtitles:", err);
+        // Swallow any remaining fetch/CORS error silently.
+        console.warn("[Subtitles] Could not load subtitle file:", err?.message || err);
         setCues([]);
       });
   }, [currentSubtitleTrack, subtitleTracks]);
@@ -1227,15 +1252,19 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
             crossOrigin="anonymous"
             playsInline
           >
-            {getDbCaptions().map((sub: any, idx: number) => (
-              <track
-                key={`${idx}_${sub.url || sub.caption_file || sub.src}`}
-                src={sub.url || sub.caption_file || sub.src}
-                label={sub.language || sub.label || sub.name}
-                srcLang={sub.languageCode || sub.language?.substring(0, 2).toLowerCase() || sub.lang || "en"}
-                kind="subtitles"
-              />
-            ))}
+            {getDbCaptions().map((sub: any, idx: number) => {
+              const rawSrc = sub.url || sub.caption_file || sub.src;
+              const trackSrc = getDevSafeUrl(rawSrc);
+              return (
+                <track
+                  key={`${idx}_${rawSrc}`}
+                  src={trackSrc}
+                  label={sub.language || sub.label || sub.name}
+                  srcLang={sub.languageCode || sub.language?.substring(0, 2).toLowerCase() || sub.lang || "en"}
+                  kind="subtitles"
+                />
+              );
+            })}
           </video>
 
           {/* Custom Subtitles Overlay */}
@@ -1435,8 +1464,6 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   onClick={(e) => e.stopPropagation()}
                   className="focusable w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
                   style={{
-                    appearance: 'slider-vertical',
-                    WebkitAppearance: 'slider-vertical',
                     writingMode: 'vertical-lr',
                     direction: 'rtl'
                   } as any}
@@ -1478,8 +1505,6 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
                   onClick={(e) => e.stopPropagation()}
                   className="focusable w-1.5 h-24 bg-zinc-700 rounded-lg cursor-pointer outline-none accent-white"
                   style={{
-                    appearance: 'slider-vertical',
-                    WebkitAppearance: 'slider-vertical',
                     writingMode: 'vertical-lr',
                     direction: 'rtl'
                   } as any}
