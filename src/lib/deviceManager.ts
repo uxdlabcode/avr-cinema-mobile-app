@@ -183,7 +183,7 @@ export async function reverseGeocode(
 async function ipBasedLocation(): Promise<LocationInfo> {
   try {
     const res = await fetch("https://ipapi.co/json/", {
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(2000),
     });
     if (!res.ok) throw new Error("ipapi failed");
     const data = await res.json();
@@ -200,23 +200,11 @@ async function ipBasedLocation(): Promise<LocationInfo> {
 }
 
 /**
- * Build full location info: coordinates → reverse geocode → fallback to IP.
+ * Build full location info: IP-based detection.
+ * We bypass HTML5 geolocation prompt entirely on authentication flows
+ * to prevent UX blocks and authorization delay.
  */
 export async function buildLocationInfo(): Promise<LocationInfo> {
-  const coords = await getCurrentLocation();
-
-  if (coords.latitude !== null && coords.longitude !== null) {
-    const geo = await reverseGeocode(coords.latitude, coords.longitude);
-    return {
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-      city: geo.city,
-      country: geo.country,
-      ip: null,
-    };
-  }
-
-  // Fall back to IP-based detection
   return ipBasedLocation();
 }
 
