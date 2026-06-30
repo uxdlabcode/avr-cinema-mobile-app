@@ -44,7 +44,7 @@ interface TVItem {
 }
 
 const TvTabSkeleton = () => (
-  <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 pt-24 px-4 animate-pulse">
+  <div className="min-h-screen bg-black text-white w-full pb-14 md:pb-0 pt-24 px-4 animate-pulse">
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Hero banner skeleton */}
       <div className="w-full h-[50vh] md:h-[65vh] bg-zinc-950 rounded-lg" />
@@ -591,7 +591,7 @@ const TvTab = () => {
   const featuredList = tvShows.slice(0, 4); // Use first 4 TV shows as featured banners
 
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative pt-14">
+    <div className="min-h-screen bg-black text-white w-full pb-14 md:pb-0 relative pt-14">
       {/* Semi-transparent Header */}
       <div className="fixed top-0 left-0 right-0 h-14 bg-gradient-to-b from-black/80 via-black/40 to-transparent backdrop-blur-sm z-50 flex items-center justify-between px-4">
         {/* Back Button */}

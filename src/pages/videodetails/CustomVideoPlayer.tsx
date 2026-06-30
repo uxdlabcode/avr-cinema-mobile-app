@@ -1115,8 +1115,9 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
     const tracks = video.textTracks;
 
     const syncTracks = () => {
+      const hasDbCaptions = getDbCaptions().length > 0;
       for (let i = 0; i < tracks.length; i++) {
-        if (i === currentSubtitleTrack) {
+        if (i === currentSubtitleTrack && !hasDbCaptions) {
           tracks[i].mode = "showing";
         } else {
           tracks[i].mode = "disabled";

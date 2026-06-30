@@ -33,7 +33,7 @@ interface MovieItem {
 }
 
 const MoviesTabSkeleton = () => (
-  <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 animate-pulse relative pt-16 md:pt-0">
+  <div className="min-h-screen bg-black text-white w-full pb-14 md:pb-0 animate-pulse relative pt-16 md:pt-0">
 
     {/* ─── HERO BANNER ─── */}
     {/* Mobile: min-h-[75vh] | Desktop: min-h-[88vh] */}
@@ -214,7 +214,7 @@ const MovieCategoryRow = ({
           {genreName}
         </h3>
         {list.length > 15 && (
-          <button 
+          <button
             onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
             className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
           >
@@ -226,7 +226,7 @@ const MovieCategoryRow = ({
       <div className="relative w-full">
         {/* Left Scroll Button */}
         {showLeft && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll('left')}
             className="focusable absolute left-[-20px] md:left-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -238,7 +238,7 @@ const MovieCategoryRow = ({
 
         {/* Right Scroll Button */}
         {showRight && (
-          <button 
+          <button
             tabIndex={-1}
             onClick={() => handleScroll('right')}
             className="focusable absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
@@ -289,13 +289,12 @@ const MovieCategoryRow = ({
 
                 {/* Floating Popup - centered on card, extends above AND below */}
                 <div
-                  className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${
-                    isFirst
-                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
-                      : isLast
+                  className={`absolute top-1/2 w-[360px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50 z-50 ${isFirst
+                    ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                    : isLast
                       ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
                       : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
-                  }`}
+                    }`}
                 >
                   {/* Landscape Thumbnail - tall & prominent */}
                   <div className="w-full h-[190px] overflow-hidden relative">
@@ -363,7 +362,7 @@ const MovieCategoryRow = ({
             );
           })}
           {list.length > 15 && !isTrending && (
-            <div 
+            <div
               onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >
@@ -588,7 +587,7 @@ const MoviesTab = () => {
   const featuredList = movies.slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 relative pt-16 md:pt-0">
+    <div className="min-h-screen bg-black text-white w-full pb-14 md:pb-0 relative pt-16 md:pt-0">
       <Header />
 
       {isLoading ? (
@@ -762,7 +761,7 @@ const MoviesTab = () => {
                                   <span>More Info</span>
                                 </Button>
 
-                                <button 
+                                <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     toggleWatchlist(slide.id, slide);
@@ -853,7 +852,7 @@ const MoviesTab = () => {
                               {/* Detailed Description Panel */}
                               <div className="space-y-4 text-left w-full relative">
                                 {/* Close Expanded Info */}
-                                <button 
+                                <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setExpandedMovieId(null);
@@ -902,7 +901,7 @@ const MoviesTab = () => {
                                       ) : (
                                         <p>No description available.</p>
                                       )}
-                                      <button 
+                                      <button
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           setShowFullDescription(false);
@@ -916,7 +915,7 @@ const MoviesTab = () => {
                                     <div className="animate-fade-in">
                                       <p className="line-clamp-3 select-all">{slide.description || "No description available."}</p>
                                       {slide.description && slide.description.length > 150 && (
-                                        <button 
+                                        <button
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setShowFullDescription(true);
@@ -945,7 +944,7 @@ const MoviesTab = () => {
               <div className="absolute bottom-6 left-0 right-0 z-20 flex items-center justify-center gap-1.5 md:pointer-events-none">
                 <div className="flex items-center justify-center gap-1.5 md:pointer-events-auto">
                   {featuredList.map((_, index) => (
-                    <button 
+                    <button
                       key={index}
                       tabIndex={-1}
                       onClick={() => carouselApi?.scrollTo(index)}

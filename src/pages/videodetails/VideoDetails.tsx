@@ -133,7 +133,7 @@ const MOVIES_DATA: Record<string, {
 const DEFAULT_MOVIE = MOVIES_DATA['1'];
 
 const VideoDetailsSkeleton = () => (
-  <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0 pt-2 px-4 animate-pulse">
+  <div className="min-h-screen bg-black text-white w-full pb-14 md:pb-0 pt-2 px-4 animate-pulse">
     <div className="w-full aspect-video bg-zinc-900 rounded-lg mb-6" />
     <div className="px-4 md:px-8 max-w-4xl mx-auto space-y-6 pt-2">
       <div className="flex justify-between items-start">
@@ -1563,7 +1563,7 @@ const VideoDetails = () => {
 
   // Movie category rendering
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-24 md:pb-0">
+    <div className="min-h-screen bg-black text-white w-full pb-10 md:pb-0">
 
       {/* Netflix Fullscreen / Aspect box Video container */}
       <div

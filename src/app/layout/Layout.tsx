@@ -94,9 +94,9 @@ export default function Layout({ children }: Props) {
 
   useEffect(() => {
     const checkWidth = () => {
-      const isTV = isTvPlatform();
       const isMobileScreen = window.innerWidth < 768;
-      setShowSidebar(!isMobileScreen && (isTV || window.innerWidth >= 1024));
+      const isTV = isTvPlatform();
+      setShowSidebar(!isMobileScreen && (isTV || window.innerWidth >= 768));
     };
     checkWidth();
     window.addEventListener("resize", checkWidth);
