@@ -667,7 +667,8 @@ const VideoDetails = () => {
                         duration: ep.duration || "N/A",
                         videoUrl: ep.videoUrl || "",
                         signedVideoUrl: signedVideoUrl, // Store signed URL
-                        description: ep.description || ""
+                        description: ep.description || "",
+                        captions: ep.captions || ep.caption || []
                       };
                     })
                   );
@@ -694,6 +695,8 @@ const VideoDetails = () => {
             movieUrl: dbMovie.movieUrl || dbMovie.videoUrl || "",
             trailerUrl: signedTrailerUrl || "",
             seasons: mappedSeasons,
+            movieCaptions: dbMovie.movieCaptions || dbMovie.caption || [],
+            trailerCaptions: dbMovie.trailerCaptions || [],
             cast: dbMovie.cast ? dbMovie.cast.map((c: any) => ({
               name: c.name,
               image: c.imageUrl || "/assets/cast1.webp"

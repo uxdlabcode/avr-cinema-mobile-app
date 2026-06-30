@@ -104,10 +104,10 @@ export default function ForgotPasswordPage() {
                   <Input
                     id="fp-email"
                     type="email"
-                    placeholder="sarah@gmail.com"
+                    placeholder="abc@gmail.com"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
-                    className="h-10 pl-10 bg-zinc-800/60 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-zinc-500"
+                    className="pl-10"
                     disabled={loading}
                     autoComplete="email"
                   />

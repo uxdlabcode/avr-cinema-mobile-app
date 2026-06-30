@@ -46,8 +46,11 @@ export const SpatialNavigationProvider: React.FC<SpatialNavigationProviderProps>
     // Apply global tv class to body
     document.body.classList.add("platform-tv");
 
+    const isPointerActiveRef = { current: false };
+
     // Automatically focus first focusable element if none is focused
     const autoFocusFirst = () => {
+      if (isPointerActiveRef.current) return;
       if (!document.activeElement || document.activeElement === document.body) {
         const firstFocusable = document.querySelector(".focusable") as HTMLElement;
         if (firstFocusable) {
@@ -59,7 +62,21 @@ export const SpatialNavigationProvider: React.FC<SpatialNavigationProviderProps>
     // Auto-focus on mount or routes change
     setTimeout(autoFocusFirst, 200);
 
+    const handlePointerInteraction = () => {
+      isPointerActiveRef.current = true;
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
+      // If user presses any arrow key/D-pad key, reactivate TV mode autofocus
+      if (
+        e.key === TV_KEYS.UP ||
+        e.key === TV_KEYS.DOWN ||
+        e.key === TV_KEYS.LEFT ||
+        e.key === TV_KEYS.RIGHT
+      ) {
+        isPointerActiveRef.current = false;
+      }
+
       // If user is currently typing in an input/textarea, let normal keyboard navigation happen
       const activeEl = document.activeElement;
       const isInputActive = 
@@ -94,12 +111,16 @@ export const SpatialNavigationProvider: React.FC<SpatialNavigationProviderProps>
       }
     };
 
+    window.addEventListener("mousedown", handlePointerInteraction);
+    window.addEventListener("touchstart", handlePointerInteraction);
     window.addEventListener("keydown", handleKeyDown);
     
     // Periodically make sure something is focused (if routes change or panels mount)
     const focusInterval = setInterval(autoFocusFirst, 1000);
 
     return () => {
+      window.removeEventListener("mousedown", handlePointerInteraction);
+      window.removeEventListener("touchstart", handlePointerInteraction);
       window.removeEventListener("keydown", handleKeyDown);
       clearInterval(focusInterval);
       document.body.classList.remove("platform-tv");

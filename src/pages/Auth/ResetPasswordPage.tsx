@@ -128,7 +128,7 @@ export default function ResetPasswordPage() {
                     placeholder="••••••••••••"
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setPasswordError(""); }}
-                    className="h-10 pl-10 pr-10 "
+                    className="pl-10 pr-10"
                     disabled={loading}
                     autoComplete="new-password"
                   />
@@ -162,7 +162,7 @@ export default function ResetPasswordPage() {
                     placeholder="••••••••••••"
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); setConfirmPasswordError(""); }}
-                    className="h-10 pl-10 pr-10"
+                    className="pl-10 pr-10"
                     disabled={loading}
                     autoComplete="new-password"
                   />
