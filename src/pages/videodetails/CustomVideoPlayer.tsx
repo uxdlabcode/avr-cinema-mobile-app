@@ -451,7 +451,13 @@ export const CustomVideoPlayer = React.forwardRef<CustomVideoPlayerRef, CustomVi
       if (currentSourceUrl.includes(".m3u8") && HlsClass && HlsClass.isSupported()) {
         let token: string | null = null;
         try {
-          token = await auth.currentUser?.getIdToken() || null;
+          // Firebase Auth is asynchronous — auth.currentUser may be null if the
+          // session hasn't been restored from storage yet. Wait for it to settle.
+          await new Promise<void>((resolve) => {
+            const unsub = auth.onAuthStateChanged(() => { unsub(); resolve(); });
+          });
+          // Force-refresh = true ensures we never use an expired cached token.
+          token = (await auth.currentUser?.getIdToken(true)) || null;
         } catch (err) {
           console.error("Error fetching auth token for HLS decryption:", err);
         }
