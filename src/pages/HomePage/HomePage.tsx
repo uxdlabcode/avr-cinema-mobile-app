@@ -115,18 +115,14 @@ const MediaCategoryRow = ({
 
   return (
     <div className="space-y-1 text-left relative group/row">
-      <div className="flex items-center justify-between pr-0">
-        <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-          {genreName}
+      <div className="mb-2 relative z-20">
+        <h3
+          tabIndex={0}
+          onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}?type=all`)}
+          className="focusable text-lg md:text-2xl font-bold text-white tracking-wide  inline-flex items-end cursor-pointer hover:text-primary transition-colors  group/title outline-none"
+        >
+          {genreName} <ChevronRight className="w-5 md:w-7 md:h-7 h-5   transition-transform " />
         </h3>
-        {list.length > 15 && (
-          <button
-            onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
-            className="focusable text-xs md:text-sm text-primary/80 hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
-          >
-            View All <ChevronRight className="w-4 h-4" />
-          </button>
-        )}
       </div>
 
       <div className="relative w-full">
@@ -164,9 +160,9 @@ const MediaCategoryRow = ({
             marginBottom: '-80px'
           }}
         >
-          {list.slice(0, 15).map((item, index) => {
+          {list.slice(0, 20).map((item, index) => {
             const isFirst = index === 0;
-            const isLast = index === Math.min(list.length, 15) - 1;
+            const isLast = index === Math.min(list.length, 20) - 1;
 
             return (
               <div
@@ -192,13 +188,12 @@ const MediaCategoryRow = ({
 
                 {/* Floating Popup - expands equally in all directions from center */}
                 <div
-                  className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${
-                    isFirst
-                      ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
-                      : isLast
+                  className={`absolute top-1/2 w-[340px] md:w-[380px] opacity-0 scale-90 pointer-events-none group-hover/card:opacity-100 group-hover/card:scale-100 group-hover/card:pointer-events-auto transition-all duration-300 ease-out rounded-xl overflow-visible z-50 ${isFirst
+                    ? "left-0 translate-x-0 -translate-y-1/2 origin-left"
+                    : isLast
                       ? "right-0 left-auto translate-x-0 -translate-y-1/2 origin-right"
                       : "left-1/2 -translate-x-1/2 -translate-y-1/2 origin-center"
-                  }`}
+                    }`}
                 >
                   {/* Popup Container with shadow and border */}
                   <div className="relative rounded-xl overflow-hidden bg-[#1a1a1a] shadow-[0_8px_40px_rgba(0,0,0,0.95)] border border-zinc-700/50">
@@ -259,9 +254,9 @@ const MediaCategoryRow = ({
               </div>
             );
           })}
-          {list.length > 15 && (
+          {list.length > 20 && (
             <div
-              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
+              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}?type=all`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >
               <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">

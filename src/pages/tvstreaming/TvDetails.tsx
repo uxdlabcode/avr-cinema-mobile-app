@@ -105,9 +105,15 @@ const MediaCategoryRow = ({
 
   return (
     <div className="space-y-1 text-left relative group/row">
-      <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-        {genreName}
-      </h3>
+      <div className="mb-2 relative z-20">
+        <h3
+          tabIndex={0}
+          onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}?type=tv_and_doc`)}
+          className="focusable text-lg md:text-2xl font-bold text-white tracking-wide inline-flex items-end cursor-pointer hover:text-primary transition-colors group/title outline-none"
+        >
+          {genreName} <ChevronRight className="w-5 md:w-7 md:h-7 h-5   transition-transform " />
+        </h3>
+      </div>
 
       <div className="relative w-full">
         {/* Left Scroll Button */}
@@ -127,18 +133,24 @@ const MediaCategoryRow = ({
           <button
             tabIndex={-1}
             onClick={() => handleScroll("right")}
-            className="focusable absolute right-[-20px] md:right-[-35px] lg:left-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
+            className="focusable absolute right-[-20px] md:right-[-35px] lg:right-[-45px] top-1/2 -translate-y-1/2 z-30 w-8 h-24 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer shadow-lg hidden md:flex md:opacity-0 md:group-hover/row:opacity-100"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
         )}
 
-        {/* Horizontal Scrollable Row - overflow-visible so popup can escape */}
+        {/* Horizontal Scrollable Row */}
         <div
           ref={rowRef}
-          className="flex overflow-x-auto overflow-y-visible pb-2.5 md:pb-6 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
-          style={{ overflowY: 'visible' }}
+          className="flex overflow-x-auto overflow-y-hidden pb-8 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
+          style={{
+            overflowY: 'hidden',
+            paddingTop: '80px',
+            marginTop: '-80px',
+            paddingBottom: '220px',
+            marginBottom: '-220px'
+          }}
         >
           {list.map((item) => (
             <div
@@ -219,6 +231,19 @@ const MediaCategoryRow = ({
               </div>
             </div>
           ))}
+          {list.length > 15 && (
+            <div
+              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}?type=tv_and_doc`)}
+              className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
+            >
+              <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">
+                <ChevronRight className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-semibold text-zinc-400 group-hover:text-white transition-colors">
+                View All
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -951,7 +976,16 @@ const TvDetails = () => {
               >
                 Popular TV Shows <ChevronRight className="w-4 h-4 ml-1" />
               </h2>
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x">
+              <div
+                className="flex gap-4 overflow-x-auto overflow-y-hidden scrollbar-hide pb-6 snap-x"
+                style={{
+                  overflowY: 'hidden',
+                  paddingTop: '20px',
+                  marginTop: '-20px',
+                  paddingBottom: '20px',
+                  marginBottom: '-20px'
+                }}
+              >
                 {tvShows.map((show) => (
                   <div
                     key={show.id}

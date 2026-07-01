@@ -209,10 +209,14 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
           if (genreItems.length === 0) return null;
           return (
             <div key={genre} className="space-y-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Tv className="w-4 h-4 text-primary" />
-                <h3 className="text-base md:text-xl font-bold text-white tracking-wide">
-                  {genre}
+              <div className="mb-3 relative z-20">
+                <h3
+                  tabIndex={0}
+                  onClick={() => navigate(`/genre/${encodeURIComponent(genre)}?type=tv`)}
+                  className="focusable text-base md:text-xl font-bold text-white tracking-wide inline-flex items-center cursor-pointer hover:text-primary transition-colors group/title outline-none"
+                >
+                  <Tv className="w-4 h-4 text-primary mr-2 inline" />
+                  {genre} <ChevronRight className="w-5 h-5 ml-1 transition-transform group-hover/title:translate-x-1" />
                 </h3>
               </div>
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-7 gap-4 ">
@@ -278,21 +282,15 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
 
   return (
     <div className={`text-left relative group/row w-full space-y-1`}>
-      <div className="flex items-center justify-between pr-4 mb-3">
-        <div className="flex items-center gap-2">
-          <Tv className="w-4 h-4 text-primary" />
-          <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-            TV Shows
-          </h3>
-        </div>
-        {items.length > 15 && (
-          <button
-            onClick={() => navigate(`/genre/TV Show`)}
-            className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
-          >
-            View All <ChevronRight className="w-4 h-4" />
-          </button>
-        )}
+      <div className="mb-3 relative z-20">
+        <h3
+          tabIndex={0}
+          onClick={() => navigate(`/genre/TV Show?type=tv`)}
+          className="focusable text-lg md:text-2xl font-bold text-white tracking-wide inline-flex items-end cursor-pointer hover:text-primary transition-colors group/title outline-none"
+        >
+          <Tv className="w-5 h-5 text-primary mr-2 inline" />
+          TV Shows <ChevronRight className="w-5 md:w-7 md:h-7 h-5   transition-transform " />
+        </h3>
       </div>
 
       <div className="relative w-full">
@@ -323,18 +321,18 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
         {/* Scrollable Row */}
         <div
           ref={rowRef}
-          className="flex overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
+          className="flex overflow-x-auto overflow-y-hidden pb-8 scrollbar-hide snap-x snap-mandatory scroll-smooth gap-4"
           style={{
-            overflowY: 'visible',
+            overflowY: 'hidden',
             paddingTop: '80px',
             marginTop: '-80px',
-            paddingBottom: '80px',
-            marginBottom: '-80px'
+            paddingBottom: '220px',
+            marginBottom: '-220px'
           }}
         >
-          {items.slice(0, 15).map((show, index) => {
+          {items.slice(0, 20).map((show, index) => {
             const isFirst = index === 0;
-            const isLast = index === Math.min(items.length, 15) - 1;
+            const isLast = index === Math.min(items.length, 20) - 1;
 
             return (
               <div
@@ -406,9 +404,9 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
               </div>
             );
           })}
-          {items.length > 15 && (
+          {items.length > 20 && (
             <div
-              onClick={() => navigate(`/genre/TV Show`)}
+              onClick={() => navigate(`/genre/TV Show?type=tv`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >
               <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">

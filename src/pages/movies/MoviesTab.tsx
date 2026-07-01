@@ -165,7 +165,7 @@ const MovieCategoryRow = ({
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
 
-  const displayList = isTrending ? list.slice(0, 10) : list.slice(0, 15);
+  const displayList = isTrending ? list.slice(0, 10) : list.slice(0, 20);
 
   const updateScrollButtons = () => {
     if (rowRef.current) {
@@ -209,18 +209,14 @@ const MovieCategoryRow = ({
 
   return (
     <div className="space-y-1 text-left relative group/row">
-      <div className="flex items-center justify-between pr-4">
-        <h3 className="text-lg md:text-2xl font-bold text-white tracking-wide">
-          {genreName}
+      <div className="mb-2 relative z-20">
+        <h3
+          tabIndex={0}
+          onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}?type=movie`)}
+          className="focusable text-lg md:text-2xl font-bold text-white tracking-wide inline-flex items-end cursor-pointer hover:text-primary transition-colors  group/title outline-none"
+        >
+          {genreName} <ChevronRight className="w-5 md:w-7 md:h-7 h-5   transition-transform " />
         </h3>
-        {list.length > 15 && (
-          <button
-            onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
-            className="focusable text-xs md:text-sm text-primary hover:text-white font-semibold flex items-center gap-1 transition-colors cursor-pointer outline-none"
-          >
-            View All <ChevronRight className="w-4 h-4" />
-          </button>
-        )}
       </div>
 
       <div className="relative w-full">
@@ -361,9 +357,9 @@ const MovieCategoryRow = ({
               </div>
             );
           })}
-          {list.length > 15 && !isTrending && (
+          {list.length > 20 && !isTrending && (
             <div
-              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
+              onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}?type=movie`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
             >
               <div className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 group-hover:text-white group-hover:bg-zinc-800 transition-colors">

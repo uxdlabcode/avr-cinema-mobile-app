@@ -27,7 +27,7 @@ import { QuizzesPage, QuizzesPageSkeleton } from "@/pages/Quizzes/QuizzesPage";
 import { QuizDetailPage } from "@/pages/Quizzes/QuizDetailPage";
 import { QuizResultPage } from "@/pages/Quizzes/QuizResultPage";
 import Trailer from "@/pages/trailer/Trailer";
-import GenrePage from "@/pages/movies/GenrePage";
+import GenreDetailsPage from "@/pages/genre/GenreDetailsPage";
 
 function RootRedirect() {
   const { user, loading, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -154,7 +154,7 @@ export const appRoutes: RouteObject[] = [
       },
       {
         path: "genre/:genreName",
-        element: <GenrePage />,
+        element: <GenreDetailsPage />,
       },
       {
         path: "home",

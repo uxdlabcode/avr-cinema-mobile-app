@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLogout } from "@/Firebase/FirebaseAuth/UserLogOut";
 import { deleteUserData } from "@/Firebase/FirebaseAuth/DeleteUser";
 import { useNavigate } from "react-router-dom";
-import LogoImage from "@/assets/Media (3) 1.png";
+const LogoImage = "/assets/headerLogo.png";
 import { db } from "@/Firebase/firebase";
 import { getSignedUrl } from "@/Firebase";
 import { collection, getDocs, getDoc, doc, query, where, onSnapshot } from "firebase/firestore";
@@ -780,15 +780,13 @@ export const ProfilePage = () => {
                 return (
                   <div
                     key={device.deviceId}
-                    className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${
-                      isCurrentDevice
-                        ? "border-primary/30 bg-primary/5"
-                        : "border-border bg-muted/10 hover:border-border/80"
-                    }`}
+                    className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${isCurrentDevice
+                      ? "border-primary/30 bg-primary/5"
+                      : "border-border bg-muted/10 hover:border-border/80"
+                      }`}
                   >
-                    <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border ${
-                      isCurrentDevice ? "bg-primary/10 border-primary/20" : "bg-muted border-border"
-                    }`}>
+                    <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border ${isCurrentDevice ? "bg-primary/10 border-primary/20" : "bg-muted border-border"
+                      }`}>
                       {isMobile
                         ? <Smartphone className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
                         : <Monitor className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
@@ -979,7 +977,7 @@ export const ProfilePage = () => {
               <Bell className="w-4 h-4 text-primary" />
               Notifications
               {unreadCount > 0 && (
-                <span className="flex items-center justify-center px-1.5 py-0.5 rounded-full bg-primary-foreground text-background text-[10px] font-bold shadow-[0_0_8px_rgba(222,203,148,0.5)] animate-pulse">
+                <span className="flex items-center justify-center px-1.5 py-0.5 rounded-full bg-primary-foreground text-background text-[10px] font-bold shadow-[0_0_8px_rgba(222,203,148,0.5)] ">
                   {unreadCount}
                 </span>
               )}
@@ -1165,13 +1163,11 @@ export const ProfilePage = () => {
                   return (
                     <Card
                       key={device.deviceId}
-                      className={`flex items-center gap-3 p-3 rounded-xl ${
-                        isCurrentDevice ? "border-primary/30 bg-primary/5" : ""
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-xl ${isCurrentDevice ? "border-primary/30 bg-primary/5" : ""
+                        }`}
                     >
-                      <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
-                        isCurrentDevice ? "bg-primary/10" : "bg-muted"
-                      }`}>
+                      <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${isCurrentDevice ? "bg-primary/10" : "bg-muted"
+                        }`}>
                         {isMobile
                           ? <Smartphone className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
                           : <Monitor className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />

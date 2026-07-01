@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, Play, Plus, Check, Loader2 } from "lucide-react";
+import { ChevronLeft, Play, Plus, Check, Loader2, Film, Tv, Layers } from "lucide-react";
 import { compoundQuery, deleteDocument, createDocument } from "@/Firebase";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "@/store";
@@ -20,18 +20,18 @@ interface MediaItem {
   [key: string]: any;
 }
 
-const GenrePageSkeleton = () => (
+const GenreDetailsSkeleton = () => (
   <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
     {Array.from({ length: 12 }).map((_, i) => (
-      <Skeleton key={i} className="w-full aspect-[2/3] rounded-md bg-zinc-900 animate-pulse" />
+      <Skeleton key={i} className="w-full aspect-[2/3] rounded-lg bg-zinc-900/80 animate-pulse border border-zinc-800/50" />
     ))}
   </div>
 );
 
-const GenrePage = () => {
+export const GenreDetailsPage: React.FC = () => {
   const { genreName } = useParams<{ genreName: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const filterType = searchParams.get("type") || "all";
   const dispatch = useDispatch<AppDispatch>();
 
@@ -67,11 +67,19 @@ const GenrePage = () => {
     if (!genreName) return "";
     const isCategoryName = ["tv show", "tv shows", "documentary", "documentaries", "trailer", "trailers"].includes(genreName.toLowerCase());
     if (isCategoryName) return genreName;
-    if (filterType === "movie" || filterType === "movies") return `${genreName} - Movies`;
-    if (filterType === "tv" || filterType === "tv show" || filterType === "tv shows") return `${genreName} - TV Shows`;
-    if (filterType === "doc" || filterType === "documentary" || filterType === "documentaries") return `${genreName} - Documentaries`;
-    if (filterType === "tv_and_doc") return `${genreName} - TV Shows & Documentaries`;
     return genreName;
+  };
+
+  const getActiveBadge = () => {
+    if (filterType === "movie" || filterType === "movies") return "Movies";
+    if (filterType === "tv" || filterType === "tv show" || filterType === "tv shows") return "TV Shows";
+    if (filterType === "doc" || filterType === "documentary" || filterType === "documentaries") return "Documentaries";
+    if (filterType === "tv_and_doc") return "TV & Documentaries";
+    return "All Categories";
+  };
+
+  const handleFilterChange = (newType: string) => {
+    setSearchParams({ type: newType });
   };
 
   // Fetch watchlist state
@@ -156,7 +164,7 @@ const GenrePage = () => {
       dispatch(
         fetchGenreMedia({
           genreName,
-          limitVal: 16,
+          limitVal: 20,
           userAge: user?.age ?? null,
           filterType,
         })
@@ -169,7 +177,7 @@ const GenrePage = () => {
     dispatch(
       fetchGenreMedia({
         genreName,
-        limitVal: 16,
+        limitVal: 20,
         userAge: user?.age ?? null,
         filterType,
       })
@@ -201,102 +209,145 @@ const GenrePage = () => {
     };
   }, [lastDocId, hasMore, loading, loadingMore, genreName, filterType, dispatch, user?.age]);
 
+  const isLiteralCategory = ["tv show", "tv shows", "documentary", "documentaries", "trailer", "trailers"].includes((genreName || "").toLowerCase());
+
   return (
-    <div className="min-h-screen bg-black text-white w-full pb-6">
-      {/* Header Bar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between h-[70px] px-4 md:px-12 bg-black/90 backdrop-blur-sm border-b border-zinc-800/50">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate(-1)}
-            className="focusable p-2 hover:bg-zinc-850 rounded-full transition-colors cursor-pointer border border-zinc-800 text-white flex items-center justify-center outline-none"
-            aria-label="Go Back"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-xl md:text-2xl font-bold tracking-wide capitalize text-white">
-            {getHeaderTitle()}
-          </h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-black text-white w-full pb-16 pt-14 selection:bg-primary selection:text-black">
+      {/* Fixed Logo Header Bar matching TvTab */}
+      <div className="fixed top-0 left-0 right-0 h-14 bg-black z-50 flex items-center justify-between px-4 border-b border-zinc-900/80">
+        <button
+          onClick={() => navigate(-1)}
+          className="focusable p-2 hover:bg-zinc-850 rounded-full transition-all duration-200 cursor-pointer text-white flex items-center justify-center outline-none"
+          aria-label="Go Back"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <img
+          src="/assets/headerLogo.png"
+          alt="AVR Cinema"
+          className="h-10 md:h-12 w-auto object-contain absolute left-1/2 -translate-x-1/2 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]"
+        />
+      </div>
+
+      {/* Sticky Underline Tabs Navigation matching TvTab */}
+      <div className="sticky top-14 z-40 bg-black flex gap-6 px-4 md:px-12 pt-3 overflow-x-auto scrollbar-hide border-b border-zinc-900 w-full">
+        {!isLiteralCategory ? (
+          [
+            { id: "all", label: "All" },
+            { id: "movie", label: "Movies" },
+            { id: "tv", label: "TV Shows" },
+            { id: "doc", label: "Documentaries" },
+          ].map((tab) => {
+            const isActive = filterType === tab.id || (tab.id === "all" && !filterType);
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleFilterChange(tab.id)}
+                className={`focusable pb-2 text-xs md:text-lg lg:text-sm font-semibold transition-colors relative whitespace-nowrap outline-none focus:bg-zinc-850 rounded px-2 cursor-pointer ${isActive ? "text-primary" : "text-zinc-400 hover:text-white"
+                  }`}
+              >
+                {tab.label}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />
+                )}
+              </button>
+            );
+          })
+        ) : (
+          <div className="pb-2 text-xs md:text-lg lg:text-sm font-semibold text-primary px-2 relative">
+            {genreName}
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-md" />
+          </div>
+        )}
+      </div>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto px-4 md:px-12 lg:px-16 pt-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-12 pt-6">
+        <h1 className="text-xl md:text-2xl font-bold tracking-wide capitalize text-white mb-6">
+          {getHeaderTitle()}
+        </h1>
         {loading ? (
-          <GenrePageSkeleton />
+          <GenreDetailsSkeleton />
         ) : filteredMedia.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <p className="text-zinc-400 text-lg">No content found under "{getHeaderTitle()}".</p>
-            <button 
-              onClick={() => navigate(-1)}
-              className="focusable mt-4 px-4 py-2 bg-primary text-black font-semibold rounded hover:bg-primary/90 transition-colors"
+          <div className="flex flex-col items-center justify-center py-32 text-center max-w-md mx-auto">
+            <div className="w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-4 text-zinc-500">
+              <Film className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">No {getActiveBadge().toLowerCase()} found</h3>
+            <p className="text-zinc-400 text-sm mb-6">
+              We couldn't find any titles in "{genreName}" matching this category filter. Try switching categories above.
+            </p>
+            <button
+              onClick={() => handleFilterChange("all")}
+              className="focusable px-6 py-2.5 bg-primary text-black font-bold text-sm rounded-full hover:bg-primary/90 transition-transform active:scale-95 shadow-lg shadow-primary/20"
             >
-              Go Back
+              View All Categories
             </button>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
               {filteredMedia.map((item) => (
-                <div 
+                <div
                   key={item.id}
                   tabIndex={0}
                   onClick={() => navigate(`/video/${item.id}`)}
-                  className="focusable focusable flex flex-col aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 snap-start outline-none"
+                  className="focusable flex flex-col aspect-[2/3] relative rounded-lg overflow-hidden cursor-pointer group shadow-lg border border-zinc-900 bg-zinc-950 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-zinc-700 outline-none"
                 >
                   <img
                     src={item.signedThumbnailUrl || "/assets/poster.png"}
                     alt={item.title}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-[1.03] group-hover:brightness-[0.4] transition-all duration-300"
+                    className="w-full h-full object-cover group-hover:scale-105 group-hover:brightness-[0.35] transition-all duration-500"
                   />
 
-                  {/* Mobile Title bar fallback */}
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
-                    <p className="text-xs font-semibold text-white truncate text-center drop-shadow-md">
+                  {/* Mobile Title Bar */}
+                  <div className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-black via-black/80 to-transparent group-hover:opacity-0 transition-opacity duration-300 md:hidden z-1">
+                    <p className="text-xs font-bold text-white truncate text-center drop-shadow-md">
                       {item.title}
                     </p>
                   </div>
 
                   {/* Desktop Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-3 text-left z-10 border border-zinc-800/80 rounded-md">
-                    <div className="flex justify-end mb-1">
-                      <span className="text-[8px] font-semibold text-zinc-350 bg-zinc-900/95 border border-zinc-850 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-3.5 text-left z-10 border border-zinc-700/60 rounded-lg backdrop-blur-[2px]">
+                    <div className="flex justify-end mb-1.5">
+                      <span className="text-[9px] font-bold text-primary bg-black/90 border border-primary/30 px-2 py-0.5 rounded-full uppercase tracking-wider">
                         {item.category || "Media"}
                       </span>
                     </div>
 
-                    <h4 className="text-xs font-bold text-white text-right leading-tight mb-1 truncate drop-shadow-md">
+                    <h4 className="text-sm font-extrabold text-white leading-tight mb-1 line-clamp-2 drop-shadow-md">
                       {item.title}
                     </h4>
 
-                    <div className="flex items-center justify-between text-[8px] font-semibold text-zinc-400 mb-2">
+                    <div className="flex items-center justify-between text-[10px] font-medium text-zinc-300 mb-3">
                       <span className="truncate">{item.language || "English"}</span>
                       <span>{item.duration || "N/A"}</span>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <button 
+                    <div className="flex items-center gap-2">
+                      <button
                         tabIndex={-1}
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/video/${item.id}`);
                         }}
-                        className="focusable flex-1 py-1 bg-primary hover:bg-primary/90 text-black font-semibold text-[10px] rounded transition-all active:scale-[0.98] cursor-pointer text-center shadow"
+                        className="focusable flex-1 py-1.5 bg-primary hover:bg-primary/90 text-black font-bold text-xs rounded transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1 shadow"
                       >
-                        Play
+                        <Play className="w-3 h-3 fill-black" /> Play
                       </button>
-                      <button 
+                      <button
                         tabIndex={-1}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleWatchlist(item.id, item);
                         }}
-                        className="focusable p-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-colors active:scale-95 shadow"
+                        className="focusable p-1.5 bg-zinc-900/90 border border-zinc-700 hover:bg-zinc-800 text-white rounded cursor-pointer flex items-center justify-center transition-all active:scale-95 shadow"
                       >
                         {watchlist.includes(item.id.toString()) ? (
-                          <Check className="w-3 h-3 text-[#DECB94]" />
+                          <Check className="w-3.5 h-3.5 text-[#DECB94]" />
                         ) : (
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         )}
                       </button>
                     </div>
@@ -306,11 +357,11 @@ const GenrePage = () => {
             </div>
 
             {/* Intersection target and loading state for infinite scroll */}
-            <div ref={observerTarget} className="flex justify-center w-full py-8">
+            <div ref={observerTarget} className="flex justify-center w-full py-12">
               {loadingMore && (
-                <div className="flex items-center gap-2 text-zinc-400 text-sm">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-300 text-sm">
                   <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                  <span>Loading more content...</span>
+                  <span>Loading more titles...</span>
                 </div>
               )}
             </div>
@@ -321,4 +372,4 @@ const GenrePage = () => {
   );
 };
 
-export default GenrePage;
+export default GenreDetailsPage;

@@ -86,7 +86,7 @@ const TVCategoryRow = ({
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
 
-  const displayList = isTrending ? list.slice(0, 10) : list.slice(0, 15);
+  const displayList = isTrending ? list.slice(0, 10) : list.slice(0, 20);
 
   const updateScrollButtons = () => {
     if (rowRef.current) {
@@ -362,7 +362,7 @@ const TVCategoryRow = ({
               </div>
             );
           })}
-          {list.length > 15 && !isTrending && (
+          {list.length > 20 && !isTrending && (
             <div 
               onClick={() => navigate(`/genre/${encodeURIComponent(genreName)}`)}
               className="focusable flex-none w-[130px] sm:w-[165px] md:w-[190px] lg:w-[210px] aspect-[2/3] relative rounded-md overflow-hidden cursor-pointer group shadow-lg border border-dashed border-zinc-800 bg-zinc-950/40 hover:bg-zinc-900/60 snap-start flex flex-col items-center justify-center gap-3 transition-colors outline-none"
