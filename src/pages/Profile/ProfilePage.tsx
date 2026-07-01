@@ -932,7 +932,7 @@ export const ProfilePage = () => {
           </Card>
 
           {/* Tier + Upgrade Row */}
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <div>
               <Button tabIndex={-1} variant="ghost" className="text-primary text-left !p-0 flex justify-start h-auto hover:bg-transparent gap-1 font-semibold text-sm">
                 {currentPlanName} <ChevronDown className="w-3.5 h-3.5" />
@@ -955,7 +955,7 @@ export const ProfilePage = () => {
                 Upgrade for more<br />benefits
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* GET SUPPORT Button */}
           <Button
