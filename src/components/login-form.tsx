@@ -9,13 +9,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { loginAsync, clearBlockedDevices } from "@/store/slices/authSlice";
+import { loginAsync, clearBlockedDevices, setAuthUser } from "@/store/slices/authSlice";
 import { useState } from "react";
 import { Eye, EyeOff, Monitor, Smartphone, MapPin, LogOut, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
-import { revokeDevice } from "@/lib/deviceManager";
+import { revokeDevice, getBrowserInfo, buildLocationInfo, getDeviceId, saveDevice } from "@/lib/deviceManager";
 import type { DeviceEntry } from "@/lib/deviceManager";
+import { getDocumentData } from "@/Firebase";
+import { auth } from "@/Firebase/firebase";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
@@ -114,17 +116,70 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     try {
       await revokeDevice(pendingUid, device.deviceId);
       toast.success(`Logged out from ${device.deviceName}`);
-      dispatch(clearBlockedDevices());
-      sessionStorage.removeItem("device_limit_blocked");
 
-      // Automatically re-attempt login
+      // Automatically re-attempt login without flashing the sign-in form
       const emailVal = email.trim().toLowerCase();
+      let loggedIn = false;
+
       if (emailVal && password) {
         const result = await dispatch(loginAsync({ email: emailVal, password }));
         if (loginAsync.fulfilled.match(result)) {
-          toast.success("Login successful");
-          navigate("/dashboard");
+          loggedIn = true;
         }
+      }
+
+      // Fallback direct registration if loginAsync could not execute or fulfill
+      if (!loggedIn) {
+        const currentUser = auth.currentUser;
+        if (currentUser && currentUser.uid === pendingUid) {
+          const [browserInfo, locationInfo] = await Promise.all([
+            Promise.resolve(getBrowserInfo()),
+            buildLocationInfo(),
+          ]);
+          const deviceId = getDeviceId();
+          const deviceResult = await saveDevice(pendingUid, currentUser.email || emailVal || "", {
+            deviceId,
+            deviceName: browserInfo.deviceName,
+            browser: browserInfo.browser,
+            platform: browserInfo.platform,
+            os: browserInfo.os,
+            ip: locationInfo.ip,
+            city: locationInfo.city,
+            country: locationInfo.country,
+            latitude: locationInfo.latitude,
+            longitude: locationInfo.longitude,
+          });
+
+          if (deviceResult.allowed) {
+            sessionStorage.setItem("device_session_active", "true");
+            sessionStorage.setItem("avr_session_device_id", deviceId);
+            const token = await currentUser.getIdToken();
+            const userDoc = await getDocumentData("users", pendingUid);
+            const role = (userDoc?.role || "user").toLowerCase();
+            dispatch(setAuthUser({
+              user: {
+                id: userDoc?.id || pendingUid,
+                email: currentUser.email || emailVal || "",
+                role,
+                name: userDoc?.name,
+                phone: userDoc?.phone,
+                avatar: userDoc?.avatar,
+                membershipPlanId: userDoc?.membershipPlanId,
+                membershipStatus: userDoc?.membershipStatus,
+              },
+              token,
+            }));
+            loggedIn = true;
+          }
+        }
+      }
+
+      sessionStorage.removeItem("device_limit_blocked");
+      dispatch(clearBlockedDevices());
+
+      if (loggedIn) {
+        toast.success("Login successful");
+        navigate("/dashboard");
       }
     } catch {
       toast.error("Failed to logout from that device");
@@ -167,9 +222,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             return (
               <div
                 key={device.deviceId}
-                className="flex items-center justify-between gap-3 p-4 rounded-xl border border-border/50 bg-muted/20"
+                className="flex flex-row items-center justify-between gap-3 p-4 rounded-xl border border-border/50 bg-muted/20"
               >
-                <div className="flex items-center gap-3">
+                <div className="flex flex-row items-center gap-3 min-w-0 flex-1">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                     {isMobile ? (
                       <Smartphone className="w-5 h-5 text-primary" />
@@ -177,15 +232,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                       <Monitor className="w-5 h-5 text-primary" />
                     )}
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-foreground truncate">
                       {device.deviceName}
                     </p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
                       <MapPin className="w-3 h-3 shrink-0" />
                       <span className="truncate">{locationStr}</span>
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Logged in {loginDate}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">Logged in {loginDate}</p>
                   </div>
                 </div>
                 <Button
@@ -226,7 +281,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             sessionStorage.removeItem("device_limit_blocked");
 
             // Sign out of Firebase Auth to ensure unauthenticated state is restored
-            const { auth } = await import("@/Firebase/firebase");
             await auth.signOut();
           }}
         >

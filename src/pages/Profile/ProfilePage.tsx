@@ -780,31 +780,33 @@ export const ProfilePage = () => {
                 return (
                   <div
                     key={device.deviceId}
-                    className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${isCurrentDevice
+                    className={`flex flex-row items-center justify-between gap-4 p-4 border rounded-xl transition-all ${isCurrentDevice
                       ? "border-primary/30 bg-primary/5"
                       : "border-border bg-muted/10 hover:border-border/80"
                       }`}
                   >
-                    <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border ${isCurrentDevice ? "bg-primary/10 border-primary/20" : "bg-muted border-border"
-                      }`}>
-                      {isMobile
-                        ? <Smartphone className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
-                        : <Monitor className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
-                      }
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-foreground font-semibold text-sm truncate">{device.deviceName || "Unknown Device"}</h4>
-                        {isCurrentDevice && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary bg-primary/10 shrink-0">
-                            This Device
-                          </Badge>
-                        )}
+                    <div className="flex flex-row items-center gap-4 min-w-0 flex-1">
+                      <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border ${isCurrentDevice ? "bg-primary/10 border-primary/20" : "bg-muted border-border"
+                        }`}>
+                        {isMobile
+                          ? <Smartphone className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                          : <Monitor className={`w-5 h-5 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                        }
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
-                        <MapPin className="w-3 h-3 shrink-0" />
-                        {locationStr}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-foreground font-semibold text-sm truncate">{device.deviceName || "Unknown Device"}</h4>
+                          {isCurrentDevice && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary bg-primary/10 shrink-0">
+                              This Device
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
+                          <MapPin className="w-3 h-3 shrink-0" />
+                          {locationStr}
+                        </p>
+                      </div>
                     </div>
                     {!isCurrentDevice && (
                       <Button
@@ -812,7 +814,7 @@ export const ProfilePage = () => {
                         size="sm"
                         disabled={revokingDeviceId === device.deviceId}
                         onClick={() => handleRevokeDevice(device.deviceId)}
-                        className="focusable shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive h-8 px-3 text-xs outline-none"
+                        className="focusable shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive h-8 px-3 text-xs outline-none ml-2"
                       >
                         {revokingDeviceId === device.deviceId
                           ? <Loader2 className="w-3 h-3 animate-spin" />
@@ -1139,7 +1141,7 @@ export const ProfilePage = () => {
             <div className="flex flex-col gap-2">
               {loadingDevices ? (
                 Array.from({ length: 2 }).map((_, i) => (
-                  <Card key={i} className="flex items-center gap-3 p-3 rounded-xl">
+                  <Card key={i} className="flex flex-row items-center gap-3 p-3 rounded-xl">
                     <Skeleton className="shrink-0 w-9 h-9 rounded-lg bg-zinc-800" />
                     <div className="flex-1 space-y-1.5">
                       <Skeleton className="h-3.5 w-2/3 rounded bg-zinc-800" />
@@ -1148,7 +1150,7 @@ export const ProfilePage = () => {
                   </Card>
                 ))
               ) : devices.length === 0 ? (
-                <Card className="flex items-center justify-center h-20 rounded-xl">
+                <Card className="flex flex-row items-center justify-center h-20 rounded-xl">
                   <p className="text-sm text-muted-foreground">No active devices</p>
                 </Card>
               ) : (
@@ -1163,29 +1165,31 @@ export const ProfilePage = () => {
                   return (
                     <Card
                       key={device.deviceId}
-                      className={`flex items-center gap-3 p-3 rounded-xl ${isCurrentDevice ? "border-primary/30 bg-primary/5" : ""
+                      className={`flex flex-row items-center justify-between gap-3 p-3 rounded-xl ${isCurrentDevice ? "border-primary/30 bg-primary/5" : ""
                         }`}
                     >
-                      <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${isCurrentDevice ? "bg-primary/10" : "bg-muted"
-                        }`}>
-                        {isMobile
-                          ? <Smartphone className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
-                          : <Monitor className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
-                        }
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-foreground font-semibold text-xs truncate">{device.deviceName || "Unknown Device"}</h4>
-                          {isCurrentDevice && (
-                            <Badge variant="outline" className="text-[8px] px-1 py-0 border-primary/40 text-primary bg-primary/10 shrink-0">
-                              This
-                            </Badge>
-                          )}
+                      <div className="flex flex-row items-center gap-3 min-w-0 flex-1">
+                        <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${isCurrentDevice ? "bg-primary/10" : "bg-muted"
+                          }`}>
+                          {isMobile
+                            ? <Smartphone className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                            : <Monitor className={`w-4 h-4 ${isCurrentDevice ? "text-primary" : "text-muted-foreground"}`} />
+                          }
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
-                          <MapPin className="w-2.5 h-2.5 shrink-0" />
-                          {locationStr}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-foreground font-semibold text-xs truncate">{device.deviceName || "Unknown Device"}</h4>
+                            {isCurrentDevice && (
+                              <Badge variant="outline" className="text-[8px] px-1 py-0 border-primary/40 text-primary bg-primary/10 shrink-0">
+                                This
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1 truncate">
+                            <MapPin className="w-2.5 h-2.5 shrink-0" />
+                            {locationStr}
+                          </p>
+                        </div>
                       </div>
                       {!isCurrentDevice && (
                         <Button
@@ -1193,11 +1197,11 @@ export const ProfilePage = () => {
                           size="sm"
                           disabled={revokingDeviceId === device.deviceId}
                           onClick={() => handleRevokeDevice(device.deviceId)}
-                          className="focusable shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10 h-7 px-2 text-[10px] outline-none"
+                          className="focusable shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10 h-7 px-2.5 text-[10px] outline-none ml-2"
                         >
                           {revokingDeviceId === device.deviceId
                             ? <Loader2 className="w-3 h-3 animate-spin" />
-                            : <><LogOut className="w-3 h-3 mr-0.5" /> Log Out</>
+                            : <><LogOut className="w-3 h-3 mr-1" /> Log Out</>
                           }
                         </Button>
                       )}

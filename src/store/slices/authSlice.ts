@@ -51,12 +51,19 @@ export const loginAsync = createAsyncThunk(
   async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
       // 1. Firebase Auth sign-in
-      const authRes = await emailPasswordLogin(credentials.email, credentials.password);
-      if (!authRes || typeof authRes === "boolean") {
-        return rejectWithValue("Invalid credentials");
+      let authRes = await emailPasswordLogin(credentials.email, credentials.password);
+      let firebaseUser = authRes && typeof authRes !== "boolean" ? authRes.user : null;
+
+      if (!firebaseUser) {
+        const { auth } = await import("@/Firebase/firebase");
+        if (auth.currentUser && auth.currentUser.email?.toLowerCase() === credentials.email.toLowerCase()) {
+          firebaseUser = auth.currentUser;
+        } else {
+          return rejectWithValue("Invalid credentials");
+        }
       }
 
-      const uid = authRes.user.uid;
+      const uid = firebaseUser.uid;
 
       // ─── Token Propagation Delay ───
       // Give the Firebase Auth state changes 500ms to propagate to the Firestore SDK
@@ -109,7 +116,7 @@ export const loginAsync = createAsyncThunk(
       }
 
       const role = (userDoc?.role || "user").toLowerCase();
-      const token = await authRes.user.getIdToken();
+      const token = await firebaseUser.getIdToken();
 
       return {
         user: {
