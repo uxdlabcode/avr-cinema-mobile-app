@@ -67,7 +67,7 @@ const DocumentaryList: React.FC<Props> = ({ isGrid = false, watchlist = [], togg
 
   useEffect(() => {
     if (mediaStatus === "idle") {
-      dispatch(fetchDocumentaryMedia());
+      dispatch(fetchDocumentaryMedia({ limitVal: 20 }));
     }
   }, [mediaStatus, dispatch]);
 

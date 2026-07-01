@@ -350,7 +350,7 @@ const TvDetails = () => {
   // Fetch media from Redux
   useEffect(() => {
     if (mediaStatus === "idle") {
-      dispatch(fetchTvMedia());
+      dispatch(fetchTvMedia({ limitVal: 20 }));
     }
   }, [mediaStatus, dispatch]);
 

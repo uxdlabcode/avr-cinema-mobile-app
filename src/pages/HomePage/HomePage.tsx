@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Play, Plus, ChevronRight, ChevronLeft, Volume2, VolumeX, X, ChevronDown, Check } from "lucide-react";
@@ -280,6 +280,8 @@ export const HomePage = () => {
   const userId = user?.id;
   const mediaItems = useSelector((state: RootState) => state.home.items);
   const mediaStatus = useSelector((state: RootState) => state.home.status);
+  const hasMore = useSelector((state: RootState) => state.home.hasMore);
+  const observerTarget = useRef<HTMLDivElement>(null);
 
   const [featuredMovies, setFeaturedMovies] = useState<any[]>([]);
   const [groupedMedia, setGroupedMedia] = useState<Record<string, any[]>>({});
@@ -292,9 +294,32 @@ export const HomePage = () => {
   // Fetch media from Redux
   useEffect(() => {
     if (mediaStatus === "idle") {
-      dispatch(fetchHomeMedia());
+      dispatch(fetchHomeMedia({ limitVal: 20 }));
     }
   }, [mediaStatus, dispatch]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          mediaStatus !== "loading" &&
+          mediaStatus !== "loadingMore" &&
+          mediaStatus !== "idle"
+        ) {
+          dispatch(fetchHomeMedia({ limitVal: 20, loadMore: true }));
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, mediaStatus, dispatch]);
 
   // Compute featured and grouped media from Redux state
   useEffect(() => {
@@ -907,6 +932,15 @@ export const HomePage = () => {
             />
           );
         })}
+
+        {/* Lazy load trigger element */}
+        {hasMore && (
+          <div ref={observerTarget} className="w-full py-8 flex justify-center items-center">
+            {mediaStatus === "loadingMore" && (
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            )}
+          </div>
+        )}
       </section>
     </div>
   );

@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getCollectionData, getSignedUrl } from "@/Firebase";
+import { collection, query, limit, startAfter, getDocs } from "firebase/firestore";
+import { db } from "@/Firebase/firebase";
+import { getSignedUrl } from "@/Firebase";
 
 export interface MediaItem {
   id: string;
@@ -24,23 +26,56 @@ export interface MediaItem {
 
 interface HomeState {
   items: MediaItem[];
-  status: "idle" | "loading" | "succeeded" | "failed";
+  status: "idle" | "loading" | "loadingMore" | "succeeded" | "failed";
   error: string | null;
+  lastDocId: string | null;
+  hasMore: boolean;
 }
 
 const initialState: HomeState = {
   items: [],
   status: "idle",
   error: null,
+  lastDocId: null,
+  hasMore: true,
 };
+
+const documentSnapshotCache = new Map<string, any>();
+
+interface FetchHomeParams {
+  limitVal?: number;
+  loadMore?: boolean;
+}
 
 export const fetchHomeMedia = createAsyncThunk(
   "home/fetchHomeMedia",
-  async () => {
-    const docs = await getCollectionData("media", 60);
+  async (params: FetchHomeParams | void, thunkAPI) => {
+    const { limitVal = 20, loadMore = false } = params || {};
+    const state = thunkAPI.getState() as any;
+    const { lastDocId } = state.home;
+
+    let q;
+    if (!loadMore || !lastDocId) {
+      q = query(collection(db, "media"), limit(limitVal));
+    } else {
+      const lastDocSnapshot = documentSnapshotCache.get(lastDocId);
+      if (lastDocSnapshot) {
+        q = query(collection(db, "media"), startAfter(lastDocSnapshot), limit(limitVal));
+      } else {
+        q = query(collection(db, "media"), limit(limitVal));
+      }
+    }
+
+    const querySnapshot = await getDocs(q);
+    const fetchedItems: any[] = [];
+
+    querySnapshot.forEach((doc) => {
+      documentSnapshotCache.set(doc.id, doc);
+      fetchedItems.push({ id: doc.id, ...doc.data() });
+    });
 
     const enriched = await Promise.all(
-      (docs || []).map(async (doc: any) => {
+      fetchedItems.map(async (doc: any) => {
         let image = "/assets/poster.png";
         if (doc.thumbnailUrl) {
           try {
@@ -63,11 +98,16 @@ export const fetchHomeMedia = createAsyncThunk(
       })
     );
 
-    return enriched.sort((a: any, b: any) => {
-      const timeA = a.createdAt?.toMillis?.() || new Date(a.createdAt || 0).getTime();
-      const timeB = b.createdAt?.toMillis?.() || new Date(b.createdAt || 0).getTime();
-      return timeB - timeA;
-    });
+    const docs = querySnapshot.docs;
+    const newLastDocId = docs.length > 0 ? docs[docs.length - 1].id : null;
+    const hasMore = docs.length === limitVal;
+
+    return {
+      items: enriched,
+      lastDocId: newLastDocId,
+      hasMore,
+      isLoadMore: loadMore && Boolean(lastDocId),
+    };
   }
 );
 
@@ -77,16 +117,29 @@ const homeSlice = createSlice({
   reducers: {
     resetHomeStatus(state) {
       state.status = "idle";
+      state.items = [];
+      state.lastDocId = null;
+      state.hasMore = true;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchHomeMedia.pending, (state) => {
-        state.status = "loading";
+      .addCase(fetchHomeMedia.pending, (state, action) => {
+        if (action.meta.arg?.loadMore) {
+          state.status = "loadingMore";
+        } else {
+          state.status = "loading";
+        }
       })
       .addCase(fetchHomeMedia.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.items = action.payload;
+        if (action.payload.isLoadMore) {
+          state.items = [...state.items, ...action.payload.items];
+        } else {
+          state.items = action.payload.items;
+        }
+        state.lastDocId = action.payload.lastDocId;
+        state.hasMore = action.payload.hasMore;
       })
       .addCase(fetchHomeMedia.rejected, (state, action) => {
         state.status = "failed";

@@ -34,7 +34,7 @@ const TrendNow = ({ watchlist = [], toggleWatchlist }: TrendNowProps) => {
 
   useEffect(() => {
     if (movieStatus === "idle") {
-      dispatch(fetchMovieMedia());
+      dispatch(fetchMovieMedia({ limitVal: 20 }));
     }
   }, [movieStatus, dispatch]);
 

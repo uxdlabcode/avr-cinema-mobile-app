@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -383,6 +383,8 @@ const MoviesTab = () => {
   const userId = user?.id;
   const mediaItems = useSelector((state: RootState) => state.movie.items);
   const mediaStatus = useSelector((state: RootState) => state.movie.status);
+  const hasMore = useSelector((state: RootState) => state.movie.hasMore);
+  const observerTarget = useRef<HTMLDivElement>(null);
   const isLoading = mediaStatus === "loading" || mediaStatus === "idle";
 
   const [movies, setMovies] = useState<MovieItem[]>([]);
@@ -473,9 +475,32 @@ const MoviesTab = () => {
   // Fetch media from Redux
   useEffect(() => {
     if (mediaStatus === "idle") {
-      dispatch(fetchMovieMedia());
+      dispatch(fetchMovieMedia({ limitVal: 20 }));
     }
   }, [mediaStatus, dispatch]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          mediaStatus !== "loading" &&
+          mediaStatus !== "loadingMore" &&
+          mediaStatus !== "idle"
+        ) {
+          dispatch(fetchMovieMedia({ limitVal: 20, loadMore: true }));
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, mediaStatus, dispatch]);
 
   useEffect(() => {
     if (mediaItems.length > 0) {
@@ -979,6 +1004,15 @@ const MoviesTab = () => {
               );
             })}
           </div>
+
+          {/* Lazy load trigger element */}
+          {hasMore && (
+            <div ref={observerTarget} className="w-full py-8 flex justify-center items-center">
+              {mediaStatus === "loadingMore" && (
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              )}
+            </div>
+          )}
 
         </div>
       )}

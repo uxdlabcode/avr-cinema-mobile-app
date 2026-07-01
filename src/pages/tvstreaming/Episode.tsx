@@ -39,7 +39,7 @@ const RecentTVShows: React.FC<Props> = ({ isGrid = false, watchlist = [], toggle
 
   useEffect(() => {
     if (mediaStatus === "idle") {
-      dispatch(fetchEpisodeMedia());
+      dispatch(fetchEpisodeMedia({ limitVal: 20 }));
     }
   }, [mediaStatus, dispatch]);
 
