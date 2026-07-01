@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite"
 // CloudFront origin hosting ALL media (videos, captions, keys).
 // In development, the Vite proxy tunnels /__cf__/* requests through so
 // the browser never makes a cross-origin request (eliminates CORS errors).
-const CLOUDFRONT_ORIGIN = 'https://d2bqjjgpbetcsa.cloudfront.net';
+const CLOUDFRONT_ORIGIN = 'https://d2hqjiqebetcsa.cloudfront.net';
 
 // https://vite.dev/config/
 export default defineConfig({

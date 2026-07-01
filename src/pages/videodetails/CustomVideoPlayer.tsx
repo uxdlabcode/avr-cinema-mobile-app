@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 // Rewrites any CloudFront URL to go through the Vite proxy in development,
 // preventing cross-origin requests (and CORS errors) on localhost.
 // In production the URL is returned unchanged.
-const _CF_ORIGIN = 'https://d2bqjjgpbetcsa.cloudfront.net';
+const _CF_ORIGIN = 'https://d2hqjiqebetcsa.cloudfront.net';
 const _CF_PROXY  = '/__cf__';
 function getDevSafeUrl(url: string): string {
   if (!url) return url;
